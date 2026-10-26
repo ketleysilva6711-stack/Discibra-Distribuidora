@@ -20,6 +20,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { id } = await params
   const body = await req.json()
   const allowed = [
+    "created_by",
     "status",
     "discount_pct",
     "shipping_value",
@@ -42,6 +43,39 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .select("*, quotation_leads(*), quotation_items(*)")
     .single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Atualizar dados do lead (endereço, telefone, etc.) quando enviados
+  if (body.lead_data && data.lead_id) {
+    const {
+      name,
+      phone,
+      email,
+      cpf_cnpj,
+      address_street,
+      address_number,
+      address_complement,
+      address_city,
+      address_state,
+      address_zip,
+    } = body.lead_data
+    await supabase
+      .from("quotation_leads")
+      .update({
+        name: name ?? null,
+        phone: phone ?? null,
+        email: email ?? null,
+        cpf_cnpj: cpf_cnpj ?? null,
+        address_street: address_street ?? null,
+        address_number: address_number ?? null,
+        address_complement: address_complement ?? null,
+        address_city: address_city ?? null,
+        address_state: address_state ?? null,
+        address_zip: address_zip ?? null,
+        last_contact_at: new Date().toISOString(),
+      })
+      .eq("id", data.lead_id)
+  }
+
   return NextResponse.json({ quotation: data })
 }
 

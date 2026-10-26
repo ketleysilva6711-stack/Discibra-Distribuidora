@@ -1,9 +1,10 @@
-name: Deploy to Cloudflare Workers
+name: Build & Deploy to Cloudflare
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -28,15 +29,16 @@ jobs:
 
       - name: Build Next.js App
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://sdafczehznywoeqnfgph.supabase.co' }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkYWZjemVoem55d29lcW5mZ3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI5NDgsImV4cCI6MjA4NzY4ODk0OH0.XjP9rAt37_XVWkp5eY57FX70TPJ9TGDFhVmvPgP-6LY' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://mvgwgzzaiamxddydrclt.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12Z3dnenphaWFteGRkeWRyY2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI5NDgsImV4cCI6MjA4NzY4ODk0OH0.sample' }}
         run: pnpm run build
 
       - name: Build OpenNext Worker Bundle
         run: pnpm exec opennextjs-cloudflare build --skipNextBuild
 
-      - name: Deploy to Cloudflare Workers
+      - name: Deploy to Cloudflare (se configurado)
+        if: env.CLOUDFLARE_API_TOKEN != ''
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || 'd671aa388a5567d4e9bd20226c38c632' }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: pnpm exec wrangler deploy

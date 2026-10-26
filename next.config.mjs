@@ -4,6 +4,7 @@
 const origin = process.env.NEXT_PUBLIC_SITE_URL || "https://atacadodeconstrucao.com"
 
 const nextConfig = {
+  output: "standalone",
   typescript: {
     // NUNCA ignore erros TypeScript em produção - isso mascara bugs reais
     ignoreBuildErrors: false,
