@@ -36,7 +36,7 @@ export default function StoreFooter() {
   ]
 
   return (
-    <footer className="bg-gradient-to-b from-[#020B1D] via-[#01081A] to-[#010510] text-white font-sans mt-20 relative overflow-hidden border-t border-[#0055FF]/25 shadow-2xl">
+    <footer className="bg-gradient-to-b from-[#020B1D] via-[#01081A] to-[#010510] text-white font-sans mt-20 relative overflow-hidden border-t border-[#0055FF]/25 shadow-2xl pb-20 lg:pb-0">
 
       {/* Top gradient accent */}
       <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#F47920] via-[#FFB347] to-[#F47920]" />

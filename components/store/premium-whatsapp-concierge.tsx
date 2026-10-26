@@ -69,7 +69,7 @@ export default function PremiumWhatsAppConcierge() {
   }
 
   return (
-    <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-[90] flex flex-col items-end gap-3 font-sans select-none">
+    <div className="hidden lg:flex fixed bottom-6 right-6 z-[90] flex-col items-end gap-3 font-sans select-none">
       {/* ── Cartão institucional ── */}
       {open && (
         <div className="w-[calc(100vw-2rem)] sm:w-[380px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_24px_60px_-16px_rgba(0,45,91,0.35)] animate-in slide-in-from-bottom-6 fade-in duration-300">
