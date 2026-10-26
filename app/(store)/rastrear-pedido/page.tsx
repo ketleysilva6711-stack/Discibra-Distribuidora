@@ -1,11 +1,27 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ChevronLeft, Package, Search, Warehouse, Truck, CheckCircle2 } from "lucide-react"
 import { findOrderByCode, findOrdersByEmail, type LocalOrder, type OrderStatus } from "@/lib/local-orders"
 import WhatsAppCta from "@/components/store/whatsapp-cta"
 import { SITE } from "@/lib/site-config"
+
+type RemoteOrder = {
+  id: string
+  code: string
+  email?: string | null
+  status: string
+  total: number
+  items_summary?: string | null
+  created_at?: string | null
+  updated_at?: string | null
+}
+
+type RemoteOrdersResponse = {
+  order?: RemoteOrder
+  orders?: RemoteOrder[]
+}
 
 const STEPS: { key: OrderStatus; label: string; desc: string; icon: typeof Package }[] = [
   { key: "received", label: "Pedido recebido", desc: "Solicitação registrada e em análise.", icon: Package },
@@ -13,6 +29,26 @@ const STEPS: { key: OrderStatus; label: string; desc: string; icon: typeof Packa
   { key: "shipped", label: "Envio", desc: "Pedido despachado / em rota.", icon: Truck },
   { key: "delivered", label: "Entrega", desc: "Concluído no destino.", icon: CheckCircle2 },
 ]
+
+function mapRemoteStatus(status: string): OrderStatus {
+  const s = (status || "received").toLowerCase()
+  if (s === "pending" || s === "confirmed") return "received"
+  if (s === "picking") return "picking"
+  if (s === "shipping") return "shipped"
+  return "delivered"
+}
+
+function mapRemoteOrder(o: RemoteOrder): LocalOrder {
+  return {
+    id: o.id,
+    code: o.code,
+    email: o.email ?? undefined,
+    status: mapRemoteStatus(o.status),
+    createdAt: o.created_at ?? new Date().toISOString(),
+    total: Number(o.total) || 0,
+    itemsSummary: o.items_summary ?? "",
+  }
+}
 
 function statusIndex(s: OrderStatus) {
   return STEPS.findIndex((x) => x.key === s)
@@ -57,23 +93,58 @@ export default function RastrearPedidoPage() {
   const [email, setEmail] = useState("")
   const [result, setResult] = useState<LocalOrder | LocalOrder[] | null>(null)
   const [searched, setSearched] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  function handleSearch(e: React.FormEvent) {
+  async function handleSearch(e: React.FormEvent) {
     e.preventDefault()
+    setLoading(true)
     setSearched(true)
     const c = code.trim()
     const em = email.trim()
-    if (c) {
-      const o = findOrderByCode(c)
-      setResult(o || null)
-      return
+
+    try {
+      if (c) {
+        const res = await fetch(`/api/orders?code=${encodeURIComponent(c)}`)
+        if (res.ok) {
+          const json: RemoteOrdersResponse = await res.json()
+          if (json.order) {
+            setResult(mapRemoteOrder(json.order))
+            setLoading(false)
+            return
+          }
+        }
+        if (res.status === 404) {
+          const o = findOrderByCode(c)
+          setResult(o || null)
+          setLoading(false)
+          return
+        }
+      }
+
+      if (em) {
+        const res = await fetch(`/api/orders?email=${encodeURIComponent(em)}`)
+        if (res.ok) {
+          const json: RemoteOrdersResponse = await res.json()
+          if (json.orders) {
+            setResult(json.orders.map(mapRemoteOrder))
+            setLoading(false)
+            return
+          }
+        }
+        const list = findOrdersByEmail(em)
+        setResult(list.length ? list : null)
+      }
+    } catch {
+      if (c) {
+        const o = findOrderByCode(c)
+        setResult(o || null)
+      } else if (em) {
+        const list = findOrdersByEmail(em)
+        setResult(list.length ? list : null)
+      }
+    } finally {
+      setLoading(false)
     }
-    if (em) {
-      const list = findOrdersByEmail(em)
-      setResult(list.length ? list : null)
-      return
-    }
-    setResult(null)
   }
 
   return (

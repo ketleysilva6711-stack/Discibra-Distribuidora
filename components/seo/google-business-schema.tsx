@@ -57,7 +57,7 @@ export function GoogleBusinessSchema({
           url: businessMapsUrl,
         }
       : {}),
-    image: "https://www.atacadodeconstrucao.com/og-default.png",
+    image: "https://www.discibradistribuidora.com/og-default.png",
     geo: {
       "@type": "GeoCoordinates",
       latitude: "-21.1767",

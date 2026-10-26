@@ -4,58 +4,64 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --popover: #ffffff;
-  --popover-foreground: #0f172a;
-  --primary: #2563eb;
-  --primary-foreground: #ffffff;
-  --secondary: #0f172a;
-  --secondary-foreground: #f8fafc;
-  --muted: #f8fafc;
-  --muted-foreground: #64748b;
-  --accent: #2563eb;
-  --accent-foreground: #ffffff;
-  --destructive: #ef4444;
-  --destructive-foreground: #f8fafc;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #2563eb;
+  /* ===== Discibra Distribuidora — identidade 2027 =====
+     Verde bio-digital = cor principal / Azul cobalto = detalhes
+     Navy + laranja = marca (logo) */
+  --background: #F7FAF8;
+  --foreground: #0A1512;
+  --card: #FFFFFF;
+  --card-foreground: #0A1512;
+  --popover: #FFFFFF;
+  --popover-foreground: #0A1512;
+  --primary: #12A06A;
+  --primary-foreground: #FFFFFF;
+  --secondary: #0B2A6B;
+  --secondary-foreground: #F2F7FF;
+  --muted: #EDF3EF;
+  --muted-foreground: #5A6B63;
+  --accent: #2563EB;
+  --accent-foreground: #FFFFFF;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --border: #E1EAE4;
+  --input: #E1EAE4;
+  --ring: #12A06A;
   --radius: 1.25rem;
-  --app-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-  --app-shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
-  --brand-navy: #0f172a;
-  --brand-blue: #2563eb;
-  --brand-concrete: #94a3b8;
+  --app-shadow: 0 4px 6px -1px rgb(4 32 22 / 0.06), 0 2px 4px -2px rgb(4 32 22 / 0.05);
+  --app-shadow-lg: 0 20px 25px -5px rgb(4 32 22 / 0.08), 0 8px 10px -6px rgb(4 32 22 / 0.05);
+  --brand-navy: #0B2A6B;
+  --brand-blue: #2563EB;
+  --brand-green: #12A06A;
+  --brand-orange: #F97316;
+  --brand-concrete: #7A8A82;
 }
 
 .dark {
-  --background: #020617;
-  --foreground: #f8fafc;
-  --card: #0f172a;
-  --card-foreground: #f8fafc;
-  --popover: #0f172a;
-  --popover-foreground: #f8fafc;
-  --primary: #0055FF;
-  --primary-foreground: #FFFFFF;
-  --secondary: #1e293b;
-  --secondary-foreground: #f8fafc;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #334155;
-  --accent-foreground: #f8fafc;
-  --destructive: #7f1d1d;
-  --destructive-foreground: #f8fafc;
-  --border: #1e293b;
-  --input: #1e293b;
-  --ring: #0055FF;
+  --background: #06110D;
+  --foreground: #EAF3EE;
+  --card: #0C1A15;
+  --card-foreground: #EAF3EE;
+  --popover: #0C1A15;
+  --popover-foreground: #EAF3EE;
+  --primary: #22C48A;
+  --primary-foreground: #04120C;
+  --secondary: #123B8C;
+  --secondary-foreground: #EAF1FF;
+  --muted: #13241D;
+  --muted-foreground: #93A69D;
+  --accent: #4C8DFF;
+  --accent-foreground: #04120C;
+  --destructive: #B91C1C;
+  --destructive-foreground: #FFFFFF;
+  --border: #1B2F27;
+  --input: #1B2F27;
+  --ring: #22C48A;
 }
 
 @theme inline {
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-heading), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -75,6 +81,25 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* escala de marca (verde) */
+  --color-brand-50: #EAFBF3;
+  --color-brand-100: #D1F5E4;
+  --color-brand-200: #A6E9CB;
+  --color-brand-300: #6FD8AC;
+  --color-brand-400: #35BE8B;
+  --color-brand-500: #12A06A;
+  --color-brand-600: #0C8256;
+  --color-brand-700: #0A6845;
+  --color-brand-800: #0A5237;
+  --color-brand-900: #083D29;
+  --color-brand-950: #04241A;
+
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-orange: var(--brand-orange);
+  --color-brand-concrete: var(--brand-concrete);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -106,15 +131,18 @@
     @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-app-lg;
   }
   .dark .glass {
-    @apply bg-slate-950/70 backdrop-blur-xl border-white/10;
+    @apply bg-neutral-950/70 backdrop-blur-xl border-white/10;
   }
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-secondary to-secondary/80;
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-primary to-accent;
   }
   .bg-mesh {
     background-image:
-      radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(15, 23, 42, 0.05) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, rgba(18, 160, 106, 0.07) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(37, 99, 235, 0.06) 0px, transparent 50%);
+  }
+  .bg-brand-strip {
+    background-image: linear-gradient(90deg, #12A06A 0%, #0EA5A0 45%, #2563EB 100%);
   }
   .shine-effect {
     @apply relative overflow-hidden;
@@ -128,6 +156,13 @@
   }
   .tap-scale {
     @apply transition-transform duration-200 active:scale-[0.97];
+  }
+  .carriola-glow {
+    animation: carriolaPulse 2s ease-in-out infinite;
+  }
+  @keyframes carriolaPulse {
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(18, 160, 106, 0.45)); }
+    50% { filter: drop-shadow(0 0 10px rgba(37, 99, 235, 0.65)); }
   }
   .animate-marquee {
     display: flex;
@@ -147,7 +182,10 @@
   @apply bg-muted;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 rounded-full border-2 border-muted hover:bg-slate-400 transition-colors;
+  background: #BBD8C7;
+  border-radius: 9999px;
+  border: 2px solid var(--muted);
 }
-
-/* Google Fonts loaded via next/font — no @import needed */
+::-webkit-scrollbar-thumb:hover {
+  background: #8FBF9F;
+}

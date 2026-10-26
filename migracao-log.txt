@@ -1,0 +1,18 @@
+﻿=== INICIO 10/25/2026 13:48:11 ===
+[categories] lidos=32 enviados=32
+[subcategories] lidos=62 enviados=62
+[products] lidos=4761 enviados=4761
+[banners] lidos=10 enviados=10
+[site_settings] lidos=1 enviados=1
+[testimonials] lidos=11 enviados=11
+[reviews] lidos=93024 enviados=93024
+[whatsapp_numbers] lidos=2 enviados=2
+[whatsapp_clicks] lidos=119 enviados=119
+[admin_users] lidos=1 enviados=1
+[admins] lidos=1 enviados=1
+[customers] lidos=0 enviados=0
+[profiles] lidos=16 enviados=16
+[orders] lidos=0 enviados=0
+[order_items] lidos=0 enviados=0
+[users] lidos=0 enviados=0
+=== FIM 10/25/2026 13:52:12 ===

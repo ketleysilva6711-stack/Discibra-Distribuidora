@@ -13,7 +13,7 @@ export default function PoliticaFretePage() {
       subtitle="Entregas, abrangência e como calculamos o frete."
     >
       <p>
-        O Atacado de Construção opera com frota própria e parceiros logísticos, conforme a região e o
+        O Discibra Distribuidora opera com frota própria e parceiros logísticos, conforme a região e o
         volume do pedido.
       </p>
       <h2 className="font-heading text-lg font-bold text-foreground pt-4">Abrangência</h2>

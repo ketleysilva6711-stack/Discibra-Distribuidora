@@ -244,7 +244,7 @@ export default function AdminSiteSettingsPage() {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#12A06A]" />
       </div>
     )
   }
@@ -253,17 +253,17 @@ export default function AdminSiteSettingsPage() {
     <div className="mx-auto max-w-4xl space-y-6 pb-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">CMS do site</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="text-2xl font-bold text-slate-900">CMS do site</h1>
+          <p className="mt-1 text-sm text-slate-500">
             Identidade visual e conteúdo institucional. Imagens no Supabase Storage; URLs na tabela{" "}
-            <code className="rounded bg-muted px-1 text-xs">site_settings</code>.
+            <code className="rounded bg-slate-100 px-1 text-xs">site_settings</code>.
           </p>
         </div>
         <button
           type="button"
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-60"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#12A06A] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0e8a5b] disabled:opacity-60"
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           Salvar tudo
@@ -289,9 +289,9 @@ export default function AdminSiteSettingsPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="marca" className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <TabsContent value="marca" className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="text-lg font-semibold">Logo e favicon</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-slate-500">
             Envio no bucket <strong>produtos</strong> (pasta <code className="text-xs">cms/</code>). PNG ou WebP recomendados.
           </p>
           <div className="mt-6 grid gap-8 sm:grid-cols-2">
@@ -299,15 +299,15 @@ export default function AdminSiteSettingsPage() {
               <p className="text-sm font-medium">Logo (header)</p>
               <div className="mt-2 flex flex-wrap items-center gap-4">
                 {form.logo_url ? (
-                  <div className="relative h-16 w-40 overflow-hidden rounded-xl border bg-muted/30">
+                  <div className="relative h-16 w-40 overflow-hidden rounded-xl border bg-slate-50">
                     <Image src={form.logo_url} alt="Logo" fill unoptimized className="object-contain p-2" />
                   </div>
                 ) : (
-                  <div className="flex h-16 w-40 items-center justify-center rounded-xl border border-dashed text-xs text-muted-foreground">
+                  <div className="flex h-16 w-40 items-center justify-center rounded-xl border border-dashed text-xs text-slate-500">
                     Padrão SVG
                   </div>
                 )}
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium transition hover:bg-muted/50">
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium transition hover:bg-slate-50">
                   <Upload className="h-4 w-4" />
                   {uploadKey === "logo" ? "Enviando…" : "Enviar logo"}
                   <input
@@ -321,7 +321,7 @@ export default function AdminSiteSettingsPage() {
               </div>
               <button
                 type="button"
-                className="mt-2 text-xs text-muted-foreground underline"
+                className="mt-2 text-xs text-slate-500 underline"
                 onClick={() => setForm((f) => ({ ...f, logo_url: "" }))}
               >
                 Usar logo padrão do site
@@ -331,15 +331,15 @@ export default function AdminSiteSettingsPage() {
               <p className="text-sm font-medium">Favicon</p>
               <div className="mt-2 flex flex-wrap items-center gap-4">
                 {form.favicon_url ? (
-                  <div className="relative h-14 w-14 overflow-hidden rounded-xl border bg-muted/30">
+                  <div className="relative h-14 w-14 overflow-hidden rounded-xl border bg-slate-50">
                     <Image src={form.favicon_url} alt="Favicon" fill unoptimized className="object-cover" />
                   </div>
                 ) : (
-                  <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-dashed text-[10px] text-muted-foreground text-center px-1">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-dashed text-[10px] text-slate-500 text-center px-1">
                     /icon
                   </div>
                 )}
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium transition hover:bg-muted/50">
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium transition hover:bg-slate-50">
                   <Upload className="h-4 w-4" />
                   {uploadKey === "favicon" ? "Enviando…" : "Enviar favicon"}
                   <input
@@ -353,7 +353,7 @@ export default function AdminSiteSettingsPage() {
               </div>
               <button
                 type="button"
-                className="mt-2 text-xs text-muted-foreground underline"
+                className="mt-2 text-xs text-slate-500 underline"
                 onClick={() => setForm((f) => ({ ...f, favicon_url: "" }))}
               >
                 Usar favicon padrão
@@ -382,45 +382,45 @@ export default function AdminSiteSettingsPage() {
             </div>
             <div>
               <label className="text-xs font-semibold uppercase text-blue-200/80 mb-1.5 block">
-                Número com DDD (Ex: (16) 99653-6403)
+                Número com DDD (Ex: (16) 99644-7972)
               </label>
               <input
                 type="text"
                 value={form.business_phone}
                 onChange={(e) => setForm({ ...form, business_phone: e.target.value })}
-                placeholder="(16) 99653-6403"
+                placeholder="(16) 99644-7972"
                 className="w-full max-w-md px-4 py-2.5 rounded-xl border border-blue-400/30 bg-slate-900/90 text-white font-mono text-sm focus:outline-none focus:border-blue-400"
               />
             </div>
           </div>
 
           <div className="mt-8 border-t pt-6">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Instruções Recomendadas</h3>
-            <ul className="mt-2 space-y-1 text-sm text-muted-foreground list-disc list-inside">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500">Instruções Recomendadas</h3>
+            <ul className="mt-2 space-y-1 text-sm text-slate-500 list-disc list-inside">
               <li>Logo: PNG ou JPEG (300x100px aprox.)</li>
               <li>Favicon: PNG quadrado (32x32px ou 64x64px)</li>
             </ul>
           </div>
         </TabsContent>
 
-        <TabsContent value="chat" className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <TabsContent value="chat" className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="text-lg font-semibold">Configuração do Chat</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-slate-500">
             Personalize o cabeçalho do chat estilo WhatsApp.
           </p>
           <div className="mt-6">
             <p className="text-sm font-medium">Imagem do cabeçalho (Header)</p>
             <div className="mt-2 flex flex-wrap items-center gap-4">
               {form.chat_header_url ? (
-                <div className="relative h-20 w-20 overflow-hidden rounded-full border bg-muted/30">
+                <div className="relative h-20 w-20 overflow-hidden rounded-full border bg-slate-50">
                   <Image src={form.chat_header_url} alt="Chat Header" fill unoptimized className="object-cover" />
                 </div>
               ) : (
-                <div className="flex h-20 w-20 items-center justify-center rounded-full border border-dashed text-xs text-muted-foreground">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full border border-dashed text-xs text-slate-500">
                   Sem foto
                 </div>
               )}
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium transition hover:bg-muted/50">
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium transition hover:bg-slate-50">
                 <Upload className="h-4 w-4" />
                 {uploadKey === "chat" ? "Enviando…" : "Enviar foto"}
                 <input
@@ -435,39 +435,39 @@ export default function AdminSiteSettingsPage() {
                 <button
                   type="button"
                   onClick={() => setForm((f) => ({ ...f, chat_header_url: "" }))}
-                  className="text-sm text-destructive hover:underline"
+                  className="text-sm text-red-600 hover:underline"
                 >
                   Remover imagem
                 </button>
               )}
             </div>
-            <p className="mt-3 text-xs text-muted-foreground">Recomendado: 100x100px ou quadrado.</p>
+            <p className="mt-3 text-xs text-slate-500">Recomendado: 100x100px ou quadrado.</p>
           </div>
         </TabsContent>
 
-        <TabsContent value="hero" className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <TabsContent value="hero" className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="text-lg font-semibold">Slides da home (CMS)</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-slate-500">
             Se houver pelo menos um slide com imagem aqui, a home usa <strong>só</strong> esta lista. Deixe vazio para voltar aos banners da
             tabela <code className="text-xs">banners</code> (menu Banners).
           </p>
           <button
             type="button"
             onClick={addBannerSlide}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-muted/50"
+            className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50"
           >
             <Plus className="h-4 w-4" /> Adicionar slide ({form.banner_images.length}/{MAX_BANNERS})
           </button>
           <div className="mt-4 space-y-4">
             {form.banner_images.map((slide, i) => (
-              <div key={i} className="rounded-2xl border border-border/80 bg-muted/20 p-4">
+              <div key={i} className="rounded-2xl border border-slate-200/80 bg-slate-100/20 p-4">
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                   <span className="text-sm font-medium">Slide {i + 1}</span>
                   <div className="flex gap-1">
                     <button
                       type="button"
                       onClick={() => moveBanner(i, -1)}
-                      className="rounded-lg border border-border bg-background p-2 hover:bg-muted/50"
+                      className="rounded-lg border border-slate-200 bg-white p-2 hover:bg-slate-50"
                       aria-label="Subir"
                     >
                       <ChevronUp className="h-4 w-4" />
@@ -475,7 +475,7 @@ export default function AdminSiteSettingsPage() {
                     <button
                       type="button"
                       onClick={() => moveBanner(i, 1)}
-                      className="rounded-lg border border-border bg-background p-2 hover:bg-muted/50"
+                      className="rounded-lg border border-slate-200 bg-white p-2 hover:bg-slate-50"
                       aria-label="Descer"
                     >
                       <ChevronDown className="h-4 w-4" />
@@ -483,7 +483,7 @@ export default function AdminSiteSettingsPage() {
                     <button
                       type="button"
                       onClick={() => removeBannerSlide(i)}
-                      className="rounded-lg border border-destructive/30 bg-background p-2 text-destructive hover:bg-destructive/10"
+                      className="rounded-lg border border-destructive/30 bg-white p-2 text-red-600 hover:bg-red-50"
                       aria-label="Remover"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -492,14 +492,14 @@ export default function AdminSiteSettingsPage() {
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="sm:col-span-2">
-                    <label className="text-xs font-medium text-muted-foreground">Imagem</label>
+                    <label className="text-xs font-medium text-slate-500">Imagem</label>
                     <div className="mt-1 flex flex-wrap items-center gap-3">
                       {slide.image_url ? (
                         <div className="relative h-24 w-40 overflow-hidden rounded-lg border">
-                          <Image src={slide.image_url} alt="" fill unoptimized className="object-cover" />
+                          <Image src={slide.image_url.trim()} alt="" fill unoptimized className="object-cover" />
                         </div>
                       ) : null}
-                      <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border bg-background px-3 py-2 text-xs font-medium">
+                      <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border bg-white px-3 py-2 text-xs font-medium">
                         <Upload className="h-3.5 w-3.5" /> Upload
                         <input
                           type="file"
@@ -511,7 +511,7 @@ export default function AdminSiteSettingsPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground">Título</label>
+                    <label className="text-xs font-medium text-slate-500">Título</label>
                     <input
                       value={slide.title || ""}
                       onChange={(e) => {
@@ -522,11 +522,11 @@ export default function AdminSiteSettingsPage() {
                           return { ...f, banner_images: next }
                         })
                       }}
-                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                      className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground">Subtítulo</label>
+                    <label className="text-xs font-medium text-slate-500">Subtítulo</label>
                     <input
                       value={slide.subtitle || ""}
                       onChange={(e) => {
@@ -537,11 +537,11 @@ export default function AdminSiteSettingsPage() {
                           return { ...f, banner_images: next }
                         })
                       }}
-                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                      className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="text-xs font-medium text-muted-foreground">Link (opcional)</label>
+                    <label className="text-xs font-medium text-slate-500">Link (opcional)</label>
                     <input
                       value={slide.link || ""}
                       onChange={(e) => {
@@ -553,7 +553,7 @@ export default function AdminSiteSettingsPage() {
                         })
                       }}
                       placeholder="/produtos ou URL"
-                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                      className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
                     />
                   </div>
                 </div>
@@ -563,28 +563,28 @@ export default function AdminSiteSettingsPage() {
         </TabsContent>
 
         <TabsContent value="conteudo" className="space-y-6">
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="text-lg font-semibold">Bloco institucional (home)</h2>
             <label className="mt-4 block text-sm font-medium">Título</label>
             <input
               value={form.institutional_title}
               onChange={(e) => setForm((f) => ({ ...f, institutional_title: e.target.value }))}
-              className="mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm"
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm"
             />
             <label className="mt-4 block text-sm font-medium">Texto</label>
             <textarea
               value={form.institutional_body}
               onChange={(e) => setForm((f) => ({ ...f, institutional_body: e.target.value }))}
               rows={5}
-              className="mt-1 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm leading-relaxed"
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm leading-relaxed"
             />
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-lg font-semibold">Depoimentos</h2>
-                <p className="text-sm text-muted-foreground">Exibidos no carrossel da home. Mínimo recomendado: 11.</p>
+                <p className="text-sm text-slate-500">Exibidos no carrossel da home. Mínimo recomendado: 11.</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <button
@@ -592,14 +592,14 @@ export default function AdminSiteSettingsPage() {
                   onClick={() =>
                     setForm((f) => ({ ...f, testimonials: DEFAULT_TESTIMONIALS.map((t) => ({ ...t })) }))
                   }
-                  className="rounded-xl border border-border bg-background px-3 py-2 text-xs font-medium"
+                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium"
                 >
                   Restaurar padrão (11)
                 </button>
                 <button
                   type="button"
                   onClick={addTestimonial}
-                  className="inline-flex items-center gap-1 rounded-xl bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground"
+                  className="inline-flex items-center gap-1 rounded-xl bg-[#12A06A] px-3 py-2 text-xs font-semibold text-white"
                 >
                   <Plus className="h-3.5 w-3.5" /> Adicionar
                 </button>
@@ -607,12 +607,12 @@ export default function AdminSiteSettingsPage() {
             </div>
             <div className="mt-4 max-h-[480px] space-y-3 overflow-y-auto pr-1">
               {form.testimonials.map((t, i) => (
-                <div key={i} className="rounded-xl border border-border/80 bg-muted/15 p-3">
+                <div key={i} className="rounded-xl border border-slate-200/80 bg-slate-100/15 p-3">
                   <div className="mb-2 flex justify-end">
                     <button
                       type="button"
                       onClick={() => removeTestimonial(i)}
-                      className="text-destructive hover:underline text-xs"
+                      className="text-red-600 hover:underline text-xs"
                     >
                       Remover
                     </button>
@@ -629,7 +629,7 @@ export default function AdminSiteSettingsPage() {
                           return { ...f, testimonials: next }
                         })
                       }}
-                      className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
                     />
                     <input
                       placeholder="Cargo / contexto (opcional)"
@@ -642,7 +642,7 @@ export default function AdminSiteSettingsPage() {
                           return { ...f, testimonials: next }
                         })
                       }}
-                      className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
                     />
                     <div className="sm:col-span-2">
                       <input
@@ -658,9 +658,9 @@ export default function AdminSiteSettingsPage() {
                             return { ...f, testimonials: next }
                           })
                         }}
-                        className="w-24 rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                        className="w-24 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
                       />
-                      <span className="ml-2 text-xs text-muted-foreground">estrelas (1–5)</span>
+                      <span className="ml-2 text-xs text-slate-500">estrelas (1–5)</span>
                     </div>
                     <div className="sm:col-span-2">
                       <textarea
@@ -675,7 +675,7 @@ export default function AdminSiteSettingsPage() {
                           })
                         }}
                         rows={3}
-                        className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
                       />
                     </div>
                   </div>
@@ -685,22 +685,22 @@ export default function AdminSiteSettingsPage() {
           </div>
         </TabsContent>
 
-<TabsContent value="catalogo" className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+<TabsContent value="catalogo" className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="text-lg font-semibold">Imagens de produtos e categorias</h2>
-          <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+          <p className="mt-2 text-sm text-slate-500 leading-relaxed">
             Para não duplicar lógica de estoque e preços, as imagens de cada produto e categoria continuam sendo
             gerenciadas nas telas dedicadas — com upload já integrado ao Supabase.
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link
               href="/admin/categorias"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium transition hover:bg-muted/50"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium transition hover:bg-slate-50"
             >
               <FolderTree className="h-4 w-4" /> Categorias
             </Link>
             <Link
               href="/admin/produtos"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium transition hover:bg-muted/50"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium transition hover:bg-slate-50"
             >
               <Package className="h-4 w-4" /> Produtos
             </Link>
@@ -708,8 +708,8 @@ export default function AdminSiteSettingsPage() {
         </TabsContent>
       </Tabs>
 
-      <p className="text-center text-xs text-muted-foreground">
-        Primeira vez ou erros? Rode <code className="rounded bg-muted px-1">scripts/012_fix_db_schema.sql</code> no Supabase.
+      <p className="text-center text-xs text-slate-500">
+        Primeira vez ou erros? Rode <code className="rounded bg-slate-100 px-1">scripts/012_fix_db_schema.sql</code> no Supabase.
       </p>
     </div>
   )

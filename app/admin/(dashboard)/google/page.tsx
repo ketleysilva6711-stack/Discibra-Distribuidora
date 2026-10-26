@@ -249,11 +249,11 @@ export default function AdminGooglePage() {
           <div className="grid gap-5 md:grid-cols-2">
             <div>
               <label className={labelCls}><StatusDot value={form.business_name} /> Nome no Google Maps</label>
-              <input type="text" value={form.business_name} onChange={set("business_name")} placeholder="Atacado de Construção" className={inputCls} />
+              <input type="text" value={form.business_name} onChange={set("business_name")} placeholder="Discibra Distribuidora" className={inputCls} />
             </div>
             <div>
               <label className={labelCls}><Phone className="h-3.5 w-3.5" /> Telefone</label>
-              <input type="tel" value={form.business_phone} onChange={set("business_phone")} placeholder="(16) 99653-6403" className={inputCls} />
+              <input type="tel" value={form.business_phone} onChange={set("business_phone")} placeholder="(16) 99644-7972" className={inputCls} />
             </div>
             <div className="md:col-span-2">
               <label className={labelCls}><MapPin className="h-3.5 w-3.5" /> Endereço Completo</label>

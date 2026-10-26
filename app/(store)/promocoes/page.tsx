@@ -122,7 +122,7 @@ export default function PromocoesPage() {
             <div className="grid gap-0 md:grid-cols-2">
               <div className="relative min-h-64 bg-white p-6 sm:min-h-80 sm:p-10">
                 {star.image_url && (
-                  <Image src={star.image_url} alt={star.name} fill className="object-contain p-6" sizes="(max-width: 768px) 100vw, 50vw" />
+                  <Image src={star.image_url.trim()} alt={star.name} fill className="object-contain p-6" sizes="(max-width: 768px) 100vw, 50vw" />
                 )}
                 <span className="absolute left-4 top-4 rounded-full bg-[#F47920] px-4 py-1.5 text-xs font-black uppercase tracking-widest text-white shadow-lg">
                   -{pct(star)}% hoje
@@ -245,7 +245,7 @@ export default function PromocoesPage() {
             </p>
           </div>
           <a
-            href="https://wa.me/5516996536403?text=Olá! Preciso de um orçamento relâmpago para minha obra."
+            href="https://wa.me/5516996447972?text=Olá! Preciso de um orçamento relâmpago para minha obra."
             target="_blank"
             rel="noopener noreferrer"
             data-track="btn_whatsapp"

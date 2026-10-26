@@ -67,7 +67,7 @@ export default function StoreFooter() {
 
           {/* Brand column */}
           <div className="sm:col-span-2 lg:col-span-4 space-y-7">
-            <DynamicBrandLogo variant="full" className="h-9 w-auto" />
+            <DynamicBrandLogo variant="full" inverted className="h-16 w-auto lg:h-20" />
 
             <p className="text-sm text-blue-100/55 leading-relaxed max-w-xs">
               Cimento, argamassa e ferragens para construtoras e obras em todo o Brasil. Atacado com logística própria e preços direto da fábrica.
@@ -204,7 +204,7 @@ export default function StoreFooter() {
                   <Image src="/images/trust/reclame-aqui.png" alt="Reclame Aqui" width={90} height={22} className="h-4 w-auto object-contain" />
                   <div className="border-l border-slate-200 pl-2">
                     <p className="text-[8px] font-black uppercase text-[#00B057] leading-none">RA 1000</p>
-                    <p className="text-[11px] font-black text-slate-800 leading-tight">Ótimo · 9.8</p>
+                    <p className="text-[11px] font-black text-slate-800 leading-tight">�"timo · 9.8</p>
                   </div>
                 </div>
                 {/* Certisign Site Seguro Oficial */}

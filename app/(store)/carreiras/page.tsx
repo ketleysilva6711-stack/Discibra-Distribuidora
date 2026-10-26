@@ -1,9 +1,9 @@
-﻿import type { Metadata } from "next"
+import type { Metadata } from "next"
 import Link from "next/link"
 import { waLink, SITE } from "@/lib/site-config"
 
 export const metadata: Metadata = {
-  title: "Trabalhe Conosco — Vagas B2B, Logística e Motoristas | C&C Distribuidora",
+  title: "Trabalhe Conosco — Vagas B2B, Logística e Motoristas | Discibra Distribuidora",
   description:
     "Oportunidades em Vendas B2B, Logística e Motoristas categoria D/E. Envie seu currículo por e-mail ou WhatsApp do RH e venha crescer no atacado da construção.",
 }

@@ -145,7 +145,7 @@ export function HeroBanner({ initialSlides }: { initialSlides?: Slide[] }) {
               {/* Proporção 1920 × 430 — exibe de ponta a ponta sem cortar */}
               <div className="relative w-full" style={{ aspectRatio: "1920 / 430" }}>
                 <Image
-                  src={slide.image_url}
+                  src={slide.image_url.trim()}
                   alt={slide.title || `Banner ${i + 1}`}
                   fill
                   priority={i === 0}

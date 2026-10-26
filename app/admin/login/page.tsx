@@ -80,48 +80,48 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-secondary">
       <div className="w-full max-w-md mx-4">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary mb-4">
-            <Lock className="w-8 h-8 text-primary-foreground" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#12A06A] mb-4">
+            <Lock className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-secondary-foreground">Painel Administrativo</h1>
-          <p className="text-secondary-foreground/60 mt-1">Atacado de Construção</p>
+          <p className="text-secondary-foreground/60 mt-1">Discibra Distribuidora</p>
         </div>
-        <form onSubmit={handleSubmit} className="bg-card rounded-xl p-8 shadow-2xl">
+        <form onSubmit={handleSubmit} className="bg-white rounded-xl p-8 shadow-2xl">
           {error && (
-            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm text-left whitespace-pre-line">
+            <div className="mb-4 p-3 bg-red-50 border border-destructive/20 rounded-lg text-red-600 text-sm text-left whitespace-pre-line">
               {error}
             </div>
           )}
           <div className="mb-5">
-            <label className="block text-sm font-medium text-card-foreground mb-2">E-mail</label>
+            <label className="block text-sm font-medium text-slate-900 mb-2">E-mail</label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+                className="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-[#12A06A] focus:border-transparent outline-none transition"
                 placeholder="seu@email.com"
                 required
               />
             </div>
           </div>
           <div className="mb-6">
-            <label className="block text-sm font-medium text-card-foreground mb-2">Senha</label>
+            <label className="block text-sm font-medium text-slate-900 mb-2">Senha</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
               <input
                 type={showPass ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-11 pr-12 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+                className="w-full pl-11 pr-12 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-[#12A06A] focus:border-transparent outline-none transition"
                 placeholder="Sua senha"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPass(!showPass)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-900"
               >
                 {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -130,7 +130,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition disabled:opacity-50"
+            className="w-full py-3 bg-[#12A06A] text-white rounded-lg font-semibold hover:bg-[#0e8a5b] transition disabled:opacity-50"
           >
             {loading ? "Entrando..." : "Entrar"}
           </button>

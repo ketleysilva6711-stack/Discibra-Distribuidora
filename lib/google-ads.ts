@@ -251,7 +251,7 @@ export async function sendCapiEvent(event: CapiEvent): Promise<boolean> {
     }
 
     const response = await fetch(
-      `https://www.googleadsgoogle.com/v1/customers/${accountId}/conversions:sendThirdPartySessionAttributionData`,
+      `https://googleads.googleapis.com/v1/customers/${accountId}/conversions:sendThirdPartySessionAttributionData`,
       {
         method: "POST",
         headers: {

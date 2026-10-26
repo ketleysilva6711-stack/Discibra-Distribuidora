@@ -178,12 +178,12 @@ export function cmsBannerSlides(row: SiteSettingsRow | null): CmsBannerSlide[] {
 }
 
 // ─── Defaults para Google Meu Negócio / SEO Local ─────────────────────────────
-export const DEFAULT_BUSINESS_NAME = "Cimento & Cal Distribuidora"
+export const DEFAULT_BUSINESS_NAME = "Discibra Distribuidora"
 
 export const DEFAULT_BUSINESS_ADDRESS =
   "Rua Igarapava, 73 - Vila Albertina, Ribeirão Preto - SP, CEP 14.075-453"
 
-export const DEFAULT_BUSINESS_PHONE = "(16) 99653-6403"
+export const DEFAULT_BUSINESS_PHONE = "(16) 99644-7972"
 
 export const DEFAULT_BUSINESS_HOURS = "Segunda a Sexta: 07:00 - 18:00 | Sábado: 07:00 - 12:00"
 

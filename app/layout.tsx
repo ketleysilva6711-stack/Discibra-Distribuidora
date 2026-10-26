@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Plus_Jakarta_Sans, Outfit } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from 'sonner'
 import Script from 'next/script'
@@ -10,17 +10,26 @@ import { resolveBusinessName, resolveBusinessMapsUrl } from '@/lib/site-settings
 import { GoogleBusinessSchema } from '@/components/seo/google-business-schema'
 import './globals.css'
 
-const inter = Inter({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
-  preload: false,
+  weight: ['400', '500', '600', '700', '800'],
+  preload: true,
+})
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-heading',
+  display: 'swap',
+  weight: ['600', '700', '800', '900'],
+  preload: true,
 })
 
 // CSP nonce gerado por middleware - aqui apenas para referência
 const cspBase = process.env.NODE_ENV === 'production'
-  ? "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net https://*.google-analytics.com https://*.google.com https://*.doubleclick.net; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https: https://*.google.com https://*.google-analytics.com https://*.doubleclick.net https://*.googletagmanager.com; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://ad.doubleclick.net https://*.doubleclick.net https://stats.g.doubleclick.net https://*.g.doubleclick.net https://*.google.com https://*.google.com.br https://connect.facebook.net https://*.facebook.com https://www.googleadservices.com https://googleads.g.doubleclick.net; frame-src 'self' https://www.googletagmanager.com https://www.facebook.com https://*.doubleclick.net https://*.google.com; object-src 'none'; base-uri 'self'; form-action 'self';"
-  : "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://*.googletagmanager.com https://ad.doubleclick.net https://*.doubleclick.net https://connect.facebook.net https://www.googleadservices.com https://googleads.g.doubleclick.net;"
+  ? "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://*.doubleclick.net https://connect.facebook.net https://*.google.com https://connect.facebook.net https://*.google-analytics.com https://*.google.com https://*.doubleclick.net; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https: https://*.google.com https://*.google-analytics.com https://*.doubleclick.net https://*.googletagmanager.com; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google.com https://*.google.com https://connect.facebook.net https://*.facebook.com https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://ad.doubleclick.net https://*.doubleclick.net https://stats.g.doubleclick.net https://*.g.doubleclick.net https://*.google.com https://*.google.com.br https://connect.facebook.net https://*.facebook.com https://www.googleadservices.com https://googleads.g.doubleclick.net; frame-src 'self' https://www.googletagmanager.com https://www.facebook.com https://*.doubleclick.net https://*.google.com; object-src 'none'; base-uri 'self'; form-action 'self';"
+  : "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://*.doubleclick.net https://connect.facebook.net https://*.google.com https://connect.facebook.net https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google.com https://*.google.com https://connect.facebook.net https://*.facebook.com https://www.googletagmanager.com https://*.google-analytics.com https://*.googletagmanager.com https://ad.doubleclick.net https://*.doubleclick.net https://connect.facebook.net https://www.googleadservices.com https://googleads.g.doubleclick.net;"
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettingsServer()
@@ -62,7 +71,7 @@ export default async function RootLayout({
   const businessMapsUrl = resolveBusinessMapsUrl(settings)
 
   return (
-      <html lang="pt-BR" className={inter.className} suppressHydrationWarning>
+      <html lang="pt-BR" className={`${plusJakarta.variable} ${outfit.variable}`} suppressHydrationWarning>
       <head>
         {/* Segurança: Meta tags de segurança */}
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
@@ -74,6 +83,8 @@ export default async function RootLayout({
           httpEquiv="Content-Security-Policy"
           content={cspBase}
         />
+        <meta name="theme-color" content="#C2410C" />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a" />
         {/* Google Business Schema JSON-LD (Server Component) */}
         <GoogleBusinessSchema
           businessName={businessName}
@@ -83,7 +94,7 @@ export default async function RootLayout({
           businessMapsUrl={businessMapsUrl}
         />
       </head>
-      <body className={inter.className} suppressHydrationWarning>
+      <body className={`${plusJakarta.variable} ${outfit.variable} font-sans`} suppressHydrationWarning>
         {/* Google Tag Manager (noscript) */}
         {gtmId && (
           <noscript>

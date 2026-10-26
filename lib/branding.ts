@@ -7,7 +7,7 @@ export const BRANDING = {
   siteName: SITE.shortName,
   legalName: SITE.legalName,
   tagline: SITE.tagline,
-  faviconPath: "/icon" as const,
+  faviconPath: "/icon.png" as const,
   /** Logo React: @/components/store/brand-logo */
   logoImportPath: "@/components/store/brand-logo",
 } as const

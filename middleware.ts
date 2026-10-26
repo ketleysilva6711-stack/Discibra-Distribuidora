@@ -49,7 +49,7 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
   return response
 }
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const response = NextResponse.next({ request })
 
@@ -111,3 +111,5 @@ export const config = {
 
 // Mantém updateSession para compatibilidade
 export { updateSession }
+
+export default middleware

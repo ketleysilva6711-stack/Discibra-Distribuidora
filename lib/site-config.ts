@@ -1,13 +1,13 @@
-/** Dados da loja — e-mail e site alinhados ao domínio oficial */
+/** Dados da loja — marca Discibra Distribuidora */
 export const SITE = {
-  legalName: "Cimento & Cal Distribuidora",
-  shortName: "C&C Distribuidora",
-  tagline: "Sua parceira em materiais de construção: força, confiança e logística profissional.",
-  whatsappE164: "5516996536403",
-  phoneDisplay: "(16) 99653-6403",
-  email: "contato@atacadodeconstrucao.com",
-  website: "https://www.atacadodeconstrucao.com",
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://www.atacadodeconstrucao.com",
+  legalName: "Discibra Distribuidora",
+  shortName: "Discibra",
+  tagline: "Cimento e materiais de construção direto pra sua obra: preço de atacado, entrega programada e atendimento rápido.",
+  whatsappE164: "5516996447972",
+  phoneDisplay: "(16) 99644-7972",
+  email: "contato@discibradistribuidora.com",
+  website: "https://www.discibradistribuidora.com",
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://www.discibradistribuidora.com",
   address: {
     street: "Rua Igarapava, 73",
     district: "Vila Albertina",

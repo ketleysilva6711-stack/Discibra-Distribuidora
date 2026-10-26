@@ -1,0 +1,631 @@
+
+========== globals.css  ->  app\globals.css ==========
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #FAF7F2;
+  --foreground: #18181B;
+  --card: #FFFFFF;
+  --card-foreground: #18181B;
+  --popover: #FFFFFF;
+  --popover-foreground: #18181B;
+  --primary: #C2410C;
+  --primary-foreground: #FFFFFF;
+  --secondary: #0A0A0A;
+  --secondary-foreground: #FAF7F2;
+  --muted: #F2ECE3;
+  --muted-foreground: #57534E;
+  --accent: #F59E0B;
+  --accent-foreground: #0A0A0A;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --border: #E7E0D6;
+  --input: #E7E0D6;
+  --ring: #C2410C;
+  --radius: 1.25rem;
+  --app-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --app-shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+  --brand-navy: #0A0A0A;
+  --brand-blue: #C2410C;
+  --brand-concrete: #78716C;
+}
+
+.dark {
+  --background: #0A0A0A;
+  --foreground: #FAF7F2;
+  --card: #18181B;
+  --card-foreground: #FAF7F2;
+  --popover: #18181B;
+  --popover-foreground: #FAF7F2;
+  --primary: #EA580C;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F59E0B;
+  --secondary-foreground: #0A0A0A;
+  --muted: #27272A;
+  --muted-foreground: #A1A1AA;
+  --accent: #F59E0B;
+  --accent-foreground: #0A0A0A;
+  --destructive: #7F1D1D;
+  --destructive-foreground: #FAF7F2;
+  --border: #27272A;
+  --input: #27272A;
+  --ring: #EA580C;
+}
+
+@theme inline {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-heading), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --shadow-app: var(--app-shadow);
+  --shadow-app-lg: var(--app-shadow-lg);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    @apply font-bold tracking-tight;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-app-lg;
+  }
+  .dark .glass {
+    @apply bg-neutral-950/70 backdrop-blur-xl border-white/10;
+  }
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-primary to-accent;
+  }
+  .bg-mesh {
+    background-image:
+      radial-gradient(at 0% 0%, rgba(194, 65, 12, 0.06) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.06) 0px, transparent 50%);
+  }
+  .shine-effect {
+    @apply relative overflow-hidden;
+  }
+  .shine-effect::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent;
+  }
+  .shine-effect:hover::after {
+    @apply translate-x-full;
+  }
+  .tap-scale {
+    @apply transition-transform duration-200 active:scale-[0.97];
+  }
+  .carriola-glow {
+    animation: carriolaPulse 2s ease-in-out infinite;
+  }
+  @keyframes carriolaPulse {
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(194, 65, 12, 0.4)); }
+    50% { filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.7)); }
+  }
+  .animate-marquee {
+    display: flex;
+    width: max-content;
+    animation: marquee 40s linear infinite;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-muted;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-stone-300 rounded-full border-2 border-muted hover:bg-stone-400 transition-colors;
+}
+
+========== dynamic-brand-logo.tsx  ->  components\store\dynamic-brand-logo.tsx ==========
+"use client"
+
+import { cn } from "@/lib/utils"
+
+type Variant = "full" | "compact" | "mono"
+
+export default function DynamicBrandLogo({
+  variant = "full",
+  className,
+  inverted = false,
+}: {
+  variant?: Variant
+  className?: string
+  inverted?: boolean
+}) {
+  const ink = inverted ? "#FAF7F2" : "#0A0A0A"
+  const sub = inverted ? "rgba(250,247,242,0.7)" : "#57534E"
+
+  const defs = (
+    <defs>
+      <clipPath id="discibraDClip">
+        <path
+          fillRule="evenodd"
+          d="M60 40 H165 a110 110 0 0 1 0 220 H60 Z M120 100 H165 a50 50 0 0 1 0 100 H120 Z"
+        />
+      </clipPath>
+    </defs>
+  )
+
+  const symbol = (
+    <g clipPath="url(#discibraDClip)">
+      <rect x="0" y="0" width="300" height="300" fill="#C2410C" />
+      <path d="M-30 236 L330 116 L330 166 L-30 286 Z" fill="#F59E0B" />
+    </g>
+  )
+
+  if (variant === "mono") {
+    return (
+      <svg viewBox="0 0 300 300" className={cn("h-9 w-9 shrink-0", className)} role="img" aria-label="Discibra">
+        {defs}
+        {symbol}
+      </svg>
+    )
+  }
+
+  return (
+    <svg viewBox="0 0 1000 300" className={cn("h-9 w-auto shrink-0", className)} role="img" aria-label="Discibra Distribuidora">
+      {defs}
+      <g transform="translate(6,0)">{symbol}</g>
+      <text
+        x="356"
+        y="158"
+        fill={ink}
+        fontSize="108"
+        fontWeight={800}
+        letterSpacing="-3"
+        style={{ fontFamily: "var(--font-heading), system-ui, sans-serif" }}
+      >
+        DISCIBRA
+      </text>
+      {variant === "full" && (
+        <text
+          x="360"
+          y="222"
+          fill={sub}
+          fontSize="34"
+          fontWeight={500}
+          letterSpacing="13"
+          style={{ fontFamily: "var(--font-heading), system-ui, sans-serif" }}
+        >
+          DISTRIBUIDORA
+        </text>
+      )}
+    </svg>
+  )
+}
+
+========== icon.tsx  ->  app\icon.tsx ==========
+import { ImageResponse } from "next/og"
+
+export const size = { width: 512, height: 512 }
+export const contentType = "image/png"
+
+// Favicon Discibra — terracota #C2410C, monograma "D" branco.
+export default function Icon() {
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#C2410C",
+          borderRadius: 112,
+          border: "10px solid rgba(255,255,255,0.30)",
+          boxShadow: "0 0 0 6px #C2410C",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            fontFamily: "sans-serif",
+            fontWeight: 900,
+            fontSize: 330,
+            lineHeight: 1,
+            color: "#FFFFFF",
+            letterSpacing: -14,
+            marginTop: -18,
+          }}
+        >
+          D
+        </div>
+      </div>
+    ),
+    { ...size }
+  )
+}
+
+========== header  ->  components\store\header.tsx ==========
+"use client"
+
+import { useState, useEffect, Suspense } from "react"
+import Link from "next/link"
+import { ShoppingCart, User, Menu, X, Phone, ChevronDown, Tag, Headset } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
+import DynamicBrandLogo from "@/components/store/dynamic-brand-logo"
+import StoreSearch from "@/components/store/store-search"
+import Topbar from "@/components/store/topbar"
+import LocationSelector from "@/components/store/location-selector"
+import ContactPopup from "@/components/store/contact-popup"
+import { SITE } from "@/lib/site-config"
+import { trackWhatsAppClick } from "@/lib/track-whatsapp"
+import { cn } from "@/lib/utils"
+
+const supabase = createClient()
+
+export default function StoreHeader() {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+  const [categories, setCategories] = useState<{ id: string; name: string; slug: string }[]>([])
+  const [user, setUser] = useState<{ email: string; name?: string } | null>(null)
+  const [cartCount, setCartCount] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8)
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  useEffect(() => {
+    supabase.from("categories").select("id, name, slug").eq("active", true).order("sort_order").then(({ data }) => {
+      if (data) setCategories(data)
+    })
+    function syncUserFromAuth() {
+      supabase.auth.getUser().then(({ data }) => {
+        if (data.user) {
+          const meta = data.user.user_metadata as any
+          setUser({ email: data.user.email || "", name: meta?.full_name ?? meta?.name })
+        } else {
+          setUser(null)
+        }
+      })
+    }
+    syncUserFromAuth()
+    const { data: sub } = supabase.auth.onAuthStateChange(() => syncUserFromAuth())
+
+    const handleCartUpdate = () => {
+      try {
+        const cart = JSON.parse(localStorage.getItem("cart") || "[]")
+        setCartCount(cart.reduce((acc: number, item: { qty: number }) => acc + item.qty, 0))
+      } catch { /* empty */ }
+    }
+    handleCartUpdate()
+    window.addEventListener("cart-updated", handleCartUpdate)
+    setIsMounted(true)
+
+    return () => {
+      sub.subscription.unsubscribe()
+      window.removeEventListener("cart-updated", handleCartUpdate)
+    }
+  }, [])
+
+  const barSurface = scrolled 
+    ? "bg-white/80 backdrop-blur-2xl border-b border-slate-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)]" 
+    : "bg-white border-b border-slate-50 shadow-sm"
+
+  return (
+    <header className="z-50 shrink-0 w-full fixed inset-x-0 top-0 lg:sticky lg:top-0">
+      <div className="hidden lg:block">
+        <Topbar />
+      </div>
+      <div className={cn(barSurface, "transition-all duration-500")}>
+        <div className="mx-auto max-w-[1440px] px-4 lg:px-10">
+          <div className="flex items-center justify-between gap-10 py-3 lg:py-4">
+            {/* Mobile Menu */}
+            <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden h-11 w-11 flex items-center justify-center rounded-2xl bg-slate-50 border border-slate-100 active:scale-90 transition-all">
+              {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+
+            {/* Logo */}
+            <Link href="/" className="shrink-0 transition-transform active:scale-95">
+              <DynamicBrandLogo variant="full" className="h-9 lg:h-11 w-auto" />
+            </Link>
+
+            {/* Desktop Search */}
+            <div className="hidden lg:flex flex-1 max-w-2xl mx-10">
+              <Suspense fallback={<div className="h-14 w-full animate-pulse rounded-2xl bg-slate-50" />}>
+                <StoreSearch />
+              </Suspense>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-4 lg:gap-10">
+              <div className="hidden xl:block">
+                <LocationSelector />
+              </div>
+
+              <div className="h-8 w-px bg-slate-100 hidden lg:block" />
+
+              {!user ? (
+                <Link href="/login" className="hidden lg:flex items-center gap-3 group">
+                   <div className="w-11 h-11 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 group-hover:bg-primary/5 group-hover:border-primary/20 transition-all">
+                      <User className="h-5 w-5 text-slate-400 group-hover:text-primary transition-colors" />
+                   </div>
+                   <div className="flex flex-col items-start">
+                     <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Minha Conta</span>
+                     <span className="text-[11px] font-black uppercase tracking-tight text-slate-900">Entrar</span>
+                   </div>
+                </Link>
+              ) : (
+                <Link href="/minha-conta" className="flex items-center gap-3 group">
+                   <div className="w-11 h-11 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 group-hover:bg-primary/5 group-hover:border-primary/20 transition-all">
+                      <User className="h-5 w-5 text-slate-400 group-hover:text-primary transition-colors" />
+                   </div>
+                   <div className="hidden lg:flex flex-col items-start leading-tight">
+                     <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Parceiro</span>
+                     <span className="text-[11px] font-black uppercase tracking-tight text-secondary truncate max-w-[100px]">
+                       {user.name?.split(" ")[0] || "Perfil"}
+                     </span>
+                   </div>
+                </Link>
+              )}
+
+              <Link href="/carrinho" className="group relative h-11 w-11 flex items-center justify-center rounded-2xl bg-slate-50 text-secondary border border-slate-100 hover:border-primary/20 hover:bg-white hover:shadow-xl transition-all">
+                <ShoppingCart className="h-5 w-5 transition-transform group-hover:scale-110" />
+                {cartCount > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-black text-white shadow-lg ring-2 ring-white">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            </div>
+          </div>
+
+          {/* Search Row Mobile */}
+          <div className="pb-4 lg:hidden">
+            <Suspense fallback={<div className="h-14 w-full animate-pulse rounded-2xl bg-slate-50" />}>
+              <StoreSearch />
+            </Suspense>
+          </div>
+
+          {/* Desktop Nav */}
+          <nav className="hidden lg:block border-t border-slate-50">
+            <ul className="flex items-center justify-between px-1">
+              <div className="flex items-center gap-2">
+                <li>
+                  <Link href="/produtos" className="flex items-center gap-2 px-5 py-3 text-[11px] font-black text-slate-600 uppercase tracking-[0.2em] hover:text-primary hover:bg-primary/5 rounded-xl transition-all">
+                    <Menu className="h-4 w-4" />
+                    Catálogo
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/promocoes" className="flex items-center gap-2 px-5 py-3 text-[11px] font-black text-[#F47920] uppercase tracking-[0.2em] hover:bg-[#F47920]/5 rounded-xl transition-all">
+                    <Tag className="h-4 w-4" />
+                    Ofertas
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/rastrear-pedido" className="px-5 py-3 text-[11px] font-black text-slate-600 uppercase tracking-[0.2em] hover:text-primary hover:bg-primary/5 rounded-xl transition-all">
+                    Rastreamento
+                  </Link>
+                </li>
+              </div>
+              
+              {isMounted && (
+                <li>
+<ContactPopup>
+                     <button className="flex items-center gap-2 px-5 py-3 text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] hover:bg-slate-50 rounded-xl transition-all border border-slate-100 hover:border-primary/30">
+                       <Headset className="h-4 w-4 text-primary" />
+                       Atendimento Consultivo
+                     </button>
+                   </ContactPopup>
+                </li>
+              )}
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div className="fixed inset-x-0 bottom-0 top-[125px] z-50 bg-white lg:hidden overflow-y-auto animate-in slide-in-from-top-2 duration-200">
+          <div className="p-6 space-y-6">
+            <Link href="/produtos" onClick={() => setMenuOpen(false)} className="flex items-center justify-between p-5 rounded-[24px] bg-slate-50 text-[11px] font-black uppercase tracking-widest text-slate-900 shadow-sm border border-slate-100">
+              Catálogo Completo
+              <ChevronDown className="h-4 w-4 -rotate-90 opacity-40" />
+            </Link>
+            <div className="grid grid-cols-1 gap-2">
+                {categories.slice(0, 8).map((cat) => (
+                  <Link key={cat.id} href={`/categoria/${cat.slug}`} onClick={() => setMenuOpen(false)} className="block px-5 py-3 text-sm font-bold text-slate-600 hover:text-primary">
+                      {cat.name}
+                  </Link>
+                ))}
+            </div>
+            <div className="pt-6 border-t border-slate-100 space-y-4">
+              <a
+                href={`tel:+${SITE.whatsappE164}`}
+                onClick={() => trackWhatsAppClick("header_phone")}
+                data-source="header_phone"
+                data-track="btn_whatsapp"
+                data-button-name="btn_whatsapp"
+                data-name="btn_whatsapp"
+                className="flex items-center justify-center gap-3 w-full h-14 rounded-2xl bg-secondary text-white font-black uppercase tracking-widest text-[11px] btn-whatsapp-track"
+              >
+              <Phone className="h-4 w-4" />
+              {SITE.phoneDisplay}
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </header>
+  )
+}
+
+
+========== tailwind.config.ts  ->  tailwind.config.ts ==========
+### NAO ENCONTRADO ###
+
+========== TOKENS DE COR USADOS NO PROJETO ==========
+app\(store)\cadastro\page.tsx:10: import DynamicBrandLogo from "@/components/store/dynamic-brand-logo"
+app\(store)\carrinho\page.tsx:96: className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground shadow-app transition hover:scale-[1.03] hover:bg-primary/92 active:scale-[0.98]"
+app\(store)\login\login-form.tsx:10: import DynamicBrandLogo from "@/components/store/dynamic-brand-logo"
+app\(store)\minha-conta\page.tsx:315: className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+app\(store)\produto\[slug]\ProductPageClient.tsx:80: { bg: "bg-amber-100", text: "text-amber-700" },
+app\(store)\produto\[slug]\ProductPageClient.tsx:339: ? "text-amber-400 fill-amber-400"
+app\(store)\produto\[slug]\ProductPageClient.tsx:523: <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-100 rounded-full">
+app\(store)\produto\[slug]\ProductPageClient.tsx:524: <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+app\(store)\produto\[slug]\ProductPageClient.tsx:525: <span className="text-sm font-black text-amber-700">{avgRating}</span>
+app\(store)\produto\[slug]\ProductPageClient.tsx:526: <span className="text-xs text-amber-500">({reviews.length} avaliações)</span>
+app\(store)\produto\[slug]\ProductPageClient.tsx:543: ? "text-amber-400 fill-amber-400"
+app\(store)\produto\[slug]\ProductPageClient.tsx:556: <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+app\(store)\produto\[slug]\ProductPageClient.tsx:560: className="h-full bg-amber-400 rounded-full transition-all duration-700"
+app\(store)\produto\[slug]\ProductPageClient.tsx:602: i < r.rating ? "text-amber-400 fill-amber-400" : "text-slate-200 fill-slate-200"
+app\(store)\produto\[slug]\ProductPageClient.tsx:672: i < reviewForm.rating ? "text-amber-400 fill-amber-400" : "text-slate-200 fill-slate-200"
+app\(store)\produtos\page.tsx:130: <button type="button" onClick={() => handleCategory("all")} className={`shrink-0 snap-start rounded-full px-4 py-2.5 text-sm font-semibold transition duration-200 lg:w-full lg:rounded-xl lg:px-3 lg:py-2.5 lg:text-left ${categoryId === "all" ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted/60 text-foreground hover:bg-muted lg:bg-transparent"}`}>
+app\(store)\produtos\page.tsx:134: <button key={c.id} type="button" onClick={() => handleCategory(c.id)} className={`max-w-[200px] shrink-0 snap-start truncate rounded-full px-4 py-2.5 text-sm font-medium transition duration-200 lg:max-w-none lg:w-full lg:rounded-xl lg:px-3 lg:py-2.5 lg:text-left ${categoryId === c.id ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted/60 text-foreground hover:bg-muted lg:bg-transparent"}`}>
+app\(store)\promocoes\page.tsx:104: <Sparkles className="h-5 w-5 text-amber-400" />
+app\(store)\recuperar-senha\page.tsx:4: import DynamicBrandLogo from "@/components/store/dynamic-brand-logo"
+app\admin\(dashboard)\analytics-whatsapp\page.tsx:162: period === p ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
+app\admin\(dashboard)\avaliacoes\page.tsx:278: <Star key={i} className={`w-3 h-3 ${i < r.rating ? "text-amber-400 fill-amber-400" : "text-slate-200"}`} />
+app\admin\(dashboard)\avaliacoes\page.tsx:295: <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 uppercase tracking-widest">
+app\admin\(dashboard)\avaliacoes\page.tsx:306: ? "hover:bg-amber-50 text-muted-foreground hover:text-amber-600"
+app\admin\(dashboard)\avaliacoes\page.tsx:390: className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+app\admin\(dashboard)\banners\page.tsx:75: <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">
+app\admin\(dashboard)\banners\page.tsx:102: <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs flex items-start gap-2">
+app\admin\(dashboard)\banners\page.tsx:118: <button onClick={handleSave} className="flex-1 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">{editing ? "Atualizar" : "Criar"}</button>
+app\admin\(dashboard)\banners\page.tsx:131: {!b.active && <div className="absolute inset-0 bg-black/50 flex items-center justify-center"><span className="text-sm font-medium text-primary-foreground bg-muted-foreground/80 px-3 py-1 rounded">Inativo</span></div>}
+app\admin\(dashboard)\categorias\page.tsx:95: <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">
+app\admin\(dashboard)\categorias\page.tsx:131: <button onClick={handleSave} className="flex-1 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">
+app\admin\(dashboard)\google\page.tsx:105: <AlertCircle className="h-4 w-4 text-amber-400 shrink-0" />
+app\admin\(dashboard)\pedidos\page.tsx:22: pending: "bg-amber-100 text-amber-700",
+app\admin\(dashboard)\produtos\page.tsx:258: <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">
+app\admin\(dashboard)\produtos\page.tsx:269: className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition text-sm whitespace-nowrap disabled:opacity-50"
+app\admin\(dashboard)\produtos\page.tsx:394: <span className="absolute top-1 left-1 px-1.5 py-0.5 bg-primary text-primary-foreground text-[10px] rounded font-bold">PRINCIPAL</span>
+app\admin\(dashboard)\produtos\page.tsx:397: <button type="button" onClick={() => setMainImage(img)} className="p-1.5 bg-primary rounded text-primary-foreground" title="Definir como principal"><ImageIcon className="w-3.5 h-3.5" /></button>
+app\admin\(dashboard)\produtos\page.tsx:435: <button onClick={handleSave} className="flex-1 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">{editing ? "Atualizar Produto" : "Criar Produto"}</button>
+app\admin\(dashboard)\produtos\page.tsx:440: className="flex items-center gap-2 px-4 py-2.5 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition disabled:opacity-50"
+app\admin\(dashboard)\produtos\page.tsx:520: className="p-2 rounded-lg hover:bg-amber-50 transition text-muted-foreground hover:text-amber-600 disabled:opacity-40"
+app\admin\(dashboard)\settings\page.tsx:266: className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-60"
+app\admin\(dashboard)\settings\page.tsx:602: className="inline-flex items-center gap-1 rounded-xl bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground"
+app\admin\(dashboard)\subcategorias\page.tsx:63: <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">
+app\admin\(dashboard)\subcategorias\page.tsx:92: <button onClick={handleSave} className="flex-1 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">{editing ? "Atualizar" : "Criar"}</button>
+app\admin\(dashboard)\whatsapp\page.tsx:80: <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">
+app\admin\(dashboard)\whatsapp\page.tsx:111: <button onClick={handleSave} className="flex-1 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">{editing ? "Atualizar" : "Adicionar"}</button>
+app\admin\(dashboard)\page.tsx:46: { label: "Avaliacoes Pendentes", value: data?.pendingReviews || 0, icon: Star, color: "bg-amber-500" },
+app\admin\(dashboard)\page.tsx:80: <Clock className="w-4 h-4 text-amber-500" />
+app\admin\(dashboard)\page.tsx:128: order.status === "pending" ? "bg-amber-100 text-amber-700" :
+app\admin\login\page.tsx:84: <Lock className="w-8 h-8 text-primary-foreground" />
+app\admin\login\page.tsx:133: className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition disabled:opacity-50"
+app\globals.css:13: --primary: #C2410C;
+app\globals.css:14: --primary-foreground: #FFFFFF;
+app\globals.css:19: --accent: #F59E0B;
+app\globals.css:25: --ring: #C2410C;
+app\globals.css:29: --brand-navy: #0A0A0A;
+app\globals.css:30: --brand-blue: #C2410C;
+app\globals.css:31: --brand-concrete: #78716C;
+app\globals.css:42: --primary-foreground: #FFFFFF;
+app\globals.css:43: --secondary: #F59E0B;
+app\globals.css:47: --accent: #F59E0B;
+app\globals.css:59: --color-background: var(--background);
+app\globals.css:60: --color-foreground: var(--foreground);
+app\globals.css:61: --color-card: var(--card);
+app\globals.css:62: --color-card-foreground: var(--card-foreground);
+app\globals.css:63: --color-popover: var(--popover);
+app\globals.css:64: --color-popover-foreground: var(--popover-foreground);
+app\globals.css:65: --color-primary: var(--primary);
+app\globals.css:66: --color-primary-foreground: var(--primary-foreground);
+app\globals.css:67: --color-secondary: var(--secondary);
+app\globals.css:68: --color-secondary-foreground: var(--secondary-foreground);
+app\globals.css:69: --color-muted: var(--muted);
+app\globals.css:70: --color-muted-foreground: var(--muted-foreground);
+app\globals.css:71: --color-accent: var(--accent);
+app\globals.css:72: --color-accent-foreground: var(--accent-foreground);
+app\globals.css:73: --color-destructive: var(--destructive);
+app\globals.css:74: --color-destructive-foreground: var(--destructive-foreground);
+app\globals.css:75: --color-border: var(--border);
+app\globals.css:76: --color-input: var(--input);
+app\globals.css:77: --color-ring: var(--ring);
+app\icon.tsx:6: // Favicon Discibra — terracota #C2410C, monograma "D" branco.
+app\icon.tsx:17: background: "#C2410C",
+app\icon.tsx:20: boxShadow: "0 0 0 6px #C2410C",
+components\store\dynamic-brand-logo.tsx:32: <rect x="0" y="0" width="300" height="300" fill="#C2410C" />
+components\store\dynamic-brand-logo.tsx:33: <path d="M-30 236 L330 116 L330 166 L-30 286 Z" fill="#F59E0B" />
+components\store\footer.tsx:6: import DynamicBrandLogo from "@/components/store/dynamic-brand-logo"
+components\store\header.tsx:7: import DynamicBrandLogo from "@/components/store/dynamic-brand-logo"
+components\store\product-card.tsx:209: <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-amber-400 text-amber-400" />
+components\ui\badge.tsx:13: 'border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90',
+components\ui\button.tsx:12: default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+components\ui\calendar.tsx:204: 'data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70',
+components\ui\chart.tsx:93: return color ? `  --color-${key}: ${color};` : null
+components\ui\chart.tsx:205: 'shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)',
+components\ui\chart.tsx:216: '--color-bg': indicatorColor,
+components\ui\chart.tsx:217: '--color-border': indicatorColor,
+components\ui\checkbox.tsx:17: 'peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
+components\ui\input.tsx:11: 'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+components\ui\switch.tsx:24: 'bg-background dark:data-[state=unchecked]:bg-foreground dark:data-[state=checked]:bg-primary-foreground pointer-events-none block size-4 rounded-full ring-0 transition-transform data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0'
+lib\branding.ts:11: /** Logo React: @/components/store/brand-logo */
+lib\branding.ts:12: logoImportPath: "@/components/store/brand-logo",
+styles\globals.css:14: --primary-foreground: #ffffff;
+styles\globals.css:29: --brand-navy: #0f172a;
+styles\globals.css:30: --brand-blue: #2563eb;
+styles\globals.css:31: --brand-concrete: #94a3b8;
+styles\globals.css:42: --primary-foreground: #FFFFFF;
+styles\globals.css:59: --color-background: var(--background);
+styles\globals.css:60: --color-foreground: var(--foreground);
+styles\globals.css:61: --color-card: var(--card);
+styles\globals.css:62: --color-card-foreground: var(--card-foreground);
+styles\globals.css:63: --color-popover: var(--popover);
+styles\globals.css:64: --color-popover-foreground: var(--popover-foreground);
+styles\globals.css:65: --color-primary: var(--primary);
+styles\globals.css:66: --color-primary-foreground: var(--primary-foreground);
+styles\globals.css:67: --color-secondary: var(--secondary);
+styles\globals.css:68: --color-secondary-foreground: var(--secondary-foreground);
+styles\globals.css:69: --color-muted: var(--muted);
+styles\globals.css:70: --color-muted-foreground: var(--muted-foreground);
+styles\globals.css:71: --color-accent: var(--accent);
+styles\globals.css:72: --color-accent-foreground: var(--accent-foreground);
+styles\globals.css:73: --color-destructive: var(--destructive);
+styles\globals.css:74: --color-destructive-foreground: var(--destructive-foreground);
+styles\globals.css:75: --color-border: var(--border);
+styles\globals.css:76: --color-input: var(--input);
+styles\globals.css:77: --color-ring: var(--ring);
+
+========== ONDE APARECE TELEFONE ==========

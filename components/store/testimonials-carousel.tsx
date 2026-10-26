@@ -113,7 +113,7 @@ export default function TestimonialsCarousel() {
         </div>
       </div>
 
-      <div className="overflow-visible" ref={emblaRef}>
+      <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex gap-6 py-4">
           {items.map((t, idx) => (
             <div

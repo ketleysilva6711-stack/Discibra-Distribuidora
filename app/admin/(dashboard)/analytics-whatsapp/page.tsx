@@ -71,19 +71,19 @@ function StatBlock({
   icon: typeof Smartphone
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-      <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground mb-3">
-        <Icon className="w-4 h-4 text-primary" />
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="flex items-center gap-2 text-sm font-semibold text-slate-500 mb-3">
+        <Icon className="w-4 h-4 text-[#12A06A]" />
         {title}
       </div>
       <ul className="space-y-2">
         {items.length === 0 ? (
-          <li className="text-sm text-muted-foreground">Sem dados</li>
+          <li className="text-sm text-slate-500">Sem dados</li>
         ) : (
           items.map(([k, v]) => (
             <li key={k} className="flex justify-between text-sm">
-              <span className="text-card-foreground">{k}</span>
-              <span className="font-bold text-primary tabular-nums">{v}</span>
+              <span className="text-slate-900">{k}</span>
+              <span className="font-bold text-[#12A06A] tabular-nums">{v}</span>
             </li>
           ))
         )}
@@ -127,13 +127,13 @@ export default function AnalyticsWhatsAppPage() {
 
   if (error) {
     return (
-      <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 space-y-3 text-sm">
-        <p className="font-semibold text-destructive">Não foi possível carregar o analytics do WhatsApp</p>
-        <p className="text-destructive/90 whitespace-pre-wrap break-words">{error.message}</p>
-        <ul className="list-disc pl-5 text-muted-foreground space-y-1.5">
-            Corrija o banco executando <code className="rounded bg-muted px-1 py-0.5 text-xs">scripts/012_fix_db_schema.sql</code> no SQL do Supabase.
+      <div className="rounded-xl border border-destructive/30 bg-red-600/5 p-6 space-y-3 text-sm">
+        <p className="font-semibold text-red-600">Não foi possível carregar o analytics do WhatsApp</p>
+        <p className="text-red-600/90 whitespace-pre-wrap break-words">{error.message}</p>
+        <ul className="list-disc pl-5 text-slate-500 space-y-1.5">
+            Corrija o banco executando <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">scripts/012_fix_db_schema.sql</code> no SQL do Supabase.
           <li>
-            Em produção, defina <code className="rounded bg-muted px-1 py-0.5 text-xs">SUPABASE_SERVICE_ROLE_KEY</code> (Settings → API → service role) ou use a política RLS do mesmo script para leitura como admin logado.
+            Em produção, defina <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">SUPABASE_SERVICE_ROLE_KEY</code> (Settings → API → service role) ou use a política RLS do mesmo script para leitura como admin logado.
           </li>
         </ul>
       </div>
@@ -144,11 +144,11 @@ export default function AnalyticsWhatsAppPage() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
             <MessageCircle className="w-5 h-5 text-[#25d366]" />
             Analytics WhatsApp
           </h2>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             Cliques que levam ao WhatsApp — origem, dispositivo e navegador.
           </p>
         </div>
@@ -159,7 +159,7 @@ export default function AnalyticsWhatsAppPage() {
               type="button"
               onClick={() => setPeriod(p)}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-                period === p ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
+                period === p ? "bg-[#12A06A] text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"
               }`}
             >
               {PERIOD_LABELS[p]}
@@ -170,33 +170,33 @@ export default function AnalyticsWhatsAppPage() {
 
       {isLoading ? (
         <div className="flex h-48 items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#12A06A] border-t-transparent" />
         </div>
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border border-border bg-gradient-to-br from-[#25d366]/15 to-card p-5 shadow-sm">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+            <div className="rounded-xl border border-slate-200 bg-gradient-to-br from-[#25d366]/15 to-card p-5 shadow-sm">
+              <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold uppercase tracking-wide">
                 <MousePointerClick className="w-4 h-4" />
                 Total de cliques
               </div>
-              <p className="mt-2 text-3xl font-bold text-foreground tabular-nums">{total}</p>
-              <p className="text-xs text-muted-foreground mt-1">{PERIOD_LABELS[period]}</p>
+              <p className="mt-2 text-3xl font-bold text-slate-900 tabular-nums">{total}</p>
+              <p className="text-xs text-slate-500 mt-1">{PERIOD_LABELS[period]}</p>
             </div>
             {bySource.slice(0, 3).map(([label, n]) => (
-              <div key={label} className="rounded-xl border border-border bg-card p-5 shadow-sm">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide line-clamp-2">{label}</p>
-                <p className="mt-2 text-2xl font-bold text-primary tabular-nums">{n}</p>
+              <div key={label} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide line-clamp-2">{label}</p>
+                <p className="mt-2 text-2xl font-bold text-[#12A06A] tabular-nums">{n}</p>
               </div>
             ))}
           </div>
 
           <div>
-            <h3 className="text-sm font-bold text-foreground mb-3">Cliques por tipo</h3>
-            <div className="rounded-xl border border-border bg-card overflow-hidden">
+            <h3 className="text-sm font-bold text-slate-900 mb-3">Cliques por tipo</h3>
+            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border bg-muted/40">
+                  <tr className="border-b border-slate-200 bg-slate-100/40">
                     <th className="text-left px-4 py-3 font-semibold">Origem</th>
                     <th className="text-right px-4 py-3 font-semibold">Cliques</th>
                     <th className="text-right px-4 py-3 font-semibold w-40">%</th>
@@ -205,16 +205,16 @@ export default function AnalyticsWhatsAppPage() {
                 <tbody>
                   {bySource.length === 0 ? (
                     <tr>
-                      <td colSpan={3} className="px-4 py-8 text-center text-muted-foreground">
+                      <td colSpan={3} className="px-4 py-8 text-center text-slate-500">
                         Nenhum evento no período
                       </td>
                     </tr>
                   ) : (
                     bySource.map(([label, n]) => (
-                      <tr key={label} className="border-b border-border last:border-0">
+                      <tr key={label} className="border-b border-slate-200 last:border-0">
                         <td className="px-4 py-2.5">{label}</td>
                         <td className="px-4 py-2.5 text-right font-medium tabular-nums">{n}</td>
-                        <td className="px-4 py-2.5 text-right text-muted-foreground tabular-nums">
+                        <td className="px-4 py-2.5 text-right text-slate-500 tabular-nums">
                           {total ? Math.round((n / total) * 100) : 0}%
                         </td>
                       </tr>
@@ -231,7 +231,7 @@ export default function AnalyticsWhatsAppPage() {
             <StatBlock title="Sistema operacional" items={osSorted} icon={Monitor} />
           </div>
 
-          <p className="text-xs text-muted-foreground flex items-center gap-2">
+          <p className="text-xs text-slate-500 flex items-center gap-2">
             <Apple className="w-3.5 h-3.5 shrink-0 opacity-60" />
             Classificação automática pelo navegador. Dados antigos podem não ter colunas preenchidas até nova migração.
           </p>

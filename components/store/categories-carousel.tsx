@@ -82,7 +82,7 @@ export default function CategoriesCarousel({ categories }: CategoriesCarouselPro
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-white p-2">
                   {category.image_url ? (
                     <Image
-                      src={category.image_url}
+                      src={category.image_url.trim()}
                       alt={category.name}
                       fill
                       draggable={false}

@@ -28,7 +28,7 @@ const BASE_KEYWORDS = [
   "construção civil",
 ]
 
-export const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.atacadodeconstrucao.com"
+export const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.discibradistribuidora.com"
 
 /**
  * Gera URL canonical para uma página

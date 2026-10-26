@@ -68,48 +68,48 @@ export default function WhatsAppPage() {
     mutate()
   }
 
-  if (isLoading) return <div className="flex items-center justify-center h-64"><div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" /></div>
+  if (isLoading) return <div className="flex items-center justify-center h-64"><div className="animate-spin w-8 h-8 border-4 border-[#12A06A] border-t-transparent rounded-full" /></div>
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-muted-foreground">{numbers?.length || 0} numeros cadastrados</p>
-          <p className="text-xs text-muted-foreground mt-1">Gerencie os numeros de WhatsApp que recebem pedidos. O sistema faz rodizio automatico entre os numeros ativos.</p>
+          <p className="text-sm text-slate-500">{numbers?.length || 0} numeros cadastrados</p>
+          <p className="text-xs text-slate-500 mt-1">Gerencie os numeros de WhatsApp que recebem pedidos. O sistema faz rodizio automatico entre os numeros ativos.</p>
         </div>
-        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">
+        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-[#12A06A] text-white rounded-lg font-medium hover:bg-[#0e8a5b] transition">
           <Plus className="w-4 h-4" /> Novo Numero
         </button>
       </div>
 
       {showForm && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-card rounded-xl p-6 w-full max-w-md border border-border">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md border border-slate-200">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-lg font-bold text-card-foreground">{editing ? "Editar Numero" : "Novo Numero"}</h3>
-              <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
+              <h3 className="text-lg font-bold text-slate-900">{editing ? "Editar Numero" : "Novo Numero"}</h3>
+              <button onClick={() => setShowForm(false)} className="text-slate-500 hover:text-slate-900"><X className="w-5 h-5" /></button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-card-foreground mb-1">Nome do Vendedor</label>
-                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex: Vendedor 1" className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none" />
+                <label className="block text-sm font-medium text-slate-900 mb-1">Nome do Vendedor</label>
+                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex: Vendedor 1" className="w-full px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-[#12A06A] outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-card-foreground mb-1">Numero WhatsApp (com DDI)</label>
-                <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="5516996447972" className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none" />
-                <p className="text-xs text-muted-foreground mt-1">Formato: 55 + DDD + numero (ex: 5516996447972)</p>
+                <label className="block text-sm font-medium text-slate-900 mb-1">Numero WhatsApp (com DDI)</label>
+                <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="5516996447972" className="w-full px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-[#12A06A] outline-none" />
+                <p className="text-xs text-slate-500 mt-1">Formato: 55 + DDD + numero (ex: 5516996447972)</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-card-foreground mb-1">Ordem</label>
-                <input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none" />
+                <label className="block text-sm font-medium text-slate-900 mb-1">Ordem</label>
+                <input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-[#12A06A] outline-none" />
               </div>
               <label className="flex items-center gap-2">
-                <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="w-4 h-4 accent-primary" />
-                <span className="text-sm text-card-foreground">Ativo</span>
+                <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="w-4 h-4 accent-[#12A06A]" />
+                <span className="text-sm text-slate-900">Ativo</span>
               </label>
               <div className="flex gap-3">
-                <button onClick={handleSave} className="flex-1 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">{editing ? "Atualizar" : "Adicionar"}</button>
-                <button onClick={() => setShowForm(false)} className="flex-1 py-2 bg-muted text-muted-foreground rounded-lg font-medium hover:bg-muted/80 transition">Cancelar</button>
+                <button onClick={handleSave} className="flex-1 py-2 bg-[#12A06A] text-white rounded-lg font-medium hover:bg-[#0e8a5b] transition">{editing ? "Atualizar" : "Adicionar"}</button>
+                <button onClick={() => setShowForm(false)} className="flex-1 py-2 bg-slate-100 text-slate-500 rounded-lg font-medium hover:bg-slate-200 transition">Cancelar</button>
               </div>
             </div>
           </div>
@@ -118,30 +118,30 @@ export default function WhatsAppPage() {
 
       <div className="grid gap-4">
         {numbers?.map((n) => (
-          <div key={n.id} className={`bg-card rounded-xl border border-border p-5 flex items-center justify-between ${!n.active ? "opacity-60" : ""}`}>
+          <div key={n.id} className={`bg-white rounded-xl border border-slate-200 p-5 flex items-center justify-between ${!n.active ? "opacity-60" : ""}`}>
             <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${n.active ? "bg-green-100 text-green-600" : "bg-muted text-muted-foreground"}`}>
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${n.active ? "bg-green-100 text-green-600" : "bg-slate-100 text-slate-500"}`}>
                 <Phone className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-medium text-card-foreground">{n.name}</h4>
-                <p className="text-sm text-muted-foreground">+{n.phone}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Pedidos: {n.order_count || 0}</p>
+                <h4 className="font-medium text-slate-900">{n.name}</h4>
+                <p className="text-sm text-slate-500">+{n.phone}</p>
+                <p className="text-xs text-slate-500 mt-0.5">Pedidos: {n.order_count || 0}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => toggleActive(n.id, n.active)} className={`p-2 rounded-lg transition ${n.active ? "hover:bg-red-50 text-green-600 hover:text-red-500" : "hover:bg-green-50 text-muted-foreground hover:text-green-600"}`} title={n.active ? "Desativar" : "Ativar"}>
+              <button onClick={() => toggleActive(n.id, n.active)} className={`p-2 rounded-lg transition ${n.active ? "hover:bg-red-50 text-green-600 hover:text-red-500" : "hover:bg-green-50 text-slate-500 hover:text-green-600"}`} title={n.active ? "Desativar" : "Ativar"}>
                 {n.active ? <Power className="w-4 h-4" /> : <PowerOff className="w-4 h-4" />}
               </button>
-              <button onClick={() => openEdit(n)} className="p-2 rounded-lg hover:bg-muted transition text-muted-foreground hover:text-primary"><Pencil className="w-4 h-4" /></button>
-              <button onClick={() => handleDelete(n.id)} className="p-2 rounded-lg hover:bg-destructive/10 transition text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></button>
+              <button onClick={() => openEdit(n)} className="p-2 rounded-lg hover:bg-slate-100 transition text-slate-500 hover:text-[#12A06A]"><Pencil className="w-4 h-4" /></button>
+              <button onClick={() => handleDelete(n.id)} className="p-2 rounded-lg hover:bg-red-50 transition text-slate-500 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
             </div>
           </div>
         ))}
         {(!numbers || numbers.length === 0) && (
-          <div className="bg-card rounded-xl border border-border p-12 text-center">
-            <Phone className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">Nenhum numero cadastrado</p>
+          <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
+            <Phone className="w-12 h-12 text-slate-500 mx-auto mb-3" />
+            <p className="text-slate-500">Nenhum numero cadastrado</p>
           </div>
         )}
       </div>

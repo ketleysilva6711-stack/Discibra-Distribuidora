@@ -19,8 +19,12 @@ function uid() {
 }
 
 export function generateOrderCode() {
-  const n = Math.floor(10000 + Math.random() * 90000)
-  return `CCC-${n}`
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+  let code = "PED-"
+  for (let i = 0; i < 8; i++) {
+    code += chars[Math.floor(Math.random() * chars.length)]
+  }
+  return code
 }
 
 export function getLocalOrders(): LocalOrder[] {

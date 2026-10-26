@@ -7,9 +7,11 @@
 import { notFound } from "next/navigation"
 import { createPublicClient } from "@/lib/supabase/public"
 import { SITE } from "@/lib/site-config"
+import { productSchema } from "@/lib/seo"
 import { ProductPageClient } from "./ProductPageClient"
 
 export const revalidate = 3600
+export const dynamicParams = true
 
 // ─── Tipos ────────────────────────────────────────────────────────────
 type Review = {
@@ -40,7 +42,8 @@ async function getProduct(slug: string) {
     .from("products")
     .select("*, categories(name, slug)")
     .eq("slug", slug)
-    .single()
+    .limit(1)
+    .maybeSingle()
 
   if (error || !data) return null
   return data
@@ -53,7 +56,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!product) {
     return {
-      title: "Produto não encontrado | Cimento & Cal Distribuidora",
+      title: "Produto não encontrado | Discibra Distribuidora",
       description: "O produto solicitado não foi encontrado em nosso catálogo.",
     }
   }
@@ -64,20 +67,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     : 0
 
   return {
-    title: `${product.name} | Preço de Atacado | Cimento & Cal`,
+    title: `${product.name} | Preço de Atacado | Discibra`,
     description: product.description || `${product.name} — ${SITE.shortName}. Compre com preço de atacado e entrega ágil.`,
-    keywords: [product.name, product.category?.name, "materiais de construção", "preço de atacado"],
+    keywords: [product.name, product.categories?.name, "materiais de construção", "preço de atacado"],
     images: allImages.length > 0 ? allImages : undefined,
     openGraph: {
-      title: `${product.name} | Preço de Atacado | Cimento & Cal`,
+      title: `${product.name} | Preço de Atacado | Discibra`,
       description: product.description || `${product.name} — ${SITE.shortName}. Compre com preço de atacado e entrega ágil.`,
       images: allImages.length > 0 ? allImages : undefined,
-      type: "website" as const,
+      type: "article" as const,
       url: `${SITE.siteUrl}/produto/${product.slug}`,
     },
     twitter: {
       card: "summary_large_image" as const,
-      title: `${product.name} | Preço de Atacado | Cimento & Cal`,
+      title: `${product.name} | Preço de Atacado | Discibra`,
       description: product.description || `${product.name} — ${SITE.shortName}`,
       images: allImages.length > 0 ? allImages : undefined,
     },
@@ -107,5 +110,25 @@ export default async function ProductPage({
     notFound()
   }
 
-  return <ProductPageClient product={product} />
+  const allImages = [product.image_url, ...(product.images || [])].filter(Boolean) as string[]
+  const schema = productSchema(
+    product.name,
+    product.description || `${product.name} — Discibra`,
+    Number(product.price),
+    product.sku || product.slug,
+    allImages[0] || `${SITE.siteUrl}/brand/icon-512.png`,
+    product.stock > 0 ? "InStock" : "OutOfStock",
+    product.avg_rating,
+    product.review_count
+  )
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+      <ProductPageClient product={product} />
+    </>
+  )
 }

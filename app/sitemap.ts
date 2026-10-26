@@ -5,10 +5,10 @@
 import type { MetadataRoute } from "next"
 import { createClient } from "@/lib/supabase/server"
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.atacadodeconstrucao.com"
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.discibradistribuidora.com"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.atacadodeconstrucao.com"
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.discibradistribuidora.com"
 
   // Buscar slugs de produtos ativos
   const supabase = await createClient()

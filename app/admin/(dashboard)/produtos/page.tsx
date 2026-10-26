@@ -1,27 +1,44 @@
-"use client"
+﻿"use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import useSWR from "swr"
 import { createClient } from "@/lib/supabase/client"
-import { Plus, Pencil, Trash2, X, Upload, ImageIcon, Package, Search, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 import Image from "next/image"
+import {
+  Plus, Pencil, Trash2, X, Upload, ImageIcon, Package, Search,
+  Star, RefreshCw, CheckCircle2, XCircle, Sparkles,
+} from "lucide-react"
 import { uploadImage } from "@/lib/upload-image"
 
 const supabase = createClient()
+const PER_PAGE = 20
 
-const fetchProducts = async () => {
-  const { data } = await supabase.from("products").select("*, categories(name)").order("created_at", { ascending: false })
-  return data || []
+function brl(n: number) { return "R$ " + (Number(n) || 0).toFixed(2).replace(".", ",") }
+
+function slugify(s: string) {
+  return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
 }
-const fetchCats = async () => {
-  const { data } = await supabase.from("categories").select("id, name").order("name")
-  return data || []
+
+const SELECT = "id, name, slug, description, price, original_price, stock, active, featured, is_new, is_discount, image_url, images, unit, sku, weight, height, width, depth, category_id, subcategory_id, categories(name)"
+
+const fetchProducts = async ([, page, q, cat, st]: [string, number, string, string, string]) => {
+  const from = (page - 1) * PER_PAGE
+  const to = from + PER_PAGE - 1
+  let query = supabase.from("products").select(SELECT, { count: "exact" }).order("created_at", { ascending: false }).range(from, to)
+  if (q) query = query.ilike("name", `%${q}%`)
+  if (cat) query = query.eq("category_id", cat)
+  if (st === "active") query = query.eq("active", true)
+  if (st === "inactive") query = query.eq("active", false)
+  if (st === "low") query = query.lte("stock", 10)
+  if (st === "featured") query = query.eq("featured", true)
+  const { data, count, error } = await query
+  if (error) throw error
+  return { rows: data || [], count: count || 0 }
 }
-const fetchSubcats = async () => {
-  const { data } = await supabase.from("subcategories").select("id, name, category_id").order("name")
-  return data || []
-}
+
+const fetchCats = async () => (await supabase.from("categories").select("id, name").order("name")).data || []
+const fetchSubcats = async () => (await supabase.from("subcategories").select("id, name, category_id").order("name")).data || []
 
 type ProductForm = {
   name: string; slug: string; description: string; price: string; original_price: string;
@@ -35,514 +52,395 @@ const emptyForm: ProductForm = {
   name: "", slug: "", description: "", price: "", original_price: "",
   category_id: "", subcategory_id: "", image_url: "", images: [],
   unit: "un", stock: "0", active: true, featured: false,
-  sku: "", weight: "0", height: "0", width: "0", depth: "0",
-  is_new: false, is_discount: false
+  sku: "", weight: "0", height: "0", width: "0", depth: "0", is_new: false, is_discount: false,
+}
+
+function InlineNumber({ value, onCommit }: { value: number; onCommit: (v: number) => void }) {
+  const [v, setV] = useState(String(value ?? 0))
+  useEffect(() => { setV(String(value ?? 0)) }, [value])
+  return (
+    <input
+      value={v}
+      onChange={(e) => setV(e.target.value)}
+      onBlur={() => { const n = Number(v.replace(",", ".")); if (!Number.isNaN(n) && n !== value) onCommit(n) }}
+      onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur() }}
+      className="w-24 rounded-lg border border-slate-200 px-2 py-1 text-sm outline-none focus:border-[#12A06A]"
+    />
+  )
 }
 
 export default function ProdutosPage() {
-  const { data: products, mutate, isLoading } = useSWR("admin-products", fetchProducts)
-  const { data: categories } = useSWR("admin-cats-select2", fetchCats)
-  const { data: subcategories } = useSWR("admin-subcats-select", fetchSubcats)
+  const [page, setPage] = useState(1)
+  const [q, setQ] = useState("")
+  const [cat, setCat] = useState("")
+  const [st, setSt] = useState("all")
+  const { data, mutate, isLoading } = useSWR(["admin-products", page, q, cat, st], fetchProducts, { keepPreviousData: true })
+  const { data: categories } = useSWR("admin-cats", fetchCats)
+  const { data: subcategories } = useSWR("admin-subcats", fetchSubcats)
+
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<string | null>(null)
   const [form, setForm] = useState<ProductForm>(emptyForm)
   const [uploading, setUploading] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [filterCat, setFilterCat] = useState("")
-  const [seedingId, setSeedingId] = useState<string | null>(null)
-  const [fetchingImageId, setFetchingImageId] = useState<string | null>(null)
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [isSeedingBulk, setIsSeedingBulk] = useState(false)
+  const [busy, setBusy] = useState<string | null>(null)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
 
-  function generateSlug(name: string) {
-    return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
-  }
+  const rows = data?.rows || []
+  const total = data?.count || 0
+  const totalPages = Math.max(1, Math.ceil(total / PER_PAGE))
+  const filteredSubcats = (subcategories || []).filter((s: any) => s.category_id === form.category_id)
 
   function openNew() { setEditing(null); setForm(emptyForm); setShowForm(true) }
-
-  function openEdit(p: Record<string, unknown>) {
-    setEditing(p.id as string)
+  function openEdit(p: any) {
+    setEditing(p.id)
     setForm({
-      name: p.name as string, slug: p.slug as string, description: (p.description as string) || "",
-      price: String(p.price), original_price: p.original_price ? String(p.original_price) : "",
-      category_id: (p.category_id as string) || "", subcategory_id: (p.subcategory_id as string) || "",
-      image_url: (p.image_url as string) || "", images: (p.images as string[]) || [],
-      unit: (p.unit as string) || "un", stock: String(p.stock || 0),
-      active: p.active as boolean, featured: p.featured as boolean,
-      sku: (p.sku as string) || "",
-      weight: String(p.weight || 0), height: String(p.height || 0),
-      width: String(p.width || 0), depth: String(p.depth || 0),
-      is_new: (p.is_new as boolean) || false, is_discount: (p.is_discount as boolean) || false
+      name: p.name || "", slug: p.slug || "", description: p.description || "",
+      price: String(p.price ?? ""), original_price: p.original_price ? String(p.original_price) : "",
+      category_id: p.category_id || "", subcategory_id: p.subcategory_id || "",
+      image_url: p.image_url || "", images: p.images || [],
+      unit: p.unit || "un", stock: String(p.stock ?? 0),
+      active: !!p.active, featured: !!p.featured, sku: p.sku || "",
+      weight: String(p.weight ?? 0), height: String(p.height ?? 0),
+      width: String(p.width ?? 0), depth: String(p.depth ?? 0),
+      is_new: !!p.is_new, is_discount: !!p.is_discount,
     })
     setShowForm(true)
   }
 
-  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files
-    if (!files || files.length === 0) return
+    if (!files?.length) return
     setUploading(true)
-    const newImages: string[] = []
+    const urls: string[] = []
     for (const file of Array.from(files)) {
       try {
-        const data = await uploadImage(file, "produtos")
-        if (data?.url) {
-          newImages.push(data.url)
-          toast.success(`Imagem "${file.name}" enviada!`)
-        } else {
-          toast.error("Falha no upload")
-        }
-      } catch {
-        toast.error("Erro ao fazer upload")
-      }
+        const res = await uploadImage(file, "produtos")
+        if (res?.url) { urls.push(res.url); toast.success(`Enviada: ${file.name}`) }
+        else toast.error("Falha no upload")
+      } catch { toast.error("Erro no upload") }
     }
     setForm((f) => {
-      const allImages = [...f.images, ...newImages]
-      return { ...f, images: allImages, image_url: f.image_url || allImages[0] || "" }
+      const all = [...f.images, ...urls].slice(0, 10)
+      return { ...f, images: all, image_url: f.image_url || all[0] || "" }
     })
     setUploading(false)
-    // Clear input
     e.target.value = ""
   }
 
-  function setMainImage(url: string) {
-    setForm((f) => ({ ...f, image_url: url }))
-  }
-
-  function removeImage(url: string) {
-    setForm((f) => ({
-      ...f,
-      images: f.images.filter((i) => i !== url),
-      image_url: f.image_url === url ? (f.images.filter((i) => i !== url)[0] || "") : f.image_url,
-    }))
-  }
-
   async function handleSave() {
-    if (!form.name || !form.price) { toast.error("Nome e preco sao obrigatorios"); return }
-    const slug = form.slug || generateSlug(form.name)
-    const payload = {
-      name: form.name, slug, description: form.description,
-      price: parseFloat(form.price) || 0,
-      original_price: form.original_price ? parseFloat(form.original_price) : null,
-      category_id: form.category_id || null, subcategory_id: form.subcategory_id || null,
-      image_url: form.image_url || null, images: form.images,
-      unit: form.unit, stock: parseInt(form.stock) || 0,
+    if (!form.name.trim() || !form.price) { toast.error("Nome e preço são obrigatórios"); return }
+    setBusy("save")
+    const payload: any = {
+      name: form.name.trim(),
+      slug: form.slug?.trim() || slugify(form.name),
+      description: form.description || null,
+      price: Number(String(form.price).replace(",", ".")) || 0,
+      original_price: form.original_price ? Number(String(form.original_price).replace(",", ".")) : null,
+      category_id: form.category_id || null,
+      subcategory_id: form.subcategory_id || null,
+      image_url: form.image_url || null,
+      images: form.images || [],
+      unit: form.unit || "un",
+      stock: Number(form.stock) || 0,
       active: form.active, featured: form.featured,
       sku: form.sku || null,
-      weight: parseFloat(form.weight) || 0,
-      height: parseFloat(form.height) || 0,
-      width: parseFloat(form.width) || 0,
-      depth: parseFloat(form.depth) || 0,
+      weight: Number(form.weight) || 0, height: Number(form.height) || 0,
+      width: Number(form.width) || 0, depth: Number(form.depth) || 0,
       is_new: form.is_new, is_discount: form.is_discount,
     }
-
-    if (editing) {
-      const { error } = await supabase.from("products").update(payload).eq("id", editing)
-      if (error) { toast.error(error.message); return }
-      toast.success("Produto atualizado!")
-    } else {
-      const { error } = await supabase.from("products").insert(payload)
-      if (error) { toast.error(error.message); return }
-      toast.success("Produto criado!")
-    }
-    setShowForm(false); mutate()
+    const { error } = editing
+      ? await supabase.from("products").update(payload).eq("id", editing)
+      : await supabase.from("products").insert(payload)
+    setBusy(null)
+    if (error) { toast.error(error.message); return }
+    toast.success(editing ? "Produto atualizado" : "Produto criado")
+    setShowForm(false)
+    mutate()
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm("Deseja excluir este produto?")) return
-    await supabase.from("products").delete().eq("id", id)
-    toast.success("Produto excluido!"); mutate()
+  async function patch(id: string, values: any) {
+    setBusy(id)
+    const { error } = await supabase.from("products").update(values).eq("id", id)
+    setBusy(null)
+    if (error) { toast.error(error.message); return }
+    mutate()
   }
 
-  /** Busca imagem no Google Images (scraper básico) */
-  async function handleFetchImage(productId: string, productName: string) {
-    if (!confirm(`Buscar e definir primeira imagem da internet para "${productName}"?`)) return
-    setFetchingImageId(productId)
+  async function handleDelete(id: string, name: string) {
+    if (!confirm(`Excluir "${name}"?`)) return
+    const { error } = await supabase.from("products").delete().eq("id", id)
+    if (error) { toast.error(error.message); return }
+    toast.success("Produto excluído")
+    setSelected((s) => { const n = new Set(s); n.delete(id); return n })
+    mutate()
+  }
+
+  async function bulk(updates: any) {
+    const ids = Array.from(selected)
+    if (!ids.length) return
+    setBusy("bulk")
+    const { error } = await supabase.from("products").update(updates).in("id", ids)
+    setBusy(null)
+    if (error) { toast.error(error.message); return }
+    toast.success(`${ids.length} produtos atualizados`)
+    setSelected(new Set())
+    mutate()
+  }
+
+  async function bulkDelete() {
+    const ids = Array.from(selected)
+    if (!ids.length || !confirm(`Excluir ${ids.length} produtos?`)) return
+    setBusy("bulk")
+    await supabase.from("products").delete().in("id", ids)
+    setBusy(null)
+    setSelected(new Set())
+    mutate()
+  }
+
+  async function fetchImage(id: string, name: string) {
+    if (!confirm(`Buscar imagem na internet para "${name}"?`)) return
+    setBusy(id)
     try {
-      const res = await fetch(`/api/admin/products/${productId}/fetch-image`, { method: "POST" })
+      const res = await fetch(`/api/admin/products/${id}/fetch-image`, { method: "POST" })
       const json = await res.json()
-      if (!res.ok) {
-        toast.error(json.error || "Erro ao buscar imagem")
-      } else {
-        toast.success("Imagem encontrada com sucesso!")
-        mutate() // Atualiza a tabela
-      }
-    } catch {
-      toast.error("Erro de rede")
-    } finally {
-      setFetchingImageId(null)
-    }
-  }
-
-  /** Gera avaliações realistas para um produto via API */
-  async function handleSeedReviews(productId: string, productName: string) {
-    if (!confirm(`Gerar avaliações realistas para "${productName}"? Isso adicionará 12–18 avaliações aprovadas.`)) return
-    setSeedingId(productId)
-    try {
-      const res = await fetch("/api/admin/products/seed-reviews-bulk", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productIds: [productId] }),
-        credentials: "include",
-      })
-      const json = await res.json()
-      if (!res.ok) {
-        toast.error(json.error || "Erro ao gerar avaliações")
-        return
-      }
-      if (json.generated === 0) {
-        toast.info(`"${productName}" já possui todas as avaliações do nosso banco. Nenhuma nova foi gerada.`)
-      } else {
-        toast.success(`✅ ${json.generated} avaliações geradas para "${productName}"!`)
-      }
-    } catch {
-      toast.error("Erro de rede ao gerar avaliações")
-    } finally {
-      setSeedingId(null)
-    }
-  }
-
-  async function handleBulkSeed() {
-    if (selectedIds.size === 0) return
-    if (!confirm(`Gerar avaliações para ${selectedIds.size} produto(s) selecionado(s)?`)) return
-    setIsSeedingBulk(true)
-    try {
-      const res = await fetch("/api/admin/products/seed-reviews-bulk", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productIds: Array.from(selectedIds) }),
-        credentials: "include",
-      })
-      const json = await res.json()
-      if (!res.ok) {
-        toast.error(json.error || "Erro ao gerar avaliações em massa")
-        return
-      }
-      toast.success(`✅ Operação concluída! ${json.generated} novas avaliações no total.`)
-      setSelectedIds(new Set())
-    } catch {
-      toast.error("Erro de rede ao gerar avaliações")
-    } finally {
-      setIsSeedingBulk(false)
-    }
-  }
-
-  function toggleSelection(id: string) {
-    const next = new Set(selectedIds)
-    if (next.has(id)) next.delete(id)
-    else next.add(id)
-    setSelectedIds(next)
+      if (json.error) toast.error(json.error); else { toast.success("Imagem atualizada"); mutate() }
+    } catch { toast.error("Erro ao buscar imagem") }
+    setBusy(null)
   }
 
   function toggleAll() {
-    if (selectedIds.size === filteredProducts.length) {
-      setSelectedIds(new Set())
-    } else {
-      setSelectedIds(new Set(filteredProducts.map((p) => p.id)))
-    }
+    setSelected((s) => (s.size === rows.length ? new Set() : new Set(rows.map((r: any) => r.id))))
   }
 
-  const filteredSubcats = subcategories?.filter((s) => s.category_id === form.category_id) || []
-
-  const filteredProducts = products?.filter((p) => {
-    const matchSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchCat = !filterCat || p.category_id === filterCat
-    return matchSearch && matchCat
-  }) || []
-
-  if (isLoading) return <div className="flex items-center justify-center h-64"><div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" /></div>
-
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground">{products?.length || 0} produtos cadastrados</p>
-        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">
-          <Plus className="w-4 h-4" /> Novo Produto
+    <div className="space-y-5">
+      {/* Barra de ações */}
+      <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 lg:flex-row lg:items-center">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <input value={q} onChange={(e) => { setQ(e.target.value); setPage(1) }} placeholder="Buscar produto por nome..."
+            className="w-full rounded-lg border border-slate-200 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-[#12A06A]" />
+        </div>
+        <select value={cat} onChange={(e) => { setCat(e.target.value); setPage(1) }}
+          className="rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-[#12A06A]">
+          <option value="">Todas as categorias</option>
+          {(categories || []).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
+        <select value={st} onChange={(e) => { setSt(e.target.value); setPage(1) }}
+          className="rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-[#12A06A]">
+          <option value="all">Todos os status</option>
+          <option value="active">Ativos</option>
+          <option value="inactive">Inativos</option>
+          <option value="low">Estoque baixo</option>
+          <option value="featured">Em destaque</option>
+        </select>
+        <button onClick={() => mutate()} className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-50">
+          <RefreshCw className="h-4 w-4" /> Atualizar
+        </button>
+        <button onClick={openNew} className="flex items-center gap-2 rounded-lg bg-[#12A06A] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#0e8a5b]">
+          <Plus className="h-4 w-4" /> Novo produto
         </button>
       </div>
 
-      {/* Filters & Bulk Actions */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        {selectedIds.size > 0 && (
-          <button
-            onClick={handleBulkSeed}
-            disabled={isSeedingBulk}
-            className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition text-sm whitespace-nowrap disabled:opacity-50"
-          >
-            <Sparkles className="w-4 h-4" />
-            {isSeedingBulk ? "Gerando..." : `Gerar em Massa (${selectedIds.size})`}
-          </button>
-        )}
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Buscar produto..." className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none text-sm" />
+      {/* Ações em lote */}
+      {selected.size > 0 && (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[#12A06A]/30 bg-[#12A06A]/5 p-3 text-xs font-bold text-slate-700">
+          <span>{selected.size} selecionados</span>
+          <button onClick={() => bulk({ active: true })} className="rounded-lg border border-slate-200 bg-white px-3 py-1.5">Ativar</button>
+          <button onClick={() => bulk({ active: false })} className="rounded-lg border border-slate-200 bg-white px-3 py-1.5">Desativar</button>
+          <button onClick={() => bulk({ featured: true })} className="rounded-lg border border-slate-200 bg-white px-3 py-1.5">Destacar</button>
+          <button onClick={bulkDelete} className="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-red-600">Excluir</button>
+          <button onClick={() => setSelected(new Set())} className="ml-auto text-slate-500">limpar</button>
         </div>
-        <select value={filterCat} onChange={(e) => setFilterCat(e.target.value)} className="px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:ring-2 focus:ring-primary outline-none">
-          <option value="">Todas Categorias</option>
-          {categories?.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
+      )}
+
+      {/* Tabela */}
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-100 text-left text-[11px] uppercase tracking-wide text-slate-400">
+                <th className="w-10 px-4 py-3">
+                  <input type="checkbox" checked={rows.length > 0 && selected.size === rows.length} onChange={toggleAll} />
+                </th>
+                <th className="px-3 py-3">Produto</th>
+                <th className="px-3 py-3">Categoria</th>
+                <th className="px-3 py-3">Preço</th>
+                <th className="px-3 py-3">Estoque</th>
+                <th className="px-3 py-3">Status</th>
+                <th className="px-3 py-3 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading && rows.length === 0 ? (
+                <tr><td colSpan={7} className="px-4 py-12 text-center text-slate-400">Carregando...</td></tr>
+              ) : rows.length === 0 ? (
+                <tr><td colSpan={7} className="px-4 py-12 text-center text-slate-400">Nenhum produto encontrado.</td></tr>
+              ) : rows.map((p: any) => (
+                <tr key={p.id} className="border-b border-slate-50 hover:bg-slate-50/60">
+                  <td className="px-4 py-3">
+                    <input type="checkbox" checked={selected.has(p.id)}
+                      onChange={() => setSelected((s) => { const n = new Set(s); n.has(p.id) ? n.delete(p.id) : n.add(p.id); return n })} />
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-slate-100 bg-slate-50">
+                        {p.image_url ? <Image src={p.image_url.trim()} alt={p.name} width={44} height={44} className="h-11 w-11 object-cover" /> : <Package className="m-2.5 h-6 w-6 text-slate-300" />}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="line-clamp-1 font-semibold text-slate-800">{p.name}</div>
+                        <div className="text-xs text-slate-400">{p.sku || p.slug}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-3 py-3 text-slate-500">{p.categories?.name || "-"}</td>
+                  <td className="px-3 py-3"><InlineNumber value={Number(p.price)} onCommit={(v) => patch(p.id, { price: v })} /></td>
+                  <td className="px-3 py-3"><InlineNumber value={Number(p.stock)} onCommit={(v) => patch(p.id, { stock: v })} /></td>
+                  <td className="px-3 py-3">
+                    <div className="flex items-center gap-1.5">
+                      <button onClick={() => patch(p.id, { active: !p.active })} title={p.active ? "Desativar" : "Ativar"}
+                        className={`rounded-lg border px-2 py-1 text-[11px] font-bold ${p.active ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-slate-50 text-slate-500"}`}>
+                        {p.active ? "Ativo" : "Inativo"}
+                      </button>
+                      <button onClick={() => patch(p.id, { featured: !p.featured })} title="Destaque"
+                        className={`rounded-lg border p-1.5 ${p.featured ? "border-amber-200 bg-amber-50 text-amber-600" : "border-slate-200 text-slate-400"}`}>
+                        <Star className={`h-3.5 w-3.5 ${p.featured ? "fill-amber-400" : ""}`} />
+                      </button>
+                    </div>
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="flex items-center justify-end gap-1">
+                      <button onClick={() => fetchImage(p.id, p.name)} disabled={busy === p.id} title="Buscar imagem"
+                        className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"><Sparkles className="h-4 w-4" /></button>
+                      <button onClick={() => openEdit(p)} title="Editar"
+                        className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"><Pencil className="h-4 w-4" /></button>
+                      <button onClick={() => handleDelete(p.id, p.name)} title="Excluir"
+                        className="rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3 text-xs text-slate-500">
+          <span>{total} produtos · página {page} de {totalPages}</span>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
+              className="rounded-lg border border-slate-200 px-3 py-1.5 font-bold disabled:opacity-40">Anterior</button>
+            <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages}
+              className="rounded-lg border border-slate-200 px-3 py-1.5 font-bold disabled:opacity-40">Próxima</button>
+          </div>
+        </div>
       </div>
 
-      {/* Modal */}
+      {/* MODAL */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center p-4 overflow-y-auto">
-          <div className="bg-card rounded-xl p-6 w-full max-w-3xl border border-border my-8">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-lg font-bold text-card-foreground">{editing ? "Editar Produto" : "Novo Produto"}</h3>
-              <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/60 p-4">
+          <div className="my-6 w-full max-w-3xl rounded-2xl bg-white shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+              <h3 className="text-base font-bold text-slate-900">{editing ? "Editar produto" : "Novo produto"}</h3>
+              <button onClick={() => setShowForm(false)} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100"><X className="h-5 w-5" /></button>
             </div>
-            <div className="space-y-5">
-              {/* Basic Info */}
-              <div className="bg-muted/50 rounded-lg p-4 space-y-4">
-                <h4 className="text-sm font-semibold text-card-foreground">Informacoes Basicas</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-card-foreground mb-1">Nome do Produto*</label>
-                    <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value, slug: generateSlug(e.target.value) })} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-card-foreground mb-1">SKU</label>
-                    <input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} placeholder="Codigo do produto" className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none text-sm" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-card-foreground mb-1">Categoria*</label>
-                    <select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value, subcategory_id: "" })} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none text-sm">
-                      <option value="">Selecione...</option>
-                      {categories?.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-card-foreground mb-1">Subcategoria</label>
-                    <select value={form.subcategory_id} onChange={(e) => setForm({ ...form, subcategory_id: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none text-sm">
-                      <option value="">Selecione...</option>
-                      {filteredSubcats.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-card-foreground mb-1">Descricao</label>
-                  <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none resize-none text-sm" />
-                </div>
-              </div>
 
-              {/* Pricing */}
-              <div className="bg-muted/50 rounded-lg p-4 space-y-4">
-                <h4 className="text-sm font-semibold text-card-foreground">Precos e Estoque</h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-card-foreground mb-1">Preco Original (R$)</label>
-                    <input type="number" step="0.01" value={form.original_price} onChange={(e) => setForm({ ...form, original_price: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-card-foreground mb-1">Preco Venda (R$)*</label>
-                    <input type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-card-foreground mb-1">Estoque*</label>
-                    <input type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-card-foreground mb-1">Unidade</label>
-                    <select value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none text-sm">
-                      <option value="un">Unidade</option>
-                      <option value="saco">Saco</option>
-                      <option value="lata">Lata</option>
-                      <option value="balde">Balde</option>
-                      <option value="pct">Pacote</option>
-                      <option value="barra">Barra</option>
-                      <option value="m">Metro</option>
-                      <option value="m2">Metro2</option>
-                      <option value="kg">Quilograma</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* Dimensions */}
-              <div className="bg-muted/50 rounded-lg p-4 space-y-4">
-                <h4 className="text-sm font-semibold text-card-foreground">Dimensoes e Peso</h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-card-foreground mb-1">Peso (kg)</label>
-                    <input type="number" step="0.001" value={form.weight} onChange={(e) => setForm({ ...form, weight: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-card-foreground mb-1">Altura (cm)</label>
-                    <input type="number" step="0.01" value={form.height} onChange={(e) => setForm({ ...form, height: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-card-foreground mb-1">Largura (cm)</label>
-                    <input type="number" step="0.01" value={form.width} onChange={(e) => setForm({ ...form, width: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-card-foreground mb-1">Profundidade (cm)</label>
-                    <input type="number" step="0.01" value={form.depth} onChange={(e) => setForm({ ...form, depth: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none text-sm" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Image Upload */}
-              <div className="bg-muted/50 rounded-lg p-4 space-y-4">
-                <h4 className="text-sm font-semibold text-card-foreground">Imagens do Produto</h4>
-                {form.images.length > 0 && (
-                  <div className="flex flex-wrap gap-3">
-                    {form.images.map((img, i) => (
-                      <div key={i} className="relative group">
-                        <Image src={img} alt={`Produto ${i + 1}`} width={100} height={100} className="w-24 h-24 rounded-lg object-cover border-2 border-border" />
-                        {form.image_url === img && (
-                          <span className="absolute top-1 left-1 px-1.5 py-0.5 bg-primary text-primary-foreground text-[10px] rounded font-bold">PRINCIPAL</span>
-                        )}
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition rounded-lg flex items-center justify-center gap-2">
-                          <button type="button" onClick={() => setMainImage(img)} className="p-1.5 bg-primary rounded text-primary-foreground" title="Definir como principal"><ImageIcon className="w-3.5 h-3.5" /></button>
-                          <button type="button" onClick={() => removeImage(img)} className="p-1.5 bg-destructive rounded text-destructive-foreground" title="Remover"><X className="w-3.5 h-3.5" /></button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <label className="flex items-center justify-center gap-2 px-4 py-4 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-muted transition">
-                  <Upload className="w-5 h-5 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">{uploading ? "Enviando imagens..." : `Clique para selecionar imagens (${form.images.length}/10)`}</span>
-                  <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" disabled={uploading || form.images.length >= 10} />
+            <div className="space-y-4 p-5">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <label className="sm:col-span-2 text-sm">
+                  <span className="font-semibold text-slate-700">Nome *</span>
+                  <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-[#12A06A]" />
+                </label>
+                <label className="text-sm">
+                  <span className="font-semibold text-slate-700">Preço (R$) *</span>
+                  <input value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })}
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-[#12A06A]" />
+                </label>
+                <label className="text-sm">
+                  <span className="font-semibold text-slate-700">Preço original</span>
+                  <input value={form.original_price} onChange={(e) => setForm({ ...form, original_price: e.target.value })}
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-[#12A06A]" />
+                </label>
+                <label className="text-sm">
+                  <span className="font-semibold text-slate-700">Categoria</span>
+                  <select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value, subcategory_id: "" })}
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-[#12A06A]">
+                    <option value="">—</option>
+                    {(categories || []).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                </label>
+                <label className="text-sm">
+                  <span className="font-semibold text-slate-700">Subcategoria</span>
+                  <select value={form.subcategory_id} onChange={(e) => setForm({ ...form, subcategory_id: e.target.value })}
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-[#12A06A]">
+                    <option value="">—</option>
+                    {filteredSubcats.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                </label>
+                <label className="text-sm">
+                  <span className="font-semibold text-slate-700">Unidade</span>
+                  <input value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })}
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-[#12A06A]" />
+                </label>
+                <label className="text-sm">
+                  <span className="font-semibold text-slate-700">Estoque</span>
+                  <input value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })}
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-[#12A06A]" />
+                </label>
+                <label className="text-sm">
+                  <span className="font-semibold text-slate-700">SKU</span>
+                  <input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })}
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-[#12A06A]" />
+                </label>
+                <label className="sm:col-span-2 text-sm">
+                  <span className="font-semibold text-slate-700">Descrição</span>
+                  <textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-[#12A06A]" />
                 </label>
               </div>
 
-              {/* Flags */}
-              <div className="bg-muted/50 rounded-lg p-4">
-                <h4 className="text-sm font-semibold text-card-foreground mb-3">Opcoes</h4>
-                <div className="flex flex-wrap items-center gap-6">
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="w-4 h-4 accent-primary" />
-                    <span className="text-sm text-card-foreground">Ativo</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} className="w-4 h-4 accent-primary" />
-                    <span className="text-sm text-card-foreground">Destaque</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" checked={form.is_new} onChange={(e) => setForm({ ...form, is_new: e.target.checked })} className="w-4 h-4 accent-primary" />
-                    <span className="text-sm text-card-foreground">Novo</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" checked={form.is_discount} onChange={(e) => setForm({ ...form, is_discount: e.target.checked })} className="w-4 h-4 accent-primary" />
-                    <span className="text-sm text-card-foreground">Promocao</span>
+              {/* Imagens */}
+              <div>
+                <p className="mb-2 text-sm font-semibold text-slate-700">Imagens ({form.images.length}/10)</p>
+                <div className="flex flex-wrap gap-3">
+                  {form.images.map((img) => (
+                    <div key={img} className="relative">
+                      <Image src={img.trim()} alt="Produto" width={96} height={96} className="h-24 w-24 rounded-lg border-2 border-slate-100 object-cover" />
+                      {form.image_url === img && <span className="absolute left-1 top-1 rounded bg-[#12A06A] px-1.5 py-0.5 text-[9px] font-bold text-white">principal</span>}
+                      <div className="absolute -right-2 -top-2 flex gap-1">
+                        <button type="button" onClick={() => setForm({ ...form, image_url: img })} className="rounded-full bg-slate-700 p-1 text-white"><ImageIcon className="h-3 w-3" /></button>
+                        <button type="button" onClick={() => setForm({ ...form, images: form.images.filter((i) => i !== img), image_url: form.image_url === img ? "" : form.image_url })} className="rounded-full bg-red-500 p-1 text-white"><X className="h-3 w-3" /></button>
+                      </div>
+                    </div>
+                  ))}
+                  <label className="flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-200 text-slate-400 hover:border-[#12A06A]">
+                    <Upload className="h-5 w-5" />
+                    <span className="mt-1 text-[10px]">{uploading ? "enviando..." : "upload"}</span>
+                    <input type="file" accept="image/*" multiple hidden onChange={handleUpload} disabled={uploading} />
                   </label>
                 </div>
               </div>
 
-              <div className="flex gap-3">
-                <button onClick={handleSave} className="flex-1 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">{editing ? "Atualizar Produto" : "Criar Produto"}</button>
-                {editing && (
-                  <button
-                    onClick={() => handleSeedReviews(editing, form.name)}
-                    disabled={!!seedingId}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition disabled:opacity-50"
-                    title="Gerar avaliações realistas automáticas"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    {seedingId === editing ? "Gerando..." : "Gerar Avaliações"}
-                  </button>
-                )}
-                <button onClick={() => setShowForm(false)} className="flex-1 py-2.5 bg-muted text-muted-foreground rounded-lg font-medium hover:bg-muted/80 transition">Cancelar</button>
+              {/* Flags */}
+              <div className="flex flex-wrap gap-4 text-sm">
+                {([["active", "Ativo"], ["featured", "Destaque"], ["is_new", "Novidade"], ["is_discount", "Em oferta"]] as const).map(([k, label]) => (
+                  <label key={k} className="flex items-center gap-2 font-medium text-slate-700">
+                    <input type="checkbox" checked={(form as any)[k]} onChange={(e) => setForm({ ...form, [k]: e.target.checked } as any)} />
+                    {label}
+                  </label>
+                ))}
               </div>
+            </div>
+
+            <div className="flex justify-end gap-3 border-t border-slate-100 px-5 py-4">
+              <button onClick={() => setShowForm(false)} className="rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-600">Cancelar</button>
+              <button onClick={handleSave} disabled={busy === "save"} className="rounded-lg bg-[#12A06A] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#0e8a5b] disabled:opacity-60">
+                {busy === "save" ? "Salvando..." : editing ? "Atualizar" : "Criar produto"}
+              </button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Products Table */}
-      <div className="bg-card rounded-xl border border-border overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border">
-              <th className="px-4 py-3 text-left w-10">
-                <input
-                  type="checkbox"
-                  checked={filteredProducts.length > 0 && selectedIds.size === filteredProducts.length}
-                  onChange={toggleAll}
-                  className="w-4 h-4 accent-primary cursor-pointer rounded border-border"
-                />
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase">Imagem</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase">Produto</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase">Categoria</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase">Preco</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase">Estoque</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase">Acoes</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredProducts.map((p) => (
-              <tr key={p.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition">
-                <td className="px-4 py-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.has(p.id)}
-                    onChange={() => toggleSelection(p.id)}
-                    className="w-4 h-4 accent-primary cursor-pointer rounded border-border"
-                  />
-                </td>
-                <td className="px-4 py-3">
-                  {p.image_url ? (
-                    <Image src={p.image_url} alt={p.name} width={48} height={48} className="w-12 h-12 rounded-lg object-cover" />
-                  ) : (
-                    <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center"><Package className="w-5 h-5 text-muted-foreground" /></div>
-                  )}
-                </td>
-                <td className="px-4 py-3">
-                  <p className="font-medium text-card-foreground text-sm">{p.name}</p>
-                  <div className="flex items-center gap-1 mt-0.5">
-                    <span className="text-xs text-muted-foreground">{p.unit}</span>
-                    {p.sku && <span className="text-xs text-muted-foreground">| SKU: {p.sku}</span>}
-                    {p.is_new && <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded font-medium">NOVO</span>}
-                    {p.is_discount && <span className="px-1.5 py-0.5 bg-red-100 text-red-700 text-[10px] rounded font-medium">PROMO</span>}
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-sm text-muted-foreground">{p.categories?.name || "-"}</td>
-                <td className="px-4 py-3">
-                  <p className="font-medium text-primary text-sm">R$ {Number(p.price).toFixed(2)}</p>
-                  {p.original_price && <p className="text-xs text-muted-foreground line-through">R$ {Number(p.original_price).toFixed(2)}</p>}
-                </td>
-                <td className="px-4 py-3 text-sm text-card-foreground">{p.stock}</td>
-                <td className="px-4 py-3">
-                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${p.active ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"}`}>{p.active ? "Ativo" : "Inativo"}</span>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-1">
-                    <button onClick={() => openEdit(p)} className="p-2 rounded-lg hover:bg-muted transition text-muted-foreground hover:text-primary" title="Editar">
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleSeedReviews(p.id, p.name)}
-                      disabled={seedingId === p.id}
-                      className="p-2 rounded-lg hover:bg-amber-50 transition text-muted-foreground hover:text-amber-600 disabled:opacity-40"
-                      title="Gerar avaliações realistas"
-                    >
-                      <Sparkles className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleFetchImage(p.id, p.name)}
-                      disabled={fetchingImageId === p.id}
-                      className="p-2 rounded-lg hover:bg-blue-50 transition text-muted-foreground hover:text-blue-600 disabled:opacity-40"
-                      title="Buscar foto automaticamente"
-                    >
-                      <Search className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => handleDelete(p.id)} className="p-2 rounded-lg hover:bg-destructive/10 transition text-muted-foreground hover:text-destructive" title="Excluir">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {filteredProducts.length === 0 && (
-              <tr><td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">Nenhum produto encontrado.</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
     </div>
   )
 }

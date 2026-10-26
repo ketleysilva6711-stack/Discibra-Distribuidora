@@ -1,21 +1,21 @@
 {
-  "name": "C&C Distribuidora — Materiais de Construção",
-  "short_name": "C&C Distribuidora",
+  "name": "Discibra Distribuidora — Materiais de Construção",
+  "short_name": "Discibra Distribuidora",
   "description": "Sua parceira em materiais de construção: força, confiança e logística profissional.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFFFFF",
-  "theme_color": "#0055FF",
+  "theme_color": "#C2410C",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icon",
+      "src": "/brand/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon.png",
+      "src": "/brand/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     }

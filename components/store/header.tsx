@@ -24,7 +24,7 @@ export default function StoreHeader() {
   const [cartCount, setCartCount] = useState(0)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8)
+    const onScroll = () => { const y = window.scrollY; setScrolled(prev => (prev ? y > 24 : y > 90)) }
     onScroll()
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
@@ -63,26 +63,36 @@ export default function StoreHeader() {
     }
   }, [])
 
-  const barSurface = scrolled 
-    ? "bg-white/80 backdrop-blur-2xl border-b border-slate-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)]" 
+  const barSurface = scrolled
+    ? "bg-white/85 backdrop-blur-2xl border-b border-slate-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.06)]"
     : "bg-white border-b border-slate-50 shadow-sm"
 
   return (
     <header className="z-50 shrink-0 w-full fixed inset-x-0 top-0 lg:sticky lg:top-0">
-      <div className="hidden lg:block">
+      {/* Topbar recolhe no scroll */}
+      <div className={cn("hidden lg:block overflow-hidden transition-all duration-500", scrolled ? "max-h-0 opacity-0" : "max-h-14 opacity-100")}>
         <Topbar />
       </div>
       <div className={cn(barSurface, "transition-all duration-500")}>
         <div className="mx-auto max-w-[1440px] px-4 lg:px-10">
-          <div className="flex items-center justify-between gap-10 py-3 lg:py-4">
+          <div className={cn("flex items-center justify-between gap-10 transition-all duration-500", scrolled ? "py-2" : "py-3 lg:py-4")}>
             {/* Mobile Menu */}
             <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden h-11 w-11 flex items-center justify-center rounded-2xl bg-slate-50 border border-slate-100 active:scale-90 transition-all">
               {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
-            {/* Logo */}
-            <Link href="/" className="shrink-0 transition-transform active:scale-95">
-              <DynamicBrandLogo variant="full" className="h-9 lg:h-11 w-auto" />
+            {/* Logo troca no scroll */}
+            <Link href="/" className="shrink-0 transition-transform active:scale-95 flex items-center gap-3 h-14 lg:h-16">
+              {scrolled ? (
+                <>
+                  <DynamicBrandLogo variant="mono" className="h-10 w-10 lg:h-12 lg:w-12" />
+                  <span className="hidden lg:block text-[13px] font-black uppercase tracking-[0.3em] text-secondary animate-in fade-in duration-500">
+                    Discibra
+                  </span>
+                </>
+              ) : (
+                <DynamicBrandLogo variant="full" className="h-12 lg:h-14 w-auto" />
+              )}
             </Link>
 
             {/* Desktop Search */}
@@ -164,7 +174,7 @@ export default function StoreHeader() {
                   </Link>
                 </li>
               </div>
-              
+
               {isMounted && (
                 <li>
 <ContactPopup>

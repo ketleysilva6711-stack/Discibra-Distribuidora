@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createPublicClient } from "@/lib/supabase/public"
+import { createAdminClient } from "@/lib/supabase/admin"
+import { isAdminServerConfigured } from "@/lib/supabase/admin"
 
 function generateOrderCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
@@ -44,14 +45,26 @@ export async function POST(request: NextRequest) {
       .join("\n")
 
     const code = generateOrderCode()
-    const supabase = createPublicClient()
+    const now = new Date().toISOString()
+
+    // Fallback resiliente: se a service role não estiver configurada,
+    // ainda assim retornamos o código gerado localmente para o fluxo WhatsApp.
+    if (!isAdminServerConfigured()) {
+      console.warn("[orders] SUPABASE_SERVICE_ROLE_KEY não configurada — salvando apenas localmente")
+      return NextResponse.json({ ok: true, code, total, warning: "service_role_not_configured" })
+    }
+
+    const supabase = createAdminClient()
     const { error } = await supabase.from("orders").insert({
+      id: crypto.randomUUID(),
       code,
       email: email?.trim() || null,
       status: "received",
       total,
       items,
       items_summary: itemsSummary,
+      created_at: now,
+      updated_at: now,
     })
 
     if (error) {
@@ -63,5 +76,53 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error("orders route error:", err)
     return NextResponse.json({ error: "Erro interno." }, { status: 500 })
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const code = searchParams.get("code")?.trim().toUpperCase()
+    const email = searchParams.get("email")?.trim().toLowerCase()
+
+    if (!code && !email) {
+      return NextResponse.json(
+        { error: "Informe código ou e-mail para consulta." },
+        { status: 400 }
+      )
+    }
+
+    if (!isAdminServerConfigured()) {
+      return NextResponse.json(
+        { error: "Serviço de consulta temporariamente indisponível." },
+        { status: 503 }
+      )
+    }
+
+    const supabase = createAdminClient()
+    let query = supabase
+      .from("orders")
+      .select("id, code, email, status, total, items_summary, created_at, updated_at")
+
+    if (code) {
+      query = query.eq("code", code)
+      const { data, error } = await query.maybeSingle()
+      if (error) throw error
+      if (!data) return NextResponse.json({ error: "Pedido não encontrado." }, { status: 404 })
+      return NextResponse.json({ order: data })
+    }
+
+    if (email) {
+      query = query.eq("email", email).order("created_at", { ascending: false }).limit(20)
+      const { data, error } = await query
+      if (error) throw error
+      return NextResponse.json({ orders: data || [] })
+    }
+  } catch (err) {
+    console.error("[orders GET error]:", err)
+    return NextResponse.json(
+      { error: "Erro interno ao consultar pedido." },
+      { status: 500 }
+    )
   }
 }

@@ -4,58 +4,61 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --popover: #ffffff;
-  --popover-foreground: #0f172a;
-  --primary: #2563eb;
-  --primary-foreground: #ffffff;
-  --secondary: #0f172a;
-  --secondary-foreground: #f8fafc;
-  --muted: #f8fafc;
-  --muted-foreground: #64748b;
-  --accent: #2563eb;
-  --accent-foreground: #ffffff;
-  --destructive: #ef4444;
-  --destructive-foreground: #f8fafc;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #2563eb;
-  --radius: 1.25rem;
-  --app-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-  --app-shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
-  --brand-navy: #0f172a;
-  --brand-blue: #2563eb;
-  --brand-concrete: #94a3b8;
+  /* ===== Discibra Distribuidora — identidade terracota 2027 ===== */
+  --background: #FAFAF9;
+  --foreground: #111827;
+  --card: #FFFFFF;
+  --card-foreground: #111827;
+  --popover: #FFFFFF;
+  --popover-foreground: #111827;
+  --primary: #C2410C;
+  --primary-foreground: #FFFFFF;
+  --secondary: #0B2A6B;
+  --secondary-foreground: #F2F7FF;
+  --muted: #F3F4F6;
+  --muted-foreground: #6B7280;
+  --accent: #F59E0B;
+  --accent-foreground: #FFFFFF;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --border: #E5E7EB;
+  --input: #E5E7EB;
+  --ring: #C2410C;
+  --radius: 1rem;
+  --app-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+  --app-shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+  --brand-navy: #0B2A6B;
+  --brand-terracota: #C2410C;
+  --brand-amber: #F59E0B;
+  --brand-concrete: #78716C;
 }
 
 .dark {
-  --background: #020617;
-  --foreground: #f8fafc;
-  --card: #0f172a;
-  --card-foreground: #f8fafc;
-  --popover: #0f172a;
-  --popover-foreground: #f8fafc;
-  --primary: #0055FF;
-  --primary-foreground: #FFFFFF;
-  --secondary: #1e293b;
-  --secondary-foreground: #f8fafc;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #334155;
-  --accent-foreground: #f8fafc;
-  --destructive: #7f1d1d;
-  --destructive-foreground: #f8fafc;
-  --border: #1e293b;
-  --input: #1e293b;
-  --ring: #0055FF;
+  --background: #06110D;
+  --foreground: #EAF3EE;
+  --card: #0C1A15;
+  --card-foreground: #EAF3EE;
+  --popover: #0C1A15;
+  --popover-foreground: #EAF3EE;
+  --primary: #22C48A;
+  --primary-foreground: #04120C;
+  --secondary: #123B8C;
+  --secondary-foreground: #EAF1FF;
+  --muted: #13241D;
+  --muted-foreground: #93A69D;
+  --accent: #4C8DFF;
+  --accent-foreground: #04120C;
+  --destructive: #B91C1C;
+  --destructive-foreground: #FFFFFF;
+  --border: #1B2F27;
+  --input: #1B2F27;
+  --ring: #22C48A;
 }
 
 @theme inline {
-  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-heading: var(--font-heading), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-sans), 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-heading), 'Outfit', var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -75,6 +78,23 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  --color-brand-50: #FFF7ED;
+  --color-brand-100: #FFEDD5;
+  --color-brand-200: #FED7AA;
+  --color-brand-300: #FDBA74;
+  --color-brand-400: #FB923C;
+  --color-brand-500: #C2410C;
+  --color-brand-600: #9A3412;
+  --color-brand-700: #7C2D12;
+  --color-brand-800: #6C2401;
+  --color-brand-900: #431407;
+  --color-brand-950: #27090A;
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-amber: var(--brand-amber);
+  --color-brand-terracota: var(--brand-terracota);
+  --color-brand-concrete: var(--brand-concrete);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -90,14 +110,24 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
+    @apply bg-background text-foreground antialiased selection:bg-primary/15 selection:text-primary;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    letter-spacing: -0.01em;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "ss01" 1;
+    line-height: 1.65;
+    letter-spacing: -0.005em;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
-    @apply font-bold tracking-tight;
+    font-family: var(--font-heading, var(--font-sans));
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    font-weight: 700;
+  }
+  h1 { font-weight: 900; letter-spacing: -0.035em; }
+  h2 { font-weight: 800; letter-spacing: -0.03em; }
+  h3 { font-weight: 700; }
+  p {
+    line-height: 1.75;
   }
 }
 
@@ -106,15 +136,18 @@
     @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-app-lg;
   }
   .dark .glass {
-    @apply bg-slate-950/70 backdrop-blur-xl border-white/10;
+    @apply bg-neutral-950/70 backdrop-blur-xl border-white/10;
   }
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-secondary to-secondary/80;
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-primary to-accent;
   }
   .bg-mesh {
     background-image:
-      radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(15, 23, 42, 0.05) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, rgba(18, 160, 106, 0.07) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(37, 99, 235, 0.06) 0px, transparent 50%);
+  }
+  .bg-brand-strip {
+    background-image: linear-gradient(90deg, #12A06A 0%, #0EA5A0 45%, #2563EB 100%);
   }
   .shine-effect {
     @apply relative overflow-hidden;
@@ -133,8 +166,8 @@
     animation: carriolaPulse 2s ease-in-out infinite;
   }
   @keyframes carriolaPulse {
-    0%, 100% { filter: drop-shadow(0 0 4px rgba(37, 99, 235, 0.4)); }
-    50% { filter: drop-shadow(0 0 10px rgba(37, 99, 235, 0.7)); }
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(18, 160, 106, 0.45)); }
+    50% { filter: drop-shadow(0 0 10px rgba(37, 99, 235, 0.65)); }
   }
   .animate-marquee {
     display: flex;
@@ -154,6 +187,11 @@
   @apply bg-muted;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 rounded-full border-2 border-muted hover:bg-slate-400 transition-colors;
+  background: #BBD8C7;
+  border-radius: 9999px;
+  border: 2px solid var(--muted);
 }
-
+::-webkit-scrollbar-thumb:hover {
+  background: #8FBF9F;
+}
+::selection { background: #0B2A6B; color: #ffffff; }

@@ -66,57 +66,57 @@ export default function BannersPage() {
     toast.success("Banner excluido!"); mutate()
   }
 
-  if (isLoading) return <div className="flex items-center justify-center h-64"><div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" /></div>
+  if (isLoading) return <div className="flex items-center justify-center h-64"><div className="animate-spin w-8 h-8 border-4 border-[#12A06A] border-t-transparent rounded-full" /></div>
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{banners?.length || 0} banners cadastrados</p>
-        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">
+        <p className="text-sm text-slate-500">{banners?.length || 0} banners cadastrados</p>
+        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 bg-[#12A06A] text-white rounded-lg font-medium hover:bg-[#0e8a5b] transition">
           <Plus className="w-4 h-4" /> Novo Banner
         </button>
       </div>
 
       {showForm && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-card rounded-xl p-6 w-full max-w-md border border-border">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md border border-slate-200">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-lg font-bold text-card-foreground">{editing ? "Editar" : "Novo"} Banner</h3>
-              <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
+              <h3 className="text-lg font-bold text-slate-900">{editing ? "Editar" : "Novo"} Banner</h3>
+              <button onClick={() => setShowForm(false)} className="text-slate-500 hover:text-slate-900"><X className="w-5 h-5" /></button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-card-foreground mb-1">Titulo</label>
-                <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none" />
+                <label className="block text-sm font-medium text-slate-900 mb-1">Titulo</label>
+                <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-[#12A06A] outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-card-foreground mb-1">Subtitulo</label>
-                <input value={form.subtitle} onChange={(e) => setForm({ ...form, subtitle: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none" />
+                <label className="block text-sm font-medium text-slate-900 mb-1">Subtitulo</label>
+                <input value={form.subtitle} onChange={(e) => setForm({ ...form, subtitle: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-[#12A06A] outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-card-foreground mb-1">Link (opcional)</label>
-                <input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary outline-none" />
+                <label className="block text-sm font-medium text-slate-900 mb-1">Link (opcional)</label>
+                <input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-[#12A06A] outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-card-foreground mb-1">Imagem*</label>
+                <label className="block text-sm font-medium text-slate-900 mb-1">Imagem*</label>
                 <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs flex items-start gap-2">
                   <span className="font-bold shrink-0">⚠️ Atenção:</span>
                   <span>A imagem deve ter exatamente <strong>1920x430px</strong> para o layout ideal. Formatos: PNG, JPEG ou WebP.</span>
                 </div>
-                {form.image_url && <Image src={form.image_url} alt="Banner" width={400} height={150} className="rounded-lg mb-2 object-cover w-full h-32" />}
-                <label className="flex items-center gap-2 px-4 py-3 border border-dashed border-border rounded-lg cursor-pointer hover:bg-muted transition">
-                  <Upload className="w-5 h-5 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">{uploading ? "Enviando..." : "Selecionar imagem"}</span>
+                {form.image_url && <Image src={form.image_url.trim()} alt="Banner" width={400} height={150} className="rounded-lg mb-2 object-cover w-full h-32" />}
+                <label className="flex items-center gap-2 px-4 py-3 border border-dashed border-slate-200 rounded-lg cursor-pointer hover:bg-slate-100 transition">
+                  <Upload className="w-5 h-5 text-slate-500" />
+                  <span className="text-sm text-slate-500">{uploading ? "Enviando..." : "Selecionar imagem"}</span>
                   <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                 </label>
               </div>
               <div className="flex items-center gap-2">
-                <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="w-4 h-4 accent-primary" />
-                <label className="text-sm text-card-foreground">Ativo</label>
+                <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="w-4 h-4 accent-[#12A06A]" />
+                <label className="text-sm text-slate-900">Ativo</label>
               </div>
               <div className="flex gap-3">
-                <button onClick={handleSave} className="flex-1 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition">{editing ? "Atualizar" : "Criar"}</button>
-                <button onClick={() => setShowForm(false)} className="flex-1 py-2 bg-muted text-muted-foreground rounded-lg font-medium hover:bg-muted/80 transition">Cancelar</button>
+                <button onClick={handleSave} className="flex-1 py-2 bg-[#12A06A] text-white rounded-lg font-medium hover:bg-[#0e8a5b] transition">{editing ? "Atualizar" : "Criar"}</button>
+                <button onClick={() => setShowForm(false)} className="flex-1 py-2 bg-slate-100 text-slate-500 rounded-lg font-medium hover:bg-slate-200 transition">Cancelar</button>
               </div>
             </div>
           </div>
@@ -125,19 +125,19 @@ export default function BannersPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {banners?.map((b) => (
-          <div key={b.id} className="bg-card rounded-xl border border-border overflow-hidden">
+          <div key={b.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
             <div className="relative h-40">
-              <Image src={b.image_url} alt={b.title || "Banner"} fill className="object-cover" />
-              {!b.active && <div className="absolute inset-0 bg-black/50 flex items-center justify-center"><span className="text-sm font-medium text-primary-foreground bg-muted-foreground/80 px-3 py-1 rounded">Inativo</span></div>}
+              <Image src={b.image_url.trim()} alt={b.title || "Banner"} fill className="object-cover" />
+              {!b.active && <div className="absolute inset-0 bg-black/50 flex items-center justify-center"><span className="text-sm font-medium text-white bg-slate-100-foreground/80 px-3 py-1 rounded">Inativo</span></div>}
             </div>
             <div className="p-4 flex items-center justify-between">
               <div>
-                <p className="font-medium text-card-foreground">{b.title || "Sem titulo"}</p>
-                {b.subtitle && <p className="text-sm text-muted-foreground">{b.subtitle}</p>}
+                <p className="font-medium text-slate-900">{b.title || "Sem titulo"}</p>
+                {b.subtitle && <p className="text-sm text-slate-500">{b.subtitle}</p>}
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => openEdit(b)} className="p-2 rounded-lg hover:bg-muted transition text-muted-foreground hover:text-primary"><Pencil className="w-4 h-4" /></button>
-                <button onClick={() => handleDelete(b.id)} className="p-2 rounded-lg hover:bg-destructive/10 transition text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></button>
+                <button onClick={() => openEdit(b)} className="p-2 rounded-lg hover:bg-slate-100 transition text-slate-500 hover:text-[#12A06A]"><Pencil className="w-4 h-4" /></button>
+                <button onClick={() => handleDelete(b.id)} className="p-2 rounded-lg hover:bg-red-50 transition text-slate-500 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
               </div>
             </div>
           </div>

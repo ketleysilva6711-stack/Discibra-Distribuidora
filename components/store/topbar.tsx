@@ -18,7 +18,7 @@ export default function Topbar() {
         {/* Lado esquerdo — Televendas WhatsApp + e-mail */}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
           <a
-            href="https://wa.me/5516996536403?text=Ol%C3%A1!%20Gostaria%20de%20fazer%20uma%20cota%C3%A7%C3%A3o%20de%20materiais%20no%20atacado."
+            href="https://wa.me/5516996447972?text=Ol%C3%A1!%20Gostaria%20de%20fazer%20uma%20cota%C3%A7%C3%A3o%20de%20materiais%20no%20atacado."
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick("topbar_phone")}
@@ -28,7 +28,7 @@ export default function Topbar() {
             className="btn-whatsapp-track flex items-center gap-2 text-white hover:text-emerald-400 font-bold transition-colors"
           >
             <WhatsAppIcon className="w-3.5 h-3.5 text-[#25D366]" />
-            <span>Televendas / WhatsApp: <strong>(16) 99653-6403</strong></span>
+            <span>Televendas / WhatsApp: <strong>(16) 99644-7972</strong></span>
           </a>
           <span className="hidden h-3 w-px bg-slate-700 sm:block" aria-hidden="true" />
           <a href={`mailto:${SITE.email}`} className="font-medium text-slate-400 transition-colors hover:text-white">
@@ -40,7 +40,7 @@ export default function Topbar() {
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-medium text-slate-400 sm:text-xs">
           <span>CD Logístico: Ribeirão Preto - SP</span>
           <span className="hidden h-3 w-px bg-slate-700 sm:block" aria-hidden="true" />
-          <span>Faturamento para CNPJ com Boleto</span>
+          <span>PIX com Desconto · Parcele 12x no Cartão</span>
           <span className="hidden h-3 w-px bg-slate-700 md:block" aria-hidden="true" />
           <span className="hidden md:inline">Horário: Seg a Sex 07h-18h | Sáb 07h-12h</span>
         </div>

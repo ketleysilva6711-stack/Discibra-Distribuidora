@@ -15,7 +15,7 @@ export default function FormasPagamentoPage() {
       <section className="rounded-2xl border border-primary/15 bg-primary/[0.04] p-6 md:p-8 mb-8 not-prose">
         <h2 className="font-heading text-lg font-bold text-foreground mb-3">Política de pagamento</h2>
         <p className="text-foreground/90 leading-relaxed text-[15px]">
-          O Atacado de Construção prioriza segurança e transparência em todas as transações. Nosso modelo comercial
+          O Discibra Distribuidora prioriza segurança e transparência em todas as transações. Nosso modelo comercial
           foi estruturado para garantir controle, rastreabilidade e segurança em cada negociação, oferecendo
           confiança total ao cliente. O setor financeiro confirma condições, prazos e formas de pagamento de forma
           clara, alinhada ao perfil da sua empresa e ao porte do pedido.

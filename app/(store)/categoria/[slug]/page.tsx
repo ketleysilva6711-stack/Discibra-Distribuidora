@@ -57,7 +57,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
           <div className="relative mx-auto flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-muted/40 shadow-inner sm:mx-0 sm:h-28 sm:w-28 md:h-32 md:w-32">
             {data.category.image_url ? (
               <Image
-                src={data.category.image_url}
+                src={data.category.image_url.trim()}
                 alt=""
                 fill
                 className="object-contain p-2"

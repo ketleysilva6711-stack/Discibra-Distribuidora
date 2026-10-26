@@ -34,7 +34,7 @@ export default function RecuperarSenhaPage() {
           <WhatsAppCta
             source="contact_page" // Utilizing existing source for analytics
             page="/recuperar-senha"
-            text="Olá! Preciso recuperar a senha da minha conta no Atacado de Construção."
+            text="Olá! Preciso recuperar a senha da minha conta no Discibra Distribuidora."
             label="Falar com o Suporte"
             className="w-full"
           />
