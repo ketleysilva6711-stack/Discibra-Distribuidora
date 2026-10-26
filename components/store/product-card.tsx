@@ -102,22 +102,22 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
       )}
     >
       {/* ── Badges flutuantes ── */}
-      <div className="absolute inset-x-4 top-4 z-10 flex items-start justify-between pointer-events-none">
-        <div className="flex flex-col gap-1.5">
+      <div className="absolute inset-x-4 top-4 z-10 flex items-start justify-between pointer-events-none" suppressHydrationWarning>
+        <div className="flex flex-col gap-1.5" suppressHydrationWarning>
           {product.is_new && (
-            <span className="inline-flex items-center gap-1 bg-emerald-500 text-white px-2.5 py-1 rounded-full shadow-lg shadow-emerald-500/30">
-              <span className="text-[10px] font-black uppercase tracking-widest">NOVO</span>
+            <span className="inline-flex items-center gap-1 bg-emerald-500 text-white px-2.5 py-1 rounded-full shadow-lg shadow-emerald-500/30 text-[10px] font-black uppercase tracking-widest" suppressHydrationWarning>
+              NOVO
             </span>
           )}
           {discount > 0 && (
-            <span className="inline-flex items-center gap-1 bg-[#F47920] text-white px-2.5 py-1 rounded-full shadow-lg shadow-orange-500/30">
-              <span className="text-[10px] font-black uppercase tracking-widest">-{discount}%</span>
+            <span className="inline-flex items-center gap-1 bg-[#F47920] text-white px-2.5 py-1 rounded-full shadow-lg shadow-orange-500/30 text-[10px] font-black uppercase tracking-widest" suppressHydrationWarning>
+              -{discount}%
             </span>
           )}
           {isLowStock && (
-            <span className="inline-flex items-center gap-1 bg-red-500/90 text-white px-2.5 py-1 rounded-full shadow-lg shadow-red-500/30">
+            <span className="inline-flex items-center gap-1 bg-red-500/90 text-white px-2.5 py-1 rounded-full shadow-lg shadow-red-500/30 text-[10px] font-black uppercase tracking-widest" suppressHydrationWarning>
               <Zap className="w-2.5 h-2.5 fill-current" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Últimas un.</span>
+              Últimas un.
             </span>
           )}
         </div>
