@@ -63,13 +63,13 @@ export default function StoreSearch() {
           autoComplete="off"
           value={q}
           onChange={(e) => handleChange(e.target.value)}
-          placeholder="Buscar cimento, aço, tubos..."
-          className="h-14 w-full rounded-2xl border border-slate-100 bg-slate-50 pl-14 pr-24 sm:pr-32 text-sm font-bold text-slate-900 placeholder:font-medium placeholder:text-slate-400 outline-none transition-all focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5"
+          placeholder="Buscar cimento, aço, ferramentas..."
+          className="h-14 w-full rounded-2xl border border-slate-100 bg-slate-50 pl-14 pr-20 sm:pr-24 text-sm font-bold text-slate-900 placeholder:font-medium placeholder:text-slate-400 outline-none transition-all focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5"
         />
         <div className="absolute right-1.5 p-1">
           <button
             type="submit"
-            className="h-11 px-4 sm:px-6 rounded-xl bg-secondary text-white text-[10px] font-black uppercase tracking-widest transition-all hover:bg-slate-800 active:scale-95 shadow-md shadow-secondary/10"
+            className="h-11 px-3 sm:px-5 rounded-xl bg-secondary text-white text-xs sm:text-sm font-black uppercase tracking-widest transition-all hover:bg-slate-800 active:scale-95 shadow-md shadow-secondary/10"
             aria-label="Buscar"
           >
             Buscar

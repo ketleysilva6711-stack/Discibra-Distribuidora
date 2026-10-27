@@ -120,10 +120,7 @@ export function HeroBanner({ initialSlides }: { initialSlides?: Slide[] }) {
   const hasData = slides && slides.length > 0
   if (!hasData && (!initialSlides || initialSlides.length === 0)) {
     return (
-      <div
-        className="relative w-full animate-pulse bg-slate-100"
-        style={{ aspectRatio: "1920 / 430" }}
-      />
+      <div className="relative w-full animate-pulse bg-slate-100 aspect-[16/9] sm:aspect-[1920/430] min-h-[180px] sm:min-h-0" />
     )
   }
 
@@ -142,8 +139,8 @@ export function HeroBanner({ initialSlides }: { initialSlides?: Slide[] }) {
         <div className="flex">
           {(slides || []).map((slide, i) => (
             <div key={slide.key} className="relative min-w-0 shrink-0 grow-0 basis-full">
-              {/* Proporção 1920 × 430 — exibe de ponta a ponta sem cortar */}
-              <div className="relative w-full" style={{ aspectRatio: "1920 / 430" }}>
+              {/* Proporção responsiva — 16:9 no mobile, 1920/430 no desktop */}
+              <div className="relative w-full aspect-[16/9] sm:aspect-[1920/430] min-h-[180px] sm:min-h-0">
                 <Image
                   src={slide.image_url.trim()}
                   alt={slide.title || `Banner ${i + 1}`}
