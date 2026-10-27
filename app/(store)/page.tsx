@@ -56,7 +56,7 @@ async function fetchHome() {
     supabase.from("products").select(PROD_FIELDS).eq("active", true).eq("is_new", true).not("image_url", "is", null).order("created_at", { ascending: false }).limit(12),
     supabase.from("products").select(PROD_FIELDS).eq("active", true).eq("is_discount", true).not("image_url", "is", null).order("created_at", { ascending: false }).limit(12),
     supabase.from("products").select(PROD_FIELDS).eq("active", true).eq("category_id", CAT_CIMENTO).not("image_url", "is", null).order("featured", { ascending: false }).order("price", { ascending: true }).limit(30),
-    supabase.from("products").select(PROD_FIELDS).eq("active", true).eq("category_id", CAT_ACO).not("image_url", "is", null).order("created_at", { ascending: false }).limit(10),
+    supabase.from("products").select(PROD_FIELDS).eq("active", true).eq("category_id", CAT_ACO).not("image_url", "is", null).order("name", { ascending: false }).limit(10),
     supabase.from("products").select(PROD_FIELDS).eq("active", true).eq("category_id", CAT_HIDRA).not("image_url", "is", null).order("created_at", { ascending: false }).limit(10),
     supabase.from("products").select(PROD_FIELDS).eq("active", true).eq("category_id", CAT_ARGAMASSA).not("image_url", "is", null).order("created_at", { ascending: false }).limit(6),
     supabase.from("products").select(PROD_FIELDS).eq("active", true).eq("category_id", CAT_REJUNTE).not("image_url", "is", null).order("created_at", { ascending: false }).limit(6),
@@ -334,6 +334,21 @@ export default async function HomePage() {
           </div>
           <div className="mx-auto max-w-7xl px-6">
             <CategoriesCarousel categories={data.categories} />
+          </div>
+        </section>
+      )}
+
+      {/* ── SEÇÃO: MAIS VENDIDOS / DESTAQUES ── */}
+      {data?.featured && data.featured.length > 0 && (
+        <section className="py-12 sm:py-16 bg-white border-b border-slate-100">
+          <div className="mx-auto max-w-7xl px-6">
+            <SectionHeader
+              title="Mais Vendidos do Atacado"
+              subtitle="Alta Demanda na Obra"
+              href="/produtos"
+              linkLabel="Ver todos"
+            />
+            <ProductsCarousel products={data.featured} autoplayDelay={5500} />
           </div>
         </section>
       )}

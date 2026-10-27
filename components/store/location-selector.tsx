@@ -5,14 +5,14 @@ import { MapPin, Navigation, ChevronDown, Loader2, Target } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export default function LocationSelector() {
-  const [location, setLocation] = useState<string>("São Paulo, SP")
+  const [location, setLocation] = useState<string>("Ribeirão Preto, SP")
   const [isDetecting, setIsDetecting] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
   // Auto detect on mount to ensure "Região de Entrega" is always accurate
   useEffect(() => {
     const saved = localStorage.getItem("user-location")
-    if (!saved || saved === "São Paulo, SP") {
+    if (!saved || saved === "Ribeirão Preto, SP") {
       detectLocation()
     }
   }, [])
