@@ -16,6 +16,7 @@ import Image from "next/image"
 import {
   Truck, ShieldCheck, CreditCard, MapPin,
   ChevronRight, BadgeCheck, Zap, Package,
+  MessageSquare, FileText,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SITE, waLink } from "@/lib/site-config"
@@ -464,15 +465,15 @@ export default async function HomePage() {
           </p>
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
             {[
-              { step: "1", icon: "💬", title: "Mande mensagem", desc: "Clique em qualquer botão de WhatsApp, envie os produtos que quer e aguarde. Respondemos em minutos." },
-              { step: "2", icon: "📋", title: "Receba o orçamento", desc: "O atendente envia a proposta com preços, condições de pagamento e prazo de entrega." },
-              { step: "3", icon: "🚛", title: "Entrega na obra", desc: "Aprovado o orçamento, agendamos a entrega — caminhão com munck ou paletizado." },
+              { step: "01", icon: <MessageSquare className="h-6 w-6 text-[#002D5B]" />, title: "Mande mensagem", desc: "Clique em qualquer botão de WhatsApp, envie os produtos que quer e aguarde. Respondemos em minutos." },
+              { step: "02", icon: <FileText className="h-6 w-6 text-[#002D5B]" />, title: "Receba o orçamento", desc: "O atendente envia a proposta com preços, condições de pagamento e prazo de entrega." },
+              { step: "03", icon: <Truck className="h-6 w-6 text-[#002D5B]" />, title: "Entrega na obra", desc: "Aprovado o orçamento, agendamos a entrega — caminhão com munck ou paletizado." },
             ].map((item) => (
-              <div key={item.step} className="relative flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#C2410C]/10 text-2xl">
+              <div key={item.step} className="flex flex-col items-center rounded-xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-[#002D5B] text-white">
                   {item.icon}
                 </div>
-                <span className="absolute -top-3 -right-3 flex h-7 w-7 items-center justify-center rounded-full bg-[#C2410C] text-[11px] font-black text-white shadow-md">
+                <span className="mb-2 text-[10px] sm:text-xs font-mono font-bold text-slate-400 tracking-widest">
                   {item.step}
                 </span>
                 <h3 className="mb-2 text-base font-black text-slate-900">{item.title}</h3>
@@ -496,15 +497,15 @@ export default async function HomePage() {
       </section>
 
       {/* ── BLOCO INSTITUCIONAL — PROVA FÍSICA ── */}
-      <section className="border-t border-slate-200 bg-[#002D5B] py-16 sm:py-20 text-white">
+      <section className="border-t border-slate-200/60 bg-[#0B1B2B] py-16 sm:py-20 text-white">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="rounded-[2.5rem] border border-white/10 bg-white/5 p-8 sm:p-12 backdrop-blur-md">
+          <div className="rounded-xl border border-white/10 bg-[#0B1B2B]/50 p-8 sm:p-12">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-8">
               <div className="space-y-4">
-                <span className="inline-flex items-center gap-2 rounded-full border border-[#F47920]/30 bg-[#F47920]/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#F47920]">
-                  <Package className="h-3 w-3" /> Prova de Existência Física
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  Prova de Existência Física
                 </span>
-                <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
+                <h2 className="text-3xl font-black tracking-tight sm:text-4xl text-white">
                   Conheça quem entrega na sua obra
                 </h2>
                 <p className="text-slate-300 leading-relaxed">
@@ -515,28 +516,28 @@ export default async function HomePage() {
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-left">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-[#F47920]">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     CNPJ
                   </p>
                   <p className="text-lg font-black text-white">59.566.414/0001-25</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-[#F47920]">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     Centro de Distribuição & Logística
                   </p>
                   <p className="text-lg font-black text-white">Ribeirão Preto — SP</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-[#F47920]">
-                    Horário de Atendimento & Expedição
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Expedição & Cargas
                   </p>
                   <p className="text-lg font-black text-white">
-                    Seg a Sex 07h-18h | Sáb 07h-12h
+                    Seg a Sex 07h às 18h | Sáb 07h às 12h
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-[#F47920]">
-                    Televendas & WhatsApp
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Central de Atendimento
                   </p>
                   <p className="text-lg font-black text-white">{SITE.phoneDisplay}</p>
                 </div>
