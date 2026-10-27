@@ -207,6 +207,30 @@ export default async function RootLayout({
           </>
         )}
 
+        {/* Google Ads (gtag.js) - carregamento preguiçoso */}
+        {googleAdsId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsId}`}
+              strategy="afterInteractive"
+            />
+            <Script
+              id="google-ads-gtag-init"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${googleAdsId}', {
+                    allow_enhanced_conversions: true
+                  });
+                `,
+              }}
+            />
+          </>
+        )}
+
         {/* Facebook Meta Pixel - carregamento preguiçoso */}
         {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
           <>
