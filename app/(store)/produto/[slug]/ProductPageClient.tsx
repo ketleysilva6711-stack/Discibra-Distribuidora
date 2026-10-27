@@ -18,6 +18,8 @@ import {
 } from "lucide-react"
 import { addToCart } from "@/components/store/product-card"
 import ProductCard from "@/components/store/product-card"
+import PalletPriceTable from "@/components/store/pallet-price-table"
+import CepFreightCalculator from "@/components/store/cep-freight-calculator"
 import Link from "next/link"
 import { toast } from "sonner"
 import { waLink, SITE } from "@/lib/site-config"
@@ -26,6 +28,9 @@ import { cn } from "@/lib/utils"
 import { ProductStructuredData } from "@/components/store/seo-structured-data"
 
 const supabase = createClient()
+
+// ─── ID da categoria de cimentos ── //
+const CAT_CIMENTO_ID = "c0134152-de0a-42f7-bb87-dd9ec8588983"
 
 // ─── Tipos ────────────────────────────────────────────────────
 type Product = {
@@ -374,6 +379,18 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                 )}
               </div>
 
+              {/* ── Tabela de Volume & Frete (cimento / saco ou unidade) ── */}
+              {(
+                product.unit === "saco" ||
+                product.unit === "unidade" ||
+                product.category_id === CAT_CIMENTO_ID ||
+                (product.categories?.name || "").toLowerCase().includes("cimento")
+              ) && (
+                <div className="mb-8">
+                  <PalletPriceTable unitPrice={Number(product.price)} />
+                </div>
+              )}
+
               {/* Disponibilidade */}
               <div className={cn(
                 "flex items-center gap-3 p-4 rounded-2xl mb-7 border",
@@ -434,10 +451,16 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                 </div>
               </div>
 
+              {/* ── Calculadora de Frete por CEP ── */}
+              <CepFreightCalculator
+                productName={product.name}
+                productSku={product.sku || product.id}
+              />
+
               {/* Botões de ação — WhatsApp é o CTA primário */}
               <div className="flex flex-col gap-3">
                 <a
-                  href={waLink(`Olá! Tenho interesse no produto: ${product.name} — R$ ${Number(product.price).toFixed(2).replace(".", ",")} por ${product.unit}`)}
+                  href={waLink(`Olá! Tenho interesse no produto: ${product.name} (Cód. ${product.sku || product.id}) — R$ ${Number(product.price).toFixed(2).replace(".", ",")}/${product.unit}. Página: ${SITE.siteUrl}/produto/${product.slug}`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   data-track="btn_whatsapp"

@@ -143,6 +143,64 @@ function pickLeaders(cimentos: any[]) {
   return out.slice(0, 12)
 }
 
+function CimentoCard({ p, duplicate }: { p: any; duplicate?: boolean }) {
+  const economy =
+    p.original_price && Number(p.original_price) > Number(p.price)
+      ? Number(p.original_price) - Number(p.price)
+      : 0
+
+  return (
+    <article aria-hidden={duplicate} className="flex w-56 shrink-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.06] backdrop-blur transition-all hover:-translate-y-1 hover:border-[#25D366]/50 hover:shadow-2xl sm:w-64">
+      <div className="relative aspect-square bg-white p-4">
+        {p.image_url && (
+          <Image src={p.image_url.trim()} alt={duplicate ? "" : p.name} fill className="object-contain p-3" sizes="256px" />
+        )}
+        {economy > 0 && (
+          <span className="absolute left-3 top-3 rounded-full bg-[#F47920] px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
+            -{Math.round((economy / Number(p.original_price)) * 100)}%
+          </span>
+        )}
+      </div>
+      <div className="flex flex-1 flex-col p-4">
+        <h3 className="line-clamp-2 min-h-[2.6rem] text-sm font-black leading-snug">{p.name}</h3>
+        <div className="mt-2">
+          {p.original_price && Number(p.original_price) > Number(p.price) && (
+            <p className="text-xs text-white/40 line-through">
+              R$ {Number(p.original_price).toFixed(2).replace(".", ",")}
+            </p>
+          )}
+          <p className="text-2xl font-black tracking-tight text-[#25D366]">
+            R$ {Number(p.price).toFixed(2).replace(".", ",")}
+            <span className="ml-1 text-xs font-bold text-white/50">/{p.unit}</span>
+          </p>
+          {economy > 0 && (
+            <p className="mt-0.5 text-[11px] font-bold text-emerald-300">
+              Economize R$ {economy.toFixed(2).replace(".", ",")} no palete/carga
+            </p>
+          )}
+        </div>
+        <div className="mt-3 flex flex-col gap-2">
+          <a
+            href={waLink(`Olá! Quero comprar ${p.name} (R$ ${Number(p.price).toFixed(2).replace(".", ",")}/${p.unit}). Quais as formas de pagamento?`)}
+            target="_blank"
+            rel="noopener noreferrer"
+            tabIndex={duplicate ? -1 : undefined}
+            data-track="btn_whatsapp"
+            data-button-name="btn_whatsapp"
+            data-source="home_cta"
+            className="btn-whatsapp-track inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl bg-[#25D366] px-3 text-xs font-black uppercase tracking-wide text-white transition-all hover:bg-[#1EBE5B] active:scale-95"
+          >
+            Comprar no WhatsApp
+          </a>
+          <Link href={`/produto/${p.slug}`} tabIndex={duplicate ? -1 : undefined} className="text-center text-[11px] font-semibold text-white/40 hover:text-white transition-colors">
+            Ver detalhes →
+          </Link>
+        </div>
+      </div>
+    </article>
+  )
+}
+
 function SectionHeader({
   title,
   subtitle,
@@ -212,6 +270,9 @@ export default async function HomePage() {
       <section className="border-b border-slate-800 bg-slate-950 text-white">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-6 py-5 sm:flex-row sm:justify-between">
           <div className="flex flex-wrap items-center gap-2 text-[11px] font-black uppercase tracking-widest">
+            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-emerald-300">
+              📍 Entregas rápidas em Ribeirão Preto, Sertãozinho, Cravinhos, Brodowski, Jardinópolis e Região
+            </span>
             <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-emerald-300">
               <BadgeCheck className="h-4 w-4" /> Aberto a Todos · Sem Exigência de CNPJ
             </span>
@@ -283,71 +344,27 @@ export default async function HomePage() {
               linkLabel="Tabela completa"
             />
             <style>{`@keyframes cimento-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }`}</style>
-            <div className="group/marquee relative overflow-hidden">
+
+            {/* Desktop: marquee rolante */}
+            <div className="group/marquee relative overflow-hidden hidden sm:flex">
               <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-slate-950 to-transparent" />
               <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-slate-950 to-transparent" />
               <div
                 className="flex w-max gap-4 py-2 pr-4 animate-[cimento-marquee_45s_linear_infinite] group-hover/marquee:[animation-play-state:paused] motion-reduce:[animation:none] motion-reduce:flex-wrap motion-reduce:w-full"
                 style={{ animationDuration: `${Math.max(30, leaders.length * 4)}s` }}
               >
-              {[...leaders, ...leaders].map((p: any, li: number) => {
-                const dup = li >= leaders.length
-                const economy =
-                  p.original_price && Number(p.original_price) > Number(p.price)
-                    ? Number(p.original_price) - Number(p.price)
-                    : 0
-                return (
-                  <article key={`${p.id}-${li}`} aria-hidden={dup} className="flex w-56 shrink-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.06] backdrop-blur transition-all hover:-translate-y-1 hover:border-[#25D366]/50 hover:shadow-2xl sm:w-64">
-                    <div className="relative aspect-square bg-white p-4">
-                      {p.image_url && (
-                        <Image src={p.image_url.trim()} alt={dup ? "" : p.name} fill className="object-contain p-3" sizes="256px" />
-                      )}
-                      {economy > 0 && (
-                        <span className="absolute left-3 top-3 rounded-full bg-[#F47920] px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
-                          -{Math.round((economy / Number(p.original_price)) * 100)}%
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex flex-1 flex-col p-4">
-                      <h3 className="line-clamp-2 min-h-[2.6rem] text-sm font-black leading-snug">{p.name}</h3>
-                      <div className="mt-2">
-                        {p.original_price && Number(p.original_price) > Number(p.price) && (
-                          <p className="text-xs text-white/40 line-through">
-                            R$ {Number(p.original_price).toFixed(2).replace(".", ",")}
-                          </p>
-                        )}
-                        <p className="text-2xl font-black tracking-tight text-[#25D366]">
-                          R$ {Number(p.price).toFixed(2).replace(".", ",")}
-                          <span className="ml-1 text-xs font-bold text-white/50">/{p.unit}</span>
-                        </p>
-                        {economy > 0 && (
-                          <p className="mt-0.5 text-[11px] font-bold text-emerald-300">
-                            Economize R$ {economy.toFixed(2).replace(".", ",")} no palete/carga
-                          </p>
-                        )}
-                      </div>
-                      <div className="mt-3 flex flex-col gap-2">
-                        <a
-                          href={waLink(`Olá! Quero comprar ${p.name} (R$ ${Number(p.price).toFixed(2).replace(".", ",")}/${p.unit}). Quais as formas de pagamento?`)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          tabIndex={dup ? -1 : undefined}
-                          data-track="btn_whatsapp"
-                          data-button-name="btn_whatsapp"
-                          data-source="home_cta"
-                          className="btn-whatsapp-track inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl bg-[#25D366] px-3 text-xs font-black uppercase tracking-wide text-white transition-all hover:bg-[#1EBE5B] active:scale-95"
-                        >
-                          Comprar no WhatsApp
-                        </a>
-                        <Link href={`/produto/${p.slug}`} tabIndex={dup ? -1 : undefined} className="text-center text-[11px] font-semibold text-white/40 hover:text-white transition-colors">
-                          Ver detalhes →
-                        </Link>
-                      </div>
-                    </div>
-                  </article>
-                )
-              })}
+                {[...leaders, ...leaders].map((p: any, li: number) => {
+                  const dup = li >= leaders.length
+                  return <CimentoCard key={`${p.id}-${li}`} p={p} duplicate={dup} />
+                })}
               </div>
+            </div>
+
+            {/* Mobile: grid fixo de 2 colunas com os 4 principais produtos */}
+            <div className="grid grid-cols-2 gap-4 sm:hidden">
+              {leaders.slice(0, 4).map((p: any) => (
+                <CimentoCard key={p.id} p={p} />
+              ))}
             </div>
           </div>
         </section>

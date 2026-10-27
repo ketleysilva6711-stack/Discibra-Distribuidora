@@ -20,6 +20,7 @@ export const WA_CLICK_SOURCES = [
   "pro_solutions_banner",
   "concierge_flyout",
   "mobile_bottom_nav",
+  "cep_freight_calculator",
 ] as const
 
 export type WaClickSource = (typeof WA_CLICK_SOURCES)[number]
@@ -48,5 +49,6 @@ export const WA_SOURCE_LABELS: Record<WaClickSource, string> = {
   pro_solutions_banner: "Banner de Soluções Pro",
   concierge_flyout: "Concierge Executivo B2B",
   mobile_bottom_nav: "Navegação inferior mobile",
+  cep_freight_calculator: "Calculadora de Frete por CEP",
 }
 
