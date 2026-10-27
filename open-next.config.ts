@@ -1,5 +1,4 @@
 ﻿import type { OpenNextConfig } from '@opennextjs/cloudflare';
-import kvIncrementalCache from '@opennextjs/cloudflare/overrides/incremental-cache/kv-incremental-cache';
 
 const config: OpenNextConfig = {
   default: {
@@ -7,7 +6,7 @@ const config: OpenNextConfig = {
       wrapper: 'cloudflare-node',
       converter: 'edge',
       proxyExternalRequest: 'fetch',
-      incrementalCache: () => Promise.resolve(kvIncrementalCache),
+      incrementalCache: 'dummy',
       tagCache: 'dummy',
       queue: 'dummy',
     },
