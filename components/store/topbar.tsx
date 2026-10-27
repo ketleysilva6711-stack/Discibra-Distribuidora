@@ -38,6 +38,8 @@ export default function Topbar() {
 
         {/* Lado direito — institucional */}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-medium text-slate-400 sm:text-xs">
+          <span className="font-semibold text-slate-300">CNPJ: 59.566.414/0001-25</span>
+          <span className="hidden h-3 w-px bg-slate-700 sm:block" aria-hidden="true" />
           <span>CD Logístico: Ribeirão Preto - SP</span>
           <span className="hidden h-3 w-px bg-slate-700 sm:block" aria-hidden="true" />
           <span>PIX com Desconto · Parcele 12x no Cartão</span>

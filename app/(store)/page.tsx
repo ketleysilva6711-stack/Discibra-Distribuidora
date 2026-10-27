@@ -476,9 +476,9 @@ export default async function HomePage() {
           </p>
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
             {[
-              { step: "01", icon: <MessageSquare className="h-6 w-6 text-[#002D5B]" />, title: "Mande mensagem", desc: "Clique em qualquer botão de WhatsApp, envie os produtos que quer e aguarde. Respondemos em minutos." },
-              { step: "02", icon: <FileText className="h-6 w-6 text-[#002D5B]" />, title: "Receba o orçamento", desc: "O atendente envia a proposta com preços, condições de pagamento e prazo de entrega." },
-              { step: "03", icon: <Truck className="h-6 w-6 text-[#002D5B]" />, title: "Entrega na obra", desc: "Aprovado o orçamento, agendamos a entrega — caminhão com munck ou paletizado." },
+              { step: "01", icon: <MessageSquare className="h-6 w-6 text-white" />, title: "Mande mensagem", desc: "Clique em qualquer botão de WhatsApp, envie os produtos que quer e aguarde. Respondemos em minutos." },
+              { step: "02", icon: <FileText className="h-6 w-6 text-white" />, title: "Receba o orçamento", desc: "O atendente envia a proposta com preços, condições de pagamento e prazo de entrega." },
+              { step: "03", icon: <Truck className="h-6 w-6 text-white" />, title: "Entrega na obra", desc: "Aprovado o orçamento, agendamos a entrega — caminhão com munck ou paletizado." },
             ].map((item) => (
               <div key={item.step} className="flex flex-col items-center rounded-xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-[#002D5B] text-white">
@@ -508,50 +508,36 @@ export default async function HomePage() {
       </section>
 
       {/* ── BLOCO INSTITUCIONAL — PROVA FÍSICA ── */}
-      <section className="border-t border-slate-200/60 bg-[#0B1B2B] py-16 sm:py-20 text-white">
+      <section className="border-t border-slate-200/60 bg-[#0B1B2B] py-14 sm:py-16 text-white">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="rounded-xl border border-white/10 bg-[#0B1B2B]/50 p-8 sm:p-12">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-8">
-              <div className="space-y-4">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                  Prova de Existência Física
-                </span>
-                <h2 className="text-3xl font-black tracking-tight sm:text-4xl text-white">
-                  Conheça quem entrega na sua obra
-                </h2>
-                <p className="text-slate-300 leading-relaxed">
-                  Distribuidora legalmente constituída com centro de distribuição próprio em Ribeirão Preto.
-                  Atendimento direto, sem intermediários.
-                </p>
+          <div className="rounded-2xl border border-white/10 bg-[#071320] p-8 sm:p-10">
+            <div className="max-w-3xl space-y-3">
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#F47920]">
+                Prova de Existência Física
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+                Conheça quem entrega na sua obra
+              </h2>
+              <p className="text-sm text-slate-300 leading-relaxed">
+                Distribuidora legalmente constituída com centro de distribuição próprio em Ribeirão Preto. Atendimento direto e sem intermediários.
+              </p>
+            </div>
+            <div className="mt-8 pt-8 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-6 text-left">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">CNPJ</p>
+                <p className="mt-1 text-base font-black text-white whitespace-nowrap">59.566.414/0001-25</p>
               </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-left">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    CNPJ
-                  </p>
-                  <p className="text-lg font-black text-white whitespace-nowrap">59.566.414/0001-25</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Centro de Distribuição & Logística
-                  </p>
-                  <p className="text-lg font-black text-white">Ribeirão Preto — SP</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Expedição & Cargas
-                  </p>
-                  <p className="text-lg font-black text-white">
-                    Seg a Sex 07h às 18h | Sáb 07h às 12h
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Central de Atendimento
-                  </p>
-                  <p className="text-lg font-black text-white">{SITE.phoneDisplay}</p>
-                </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Centro de Distribuição</p>
+                <p className="mt-1 text-base font-black text-white whitespace-nowrap">Ribeirão Preto — SP</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Expedição & Cargas</p>
+                <p className="mt-1 text-sm font-semibold text-white">Seg a Sex 07h-18h | Sáb 07h-12h</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Central Telefônica</p>
+                <p className="mt-1 text-base font-black text-white whitespace-nowrap">(16) 99644-7972</p>
               </div>
             </div>
           </div>

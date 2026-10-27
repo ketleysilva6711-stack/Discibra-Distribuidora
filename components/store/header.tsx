@@ -69,36 +69,6 @@ export default function StoreHeader() {
 
   return (
     <header className="z-50 shrink-0 w-full fixed inset-x-0 top-0 lg:sticky lg:top-0">
-      {/* ── TOPBAR INFORMATIVA (prova física + contato) ── */}
-      <div
-        className={cn(
-          "w-full border-b border-slate-200/60 bg-[#002D5B]/90 backdrop-blur text-white overflow-hidden transition-all duration-500",
-          scrolled ? "max-h-0 opacity-0" : "max-h-[40px] opacity-100"
-        )}
-      >
-        <div className="mx-auto max-w-[1440px] px-4 lg:px-10">
-          <div className="overflow-x-auto whitespace-nowrap text-[11px] font-medium px-3 py-1.5 sm:hidden">
-            <span className="text-[#F47920] font-black mr-2">CNPJ 59.566.414/0001-25</span>
-            <span className="opacity-80 mx-1">·</span>
-            <span className="text-emerald-300 mr-2">CD Ribeirão Preto/SP</span>
-            <span className="opacity-80 mx-1">·</span>
-            <span className="mr-2">Seg a Sex 07h-18h | Sáb 07h-12h</span>
-            <span className="opacity-80 mx-1">·</span>
-            <span className="font-black">(16) 99644-7972</span>
-          </div>
-          <div className="hidden sm:flex items-center justify-between px-6 py-2 text-xs sm:text-[11px]">
-            <div className="flex items-center gap-3">
-              <span className="text-[#F47920] font-black">CNPJ 59.566.414/0001-25</span>
-              <span className="text-white/60 mx-1">·</span>
-              <span className="text-emerald-300">CD Ribeirão Preto/SP</span>
-              <span className="text-white/60 mx-1">·</span>
-              <span className="text-white">Seg a Sex 07h-18h | Sáb 07h-12h</span>
-              <span className="text-white/60 mx-1">·</span>
-              <span className="font-black text-white">(16) 99644-7972</span>
-            </div>
-          </div>
-        </div>
-      </div>
       {/* Topbar recolhe no scroll */}
       <div className={cn("hidden lg:block overflow-hidden transition-all duration-500", scrolled ? "max-h-0 opacity-0" : "max-h-14 opacity-100")}>
         <Topbar />

@@ -55,7 +55,7 @@ export default function CepFreightCalculator({
     setError(null)
 
     try {
-      const res = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`)
+      const res = await fetch(`/api/cep?cep=${cleanCep}`)
       const data = await res.json()
 
       if (data.erro || !data.localidade) {
