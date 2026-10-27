@@ -64,7 +64,7 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const settings = await getSiteSettingsServer()
-  const gtmId = settings?.gtm_id?.trim() || process.env.NEXT_PUBLIC_GTM_ID || "GTM-MLK62TBK"
+  const gtmId = settings?.gtm_id?.trim() || process.env.NEXT_PUBLIC_GTM_ID || "GTM-K6K78L54"
   const ga4Id = settings?.ga4_id?.trim() || process.env.NEXT_PUBLIC_GA_ID
   const businessName = resolveBusinessName(settings)
   const googleAdsId = settings?.google_ads_id?.trim() || process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || "AW-16526087847"

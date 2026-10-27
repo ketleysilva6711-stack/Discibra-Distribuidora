@@ -32,7 +32,7 @@ export const GOOGLE_ADS = {
   addToCartConversionId: process.env.NEXT_PUBLIC_GOOGLE_ADS_ADD_TO_CART_ID || "",
 
   // Tag Manager Container ID
-  gtmId: process.env.NEXT_PUBLIC_GTM_ID || "",
+  gtmId: process.env.NEXT_PUBLIC_GTM_ID || "GTM-K6K78L54",
 }
 
 // Tipos de eventos de conversão suportados
