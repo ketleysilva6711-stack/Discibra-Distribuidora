@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Search, Truck, AlertCircle, CheckCircle2 } from "lucide-react"
 import { waLink } from "@/lib/site-config"
 import { trackWhatsAppClick } from "@/lib/track-whatsapp"
@@ -29,14 +29,14 @@ export default function CepFreightCalculator({
   const [address, setAddress] = useState<{ cep: string; logradouro: string; bairro: string; localidade: string; uf: string } | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  // Máscara de CEP: 00000-000
-  useEffect(() => {
-    let value = cep.replace(/\D/g, "")
-    if (value.length > 5) {
-      value = `${value.slice(0, 5)}-${value.slice(5, 8)}`
+  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value.replace(/\D/g, "")
+    if (val.length > 8) val = val.slice(0, 8)
+    if (val.length > 5) {
+      val = `${val.slice(0, 5)}-${val.slice(5, 8)}`
     }
-    setCep(value)
-  }, [cep])
+    setCep(val)
+  }
 
   const cleanCep = cep.replace(/\D/g, "")
 
@@ -108,7 +108,7 @@ export default function CepFreightCalculator({
             <input
               type="text"
               value={cep}
-              onChange={(e) => setCep(e.target.value)}
+              onChange={handleCepChange}
               maxLength={10}
               placeholder="00000-000"
               disabled={loading}

@@ -3,7 +3,7 @@
 // Home B2B corporativa — seções por departamento
 // =============================================================================
 
-export const revalidate = 300
+export const dynamic = "force-static"
 
 import { createPublicClient } from "@/lib/supabase/public"
 import { HeroBanner } from "@/components/store/hero-banner"
@@ -78,12 +78,8 @@ async function fetchHome() {
     }
   }
 
-  const { data: settingsData, error: settingsErr } = await supabase
-    .from("site_settings")
-    .select("banner_images")
-    .eq("id", "default")
-    .maybeSingle()
   let slides: any[] = []
+  const settingsData = siteSettingsRes?.data || null
   if (settingsData?.banner_images) {
     try {
       const parsed = Array.isArray(settingsData.banner_images)
@@ -519,7 +515,7 @@ export default async function HomePage() {
                   <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     CNPJ
                   </p>
-                  <p className="text-lg font-black text-white">59.566.414/0001-25</p>
+                  <p className="text-lg font-black text-white whitespace-nowrap">59.566.414/0001-25</p>
                 </div>
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
