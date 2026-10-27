@@ -14,7 +14,7 @@
 // IDs de conversão do Google Ads (configuráveis via .env)
 export const GOOGLE_ADS = {
   // Conversão "WhatsApp Click" — cada clique no WhatsApp
-  whatsappConversionId: process.env.NEXT_PUBLIC_GOOGLE_ADS_WHATSAPP_ID || "",
+  whatsappConversionId: process.env.NEXT_PUBLIC_GOOGLE_ADS_WHATSAPP_ID || "AW-16526087847/O9LwCKLG96odEKetoMg9",
 
   // Conversão "Lead Form" — preenchimento de formulário de contato
   leadFormConversionId: process.env.NEXT_PUBLIC_GOOGLE_ADS_LEAD_FORM_ID || "",
@@ -102,9 +102,9 @@ export function fireConversion(config: ConversionConfig): void {
 export function fireWhatsappConversion(
   source: string,
   page: string = "",
-  value: number = 1.5 // Valor estimado do lead em BRL
+  value: number = 1.0 // Valor estimado do lead em BRL
 ): void {
-  const id = GOOGLE_ADS.whatsappConversionId
+  const id = GOOGLE_ADS.whatsappConversionId || "AW-16526087847/O9LwCKLG96odEKetoMg9"
   if (!id) {
     console.warn("[GoogleAds] WhatsApp conversion ID not configured")
     return
