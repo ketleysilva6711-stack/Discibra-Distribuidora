@@ -6,6 +6,7 @@ import { rawTokens, slugTokens, escapeLike } from "@/lib/search-normalize"
 import { cn } from "@/lib/utils"
 
 const PAGE_SIZE = 36
+export const revalidate = 300 // 5 min de cache edge/ISR
 
 type Category = { id: string; name: string; slug: string }
 type Product = {

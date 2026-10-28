@@ -1,7 +1,8 @@
+import type { Metadata } from "next"
 import ProductCard from "@/components/store/product-card"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, LayoutGrid } from "lucide-react"
+import { ArrowLeft, ArrowRight, LayoutGrid } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 
 /**
@@ -38,12 +39,41 @@ function slugCandidates(slug: string): string[] {
   return out
 }
 
+export const revalidate = 300 // 5 min de cache edge/ISR
+
+export async function generateMetadata({
+  params,
+}: Readonly<{ params: Promise<{ slug: string }> }>): Promise<Metadata> {
+  const { slug } = await params
+  const supabase = await createClient()
+
+  const candidates = slugCandidates(slug)
+  const { data: cats } = await supabase
+    .from("categories")
+    .select("id, name, slug")
+    .in("slug", candidates)
+    .eq("active", true)
+    .order("sort_order")
+
+  const cat = cats?.[0]
+  const slugCanonico = cat?.slug ?? (slug || "").toLowerCase().trim()
+
+  return {
+    alternates: {
+      canonical: `https://www.discibradistribuidora.com/categoria/${slugCanonico}`,
+    },
+  }
+}
+
 export default async function CategoryPage({
   params,
+  searchParams,
 }: Readonly<{
   params: Promise<{ slug: string }>
+  searchParams: Promise<{ page?: string }>
 }>) {
   const { slug } = await params
+  const { page = "1" } = await searchParams
   const supabase = await createClient()
 
   // Resolve o slug por candidatos (exato + aliases), categoria ativa primeiro
@@ -67,12 +97,22 @@ export default async function CategoryPage({
     )
   }
 
-  const { data: products } = await supabase
+  const PAGE_SIZE = 36
+  const currentPage = Math.max(1, parseInt(page, 10) || 1)
+  const from = (currentPage - 1) * PAGE_SIZE
+  const to = from + PAGE_SIZE - 1
+
+  const { data: products, count, error } = await supabase
     .from("products")
-    .select("*")
+    .select("*", { count: "exact" })
     .eq("category_id", cat.id)
     .eq("active", true)
     .order("created_at", { ascending: false })
+    .range(from, to)
+
+  if (error) throw error
+
+  const total = count ?? 0
 
   return (
     <div className="mx-auto max-w-7xl px-3 py-6 sm:px-4 sm:py-10">
@@ -103,7 +143,7 @@ export default async function CategoryPage({
               {cat.name}
             </h1>
             <p className="mt-2 text-sm text-muted-foreground sm:text-[15px]">
-              {(products || []).length} {(products || []).length === 1 ? "produto" : "produtos"} disponíveis
+              {total} {total === 1 ? "produto" : "produtos"} disponíveis
             </p>
           </div>
         </div>
@@ -119,6 +159,50 @@ export default async function CategoryPage({
         <div className="rounded-2xl border border-dashed border-border/80 bg-muted/20 py-16 text-center text-muted-foreground">
           Nenhum produto nesta categoria.
         </div>
+      )}
+
+      {total > PAGE_SIZE && (
+        <nav aria-label="Paginacao da categoria" className="mt-8 flex flex-wrap items-center justify-center gap-1.5">
+          {currentPage > 1 && (
+            <Link
+              href={`/categoria/${cat.slug}?page=1`}
+              className="h-10 px-3 items-center justify-center rounded-full border bg-white text-xs font-bold text-slate-600 sm:inline-flex"
+            >
+              Primeira
+            </Link>
+          )}
+          <Link
+            href={`/categoria/${cat.slug}?page=${Math.max(1, currentPage - 1)}`}
+            aria-label="Pagina anterior"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+          {Array.from(
+            { length: Math.min(Math.ceil(total / PAGE_SIZE), 7) },
+            (_, i) => i + 1,
+          ).map((p) => (
+            <Link
+              key={p}
+              href={`/categoria/${cat.slug}?page=${p}`}
+              aria-current={p === currentPage ? "page" : undefined}
+              className={`inline-flex h-10 min-w-10 items-center justify-center rounded-full border px-2 text-sm font-bold transition ${
+                p === currentPage
+                  ? "border-slate-900 bg-slate-900 text-white"
+                  : "bg-white text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              {p}
+            </Link>
+          ))}
+          <Link
+            href={`/categoria/${cat.slug}?page=${Math.min(Math.ceil(total / PAGE_SIZE), currentPage + 1)}`}
+            aria-label="Proxima pagina"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white"
+          >
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </nav>
       )}
     </div>
   )

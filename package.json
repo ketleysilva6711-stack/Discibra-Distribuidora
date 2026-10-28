@@ -1,6 +1,7 @@
 {
   "name": "distribuidora-cimento",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
   "description": "Distribuidora de Cimento - Plataforma de vendas atacadista de materiais de construção",
   "scripts": {
@@ -10,8 +11,8 @@
     "pages:build": "opennextjs-cloudflare build",
     "pages:preview": "pnpm run pages:build; wrangler dev",
     "pages:deploy": "pnpm run pages:build; wrangler deploy",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,tsx,css,json}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,css,json}\"",
     "type-check": "tsc --noEmit",
