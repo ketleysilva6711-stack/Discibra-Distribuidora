@@ -30,13 +30,12 @@ type Promo = {
 
 async function fetchPromotions(): Promise<Promo[]> {
   const supabase = await createClient()
-  // Busca candidatos com desconto ou em destaque; valida desconto real no servidor.
+  // Busca todos os produtos ativos com imagem; priorização de desconto feita no servidor.
   const { data, error } = await supabase
     .from("products")
     .select("id, name, slug, price, original_price, image_url, unit, stock, category_id, is_discount, featured")
     .eq("active", true)
     .not("image_url", "is", null)
-    .or("is_discount.eq.true,original_price.not.is.null,featured.eq.true")
     .order("created_at", { ascending: false })
     .limit(48)
   if (error) throw error
@@ -47,7 +46,7 @@ async function fetchPromotions(): Promise<Promo[]> {
   // 2. Fallback: produtos marcados como desconto/destaque
   const destaques = rows.filter((p) => p.is_discount === true || p.featured === true)
   if (destaques.length > 0) return destaques
-  // 3. Último recurso: os mais recentes ativos com imagem
+  // 3. Último recurso: todos os produtos ativos com imagem (garante vitrine sempre preenchida)
   return rows
 }
 
