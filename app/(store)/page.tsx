@@ -309,29 +309,65 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── PILARES DE CONFIANÇA — FAIXA HORIZONTAL COMPACTA ── */}
-      <section className="border-b border-[var(--line)] bg-[var(--surface-alt)]">
-        <div className="mx-auto max-w-7xl px-4">
-          <div className="flex overflow-x-auto [scrollbar-width:none] [-webkit-overflow-scrolling:touch] divide-x divide-[var(--line)]">
-            {trustPillars.map((item) => (
-              <div
-                key={item.title}
-                className="flex-none w-1/2 sm:flex-1 flex items-center gap-3 px-4 py-3 min-w-[160px]"
-              >
-                {item.icon}
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold text-[var(--ink)] leading-tight truncate">
-                    {item.title}
-                  </p>
-                  <p className="mt-0.5 text-[11px] text-[var(--ink-muted)] leading-tight truncate">
-                    {item.desc}
-                  </p>
-                </div>
+      {/* TRUST BAR — 4 itens compactos */}
+      <div className="border-y border-[var(--line)] bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-[var(--line)]">
+            {/* 1 — Preço de Atacado */}
+            <div className="flex items-center gap-3 px-4 py-3">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                strokeLinejoin="round" className="text-[var(--accent)] flex-none shrink-0">
+                <path d="M3 9h18M3 15h18M12 3v18M7.5 3h9a4.5 4.5 0 0 1 0 18h-9a4.5 4.5 0 0 1 0-18z"/>
+              </svg>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-[var(--ink)] leading-tight">Preço de Atacado</p>
+                <p className="text-[11px] text-[var(--ink-muted)] leading-tight truncate">Sem exigência de CNPJ</p>
               </div>
-            ))}
+            </div>
+            {/* 2 — Parcele 12× */}
+            <div className="flex items-center gap-3 px-4 py-3">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                strokeLinejoin="round" className="text-[var(--accent)] flex-none shrink-0">
+                <rect x="2" y="5" width="20" height="14" rx="2"/>
+                <line x1="2" y1="10" x2="22" y2="10"/>
+              </svg>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-[var(--ink)] leading-tight">Parcele 12×</p>
+                <p className="text-[11px] text-[var(--ink-muted)] leading-tight truncate">Cartão ou PIX sem acréscimo</p>
+              </div>
+            </div>
+            {/* 3 — Entrega Descarregada */}
+            <div className="flex items-center gap-3 px-4 py-3">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                strokeLinejoin="round" className="text-[var(--accent)] flex-none shrink-0">
+                <rect x="1" y="3" width="15" height="13" rx="1"/>
+                <path d="M16 8h4l3 5v3h-7V8z"/>
+                <circle cx="5.5" cy="18.5" r="2.5"/>
+                <circle cx="18.5" cy="18.5" r="2.5"/>
+              </svg>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-[var(--ink)] leading-tight">Entrega Descarregada</p>
+                <p className="text-[11px] text-[var(--ink-muted)] leading-tight truncate">Munck ou paletizado na obra</p>
+              </div>
+            </div>
+            {/* 4 — Direto da Fábrica */}
+            <div className="flex items-center gap-3 px-4 py-3">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                strokeLinejoin="round" className="text-[var(--accent)] flex-none shrink-0">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-[var(--ink)] leading-tight">Direto da Fábrica</p>
+                <p className="text-[11px] text-[var(--ink-muted)] leading-tight truncate">Certificado ABNT</p>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* ── CATEGORIAS (contadores reais) ── */}
       {data?.categories && data.categories.length > 0 && (
