@@ -7,7 +7,6 @@ export const dynamic = "force-static"
 
 import { createPublicClient } from "@/lib/supabase/public"
 import { HeroBanner } from "@/components/store/hero-banner"
-import ResponsivePromoBanner from "@/components/store/responsive-promo-banner"
 import CategoriesCarousel from "@/components/store/categories-carousel"
 import ProductsCarousel from "@/components/store/products-carousel"
 import InstitutionalSection from "@/components/store/institutional-section"
@@ -266,8 +265,7 @@ export default async function HomePage() {
         <HeroBanner initialSlides={initialSlides} />
       </div>
 
-      {/* OFERTAS PROMOCIONAIS RESPONSIVAS (mobile vs desktop) */}
-      <ResponsivePromoBanner />
+      {/* OFERTAS PROMOCIONAIS RESPONSIVAS (mobile vs desktop) */}
 
       {/* ── FAIXA ABERTO A TODOS — PÓS-HERO (corporativa) ── */}
       <section className="border-b border-slate-200/60 bg-[#002D5B] text-white">

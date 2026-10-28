@@ -1,0 +1,26 @@
+﻿**********************
+Início da transcrição do Windows PowerShell
+Hora de início: 20261028030558
+Nome de Usuário: DESKTOP-T9PGQB9\Projetos
+Executar como Usuário: DESKTOP-T9PGQB9\Projetos
+Nome da Configuração: 
+Computador: DESKTOP-T9PGQB9 (Microsoft Windows NT 10.0.26300.0)
+Aplicativo Host: C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.EXE -NoLogo -NoProfile -NonInteractive -Command New-Item -ItemType Directory -Force docs\diagnostico | Out-Null; Start-Transcript -Path docs\diagnostico\transcript-fase1.txt -Force; Write-Output "TRANSCRIPT INICIADO"
+ID do Processo: 15160
+PSVersion: 5.1.26100.9711
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9711
+BuildVersion: 10.0.26100.9711
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcrição iniciada, o arquivo de saída é docs\diagnostico\transcript-fase1.txt
+TRANSCRIPT INICIADO
+PS>$global:?
+True
+**********************
+Fim da transcrição do Windows PowerShell
+Hora de término: 20261028030558
+**********************

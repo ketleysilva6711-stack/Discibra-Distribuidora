@@ -1,0 +1,6 @@
+GTM- home: 4
+AW- home: 3
+ld+json home: 1
+Carregando produtos: 3
+/produto/ produtos: 0
+/produto/ categoria: 0
