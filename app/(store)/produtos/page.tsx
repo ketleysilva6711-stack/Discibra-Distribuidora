@@ -105,25 +105,23 @@ export default async function ProductsPage({
       </Link>
 
       <div className="flex flex-col gap-6">
-        {/* Barra de filtros em faixa horizontal (chips sutis) */}
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2">
+        {/* Barra de filtros em faixa horizontal (chips sutis, 1 linha scrollável no mobile) */}
+        <div className="mb-8 flex items-center gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [-webkit-overflow-scrolling:touch]">
+          <Link
+            href={`/produtos${qs}`}
+            className={`shrink-0 rounded-[4px] px-3 py-1.5 text-xs font-semibold transition-colors ${category === "all" ? "bg-[#111318] text-white" : "bg-white text-[#111318] border border-[#E5E5E3] hover:bg-[#FAFAF9]"}`}
+          >
+            Todas
+          </Link>
+          {(categories || []).map((c) => (
             <Link
-              href={`/produtos${qs}`}
-              className={`shrink-0 rounded-[4px] px-3 py-1.5 text-xs font-semibold transition-colors ${category === "all" ? "bg-[#111318] text-white" : "bg-white text-[#111318] border border-[#E5E5E3] hover:bg-[#FAFAF9]"}`}
+              key={c.id}
+              href={`/produtos?category=${c.id}${qs}`}
+              className={`shrink-0 truncate rounded-[4px] px-3 py-1.5 text-xs font-medium transition-colors ${category === c.id ? "bg-[#111318] text-white" : "bg-white text-[#111318] border border-[#E5E5E3] hover:bg-[#FAFAF9]"}`}
             >
-              Todas
+              {c.name}
             </Link>
-            {(categories || []).map((c) => (
-              <Link
-                key={c.id}
-                href={`/produtos?category=${c.id}${qs}`}
-                className={`truncate rounded-[4px] px-3 py-1.5 text-xs font-medium transition-colors ${category === c.id ? "bg-[#111318] text-white" : "bg-white text-[#111318] border border-[#E5E5E3] hover:bg-[#FAFAF9]"}`}
-              >
-                {c.name}
-              </Link>
-            ))}
-          </div>
+          ))}
         </div>
 
         <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground md:text-3xl">Catálogo</h1>

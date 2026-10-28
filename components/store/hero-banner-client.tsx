@@ -30,7 +30,7 @@ export function HeroBannerClient({ banners }: HeroBannerClientProps) {
   if (!banners || total === 0) return null
   return (
     <div
-      className="relative w-full overflow-hidden bg-[#111318]"
+      className="relative w-full overflow-hidden bg-[#FAFAF9]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -84,11 +84,6 @@ export function HeroBannerClient({ banners }: HeroBannerClientProps) {
                 }`}
               />
             ))}
-            {total > 8 && (
-              <span className="text-[10px] text-white/80 font-mono ml-1">
-                {currentIndex + 1}/{total}
-              </span>
-            )}
           </div>
         </>
       )}
