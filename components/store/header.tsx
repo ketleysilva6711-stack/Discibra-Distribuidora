@@ -77,7 +77,7 @@ export default function StoreHeader() {
         <div className="mx-auto max-w-[1440px] px-4 lg:px-10">
           <div className={cn("flex items-center justify-between gap-10 transition-all duration-500", scrolled ? "py-2" : "py-3 lg:py-4")}>
             {/* Mobile Menu */}
-            <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden h-11 w-11 flex items-center justify-center rounded-2xl bg-slate-50 border border-slate-100 active:scale-90 transition-all">
+            <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden h-11 w-11 flex items-center justify-center rounded-[4px] bg-slate-50 border border-[#E5E5E3] active:scale-95 transition-all">
               {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
@@ -112,7 +112,7 @@ export default function StoreHeader() {
 
               {!user ? (
                 <Link href="/login" className="hidden lg:flex items-center gap-3 group">
-                   <div className="w-11 h-11 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 group-hover:bg-primary/5 group-hover:border-primary/20 transition-all">
+                   <div className="w-11 h-11 rounded-[4px] bg-slate-50 flex items-center justify-center border border-[#E5E5E3] group-hover:bg-slate-100 transition-all">
                       <User className="h-5 w-5 text-slate-400 group-hover:text-primary transition-colors" />
                    </div>
                    <div className="flex flex-col items-start">
@@ -122,7 +122,7 @@ export default function StoreHeader() {
                 </Link>
               ) : (
                 <Link href="/minha-conta" className="flex items-center gap-3 group">
-                   <div className="w-11 h-11 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 group-hover:bg-primary/5 group-hover:border-primary/20 transition-all">
+                   <div className="w-11 h-11 rounded-[4px] bg-slate-50 flex items-center justify-center border border-[#E5E5E3] group-hover:bg-slate-100 transition-all">
                       <User className="h-5 w-5 text-slate-400 group-hover:text-primary transition-colors" />
                    </div>
                    <div className="hidden lg:flex flex-col items-start leading-tight">
@@ -134,10 +134,10 @@ export default function StoreHeader() {
                 </Link>
               )}
 
-              <Link href="/carrinho" className="group relative h-11 w-11 flex items-center justify-center rounded-2xl bg-slate-50 text-secondary border border-slate-100 hover:border-primary/20 hover:bg-white hover:shadow-xl transition-all">
+              <Link href="/carrinho" className="group relative h-11 w-11 flex items-center justify-center rounded-[4px] bg-slate-50 text-slate-800 border border-[#E5E5E3] hover:border-slate-400 hover:bg-white transition-all">
                 <ShoppingCart className="h-5 w-5 transition-transform group-hover:scale-110" />
                 {cartCount > 0 && (
-                  <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-black text-white shadow-lg ring-2 ring-white">
+                  <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-[4px] bg-[#15803D] px-1 text-[9px] font-black text-white ring-1 ring-white">
                     {cartCount}
                   </span>
                 )}
@@ -157,19 +157,19 @@ export default function StoreHeader() {
             <ul className="flex items-center justify-between px-1">
               <div className="flex items-center gap-2">
                 <li>
-                  <Link href="/produtos" className="flex items-center gap-2 px-5 py-3 text-[11px] font-black text-slate-600 uppercase tracking-[0.2em] hover:text-primary hover:bg-primary/5 rounded-xl transition-all">
+                  <Link href="/produtos" className="flex items-center gap-2 px-5 py-3 text-[11px] font-black text-slate-600 uppercase tracking-[0.2em] hover:text-primary hover:bg-primary/5 rounded-[4px] transition-all">
                     <Menu className="h-4 w-4" />
                     Catálogo
                   </Link>
                 </li>
                 <li>
-                  <Link href="/promocoes" className="flex items-center gap-2 px-5 py-3 text-[11px] font-black text-[#F47920] uppercase tracking-[0.2em] hover:bg-[#F47920]/5 rounded-xl transition-all">
+                  <Link href="/promocoes" className="flex items-center gap-2 px-5 py-3 text-[11px] font-black text-[#F47920] uppercase tracking-[0.2em] hover:bg-[#F47920]/5 rounded-[4px] transition-all">
                     <Tag className="h-4 w-4" />
                     Ofertas
                   </Link>
                 </li>
                 <li>
-                  <Link href="/rastrear-pedido" className="px-5 py-3 text-[11px] font-black text-slate-600 uppercase tracking-[0.2em] hover:text-primary hover:bg-primary/5 rounded-xl transition-all">
+                  <Link href="/rastrear-pedido" className="px-5 py-3 text-[11px] font-black text-slate-600 uppercase tracking-[0.2em] hover:text-primary hover:bg-primary/5 rounded-[4px] transition-all">
                     Rastreamento
                   </Link>
                 </li>
