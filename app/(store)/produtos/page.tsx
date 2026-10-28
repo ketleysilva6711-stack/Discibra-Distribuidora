@@ -1,6 +1,6 @@
 import ProductCard from "@/components/store/product-card"
 import Link from "next/link"
-import { ArrowLeft, SlidersHorizontal, Search, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowLeft, Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { rawTokens, slugTokens, escapeLike } from "@/lib/search-normalize"
 import { cn } from "@/lib/utils"
@@ -104,48 +104,41 @@ export default async function ProductsPage({
         <ArrowLeft className="h-4 w-4 shrink-0" /> Voltar
       </Link>
 
-      <div className="flex flex-col gap-6 lg:flex-row lg:gap-10">
-        <aside className="shrink-0 lg:w-56">
-          <div className="lg:sticky lg:top-24">
-            <div className="mb-1 hidden items-center gap-2 font-heading text-sm font-bold text-foreground lg:flex">
-              <SlidersHorizontal className="h-4 w-4 text-primary" />
-              Filtros
-            </div>
-            <p className="mb-2 hidden text-xs text-muted-foreground lg:block">Categoria</p>
-            <div className="scrollbar-hide -mx-1 flex snap-x snap-mandatory gap-2 overflow-x-auto px-1 pb-1 lg:mx-0 lg:block lg:space-y-1.5 lg:overflow-visible lg:rounded-2xl lg:border lg:border-border/50 lg:bg-card lg:p-3 lg:shadow-app">
+      <div className="flex flex-col gap-6">
+        {/* Barra de filtros em faixa horizontal (chips sutis) */}
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href={`/produtos${qs}`}
+              className={`shrink-0 rounded-[4px] px-3 py-1.5 text-xs font-semibold transition-colors ${category === "all" ? "bg-[#111318] text-white" : "bg-white text-[#111318] border border-[#E5E5E3] hover:bg-[#FAFAF9]"}`}
+            >
+              Todas
+            </Link>
+            {(categories || []).map((c) => (
               <Link
-                href={`/produtos${qs}`}
-                className={`shrink-0 snap-start rounded-full px-4 py-2.5 text-sm font-semibold transition duration-200 lg:w-full lg:rounded-xl lg:px-3 lg:py-2.5 lg:text-left ${category === "all" ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted/60 text-foreground hover:bg-muted lg:bg-transparent"}`}
+                key={c.id}
+                href={`/produtos?category=${c.id}${qs}`}
+                className={`truncate rounded-[4px] px-3 py-1.5 text-xs font-medium transition-colors ${category === c.id ? "bg-[#111318] text-white" : "bg-white text-[#111318] border border-[#E5E5E3] hover:bg-[#FAFAF9]"}`}
               >
-                Todas
+                {c.name}
               </Link>
-              {(categories || []).map((c) => (
-                <Link
-                  key={c.id}
-                  href={`/produtos?category=${c.id}${qs}`}
-                  className={`max-w-[200px] shrink-0 snap-start truncate rounded-full px-4 py-2.5 text-sm font-medium transition duration-200 lg:max-w-none lg:w-full lg:rounded-xl lg:px-3 lg:py-2.5 lg:text-left ${category === c.id ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted/60 text-foreground hover:bg-muted lg:bg-transparent"}`}
-                >
-                  {c.name}
-                </Link>
-              ))}
-            </div>
+            ))}
           </div>
-        </aside>
+        </div>
 
-        <div className="min-w-0 flex-1">
-          <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground md:text-3xl">Catálogo</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {total.toLocaleString("pt-BR")} produtos disponíveis{totalPages > 1 ? ` – página ${safePage} de ${totalPages}` : ""}
-          </p>
-          <form method="get" className="relative mb-6 mt-4 max-w-lg">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              name="q"
-              defaultValue={q}
-              placeholder="Filtrar por nome..."
-              className="h-11 w-full rounded-full border border-border/50 bg-background pl-10 pr-4 text-sm shadow-inner outline-none transition duration-200 focus:border-primary/35 focus:shadow-app"
-              aria-label="Filtrar produtos por nome"
-            />
+        <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground md:text-3xl">Catálogo</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {total.toLocaleString("pt-BR")} produtos disponíveis{totalPages > 1 ? ` – página ${safePage} de ${totalPages}` : ""}
+        </p>
+        <form method="get" className="relative mb-6 mt-4 max-w-sm">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Filtrar por nome..."
+            className="w-full px-3 py-2 border border-[#E5E5E3] rounded-[4px] text-xs focus:outline-none focus:border-[#111318] transition-colors"
+            aria-label="Filtrar produtos por nome"
+          />
             <button
               type="submit"
               className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100"
@@ -224,6 +217,5 @@ export default async function ProductsPage({
           )}
         </div>
       </div>
-    </div>
   )
 }
