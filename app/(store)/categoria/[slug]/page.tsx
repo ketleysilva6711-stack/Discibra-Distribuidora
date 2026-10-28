@@ -61,14 +61,15 @@ export async function generateMetadata({
     }
   }
 
+  const catName = (cat?.name ?? "").replace(/Reiuntes/gi, "Rejuntes")
   const slugCanonico = cat.slug ?? (slug || "").toLowerCase().trim()
 
   return {
-    title: `${cat.name} no Atacado e Varejo`,
-    description: `Compre ${cat.name} com os melhores preços direto da fábrica. Entrega descarregada em Ribeirão Preto e região.`,
+    title: `${catName} no Atacado e Varejo`,
+    description: `Compre ${catName} com os melhores preços direto da fábrica. Entrega descarregada em Ribeirão Preto e região.`,
     openGraph: {
-      title: `${cat.name} no Atacado e Varejo — Discibra Distribuidora`,
-      description: `Compre ${cat.name} com os melhores preços direto da fábrica. Entrega descarregada em Ribeirão Preto e região.`,
+      title: `${catName} no Atacado e Varejo — Discibra Distribuidora`,
+      description: `Compre ${catName} com os melhores preços direto da fábrica. Entrega descarregada em Ribeirão Preto e região.`,
       type: "website",
       siteName: "Discibra",
       url: `https://www.discibradistribuidora.com/categoria/${slugCanonico}`,
@@ -77,14 +78,14 @@ export async function generateMetadata({
           url: "https://www.discibradistribuidora.com/og-default.png",
           width: 1200,
           height: 630,
-          alt: `Discibra — ${cat.name}`,
+          alt: `Discibra — ${catName}`,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${cat.name} no Atacado e Varejo — Discibra Distribuidora`,
-      description: `Compre ${cat.name} com os melhores preços direto da fábrica. Entrega descarregada em Ribeirão Preto e região.`,
+      title: `${catName} no Atacado e Varejo — Discibra Distribuidora`,
+      description: `Compre ${catName} com os melhores preços direto da fábrica. Entrega descarregada em Ribeirão Preto e região.`,
     },
     alternates: {
       canonical: `https://www.discibradistribuidora.com/categoria/${slugCanonico}`,
@@ -113,6 +114,7 @@ export default async function CategoryPage({
     .order("sort_order")
 
   const cat = cats?.[0]
+  const catName = (cat?.name ?? "").replace(/Reiuntes/gi, "Rejuntes")
   if (!cat) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-16 text-center">
@@ -165,7 +167,7 @@ export default async function CategoryPage({
   const breadcrumbItems = [
     { name: "Início", url: "/" },
     { name: "Categorias", url: "/produtos" },
-    { name: cat.name, url: `/categoria/${cat.slug}` },
+    { name: catName, url: `/categoria/${cat.slug}` },
   ]
 
   return (
@@ -197,7 +199,7 @@ export default async function CategoryPage({
           Categorias
         </Link>
         <ChevronRight className="h-3 w-3" />
-        <span className="text-slate-900 font-medium">{cat.name}</span>
+        <span className="text-slate-900 font-medium">{catName}</span>
       </nav>
 
       <Link
@@ -224,7 +226,7 @@ export default async function CategoryPage({
           </div>
           <div className="min-w-0 text-center sm:text-left">
             <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl md:text-4xl">
-              {cat.name}
+              {catName}
             </h1>
             <p className="mt-2 text-sm text-muted-foreground sm:text-[15px]">
               {total} {total === 1 ? "produto" : "produtos"} disponíveis
@@ -273,7 +275,7 @@ export default async function CategoryPage({
           </Link>
           <a
             href={`https://wa.me/5516996447972?text=${encodeURIComponent(
-              `Olá! Gostaria de uma cotação personalizada de produtos da categoria "${cat.name}".`,
+              `Olá! Gostaria de uma cotação personalizada de produtos da categoria "${catName}".`,
             )}`}
             target="_blank"
             rel="noopener noreferrer"

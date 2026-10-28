@@ -10,7 +10,6 @@ import { useState } from "react"
 import useSWR from "swr"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
-import Script from "next/script"
 import {
   ShoppingCart, Minus, Plus, Package, Star,
   ChevronRight, Truck, ShieldCheck, Award,
@@ -25,7 +24,6 @@ import { toast } from "sonner"
 import { waLink, SITE } from "@/lib/site-config"
 import { trackWhatsAppClick } from "@/lib/track-whatsapp"
 import { cn } from "@/lib/utils"
-import { ProductStructuredData } from "@/components/store/seo-structured-data"
 
 const supabase = createClient()
 
@@ -177,70 +175,8 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
     count: reviews && reviews.filter((r: Review) => r.rating === star).length || 0,
   }))
 
-  // ── JSON-LD para SEO / Google Ads / Meta Ads ─────────────────
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: product.name,
-    description: product.description || `${product.name} — ${SITE.shortName}. Compre com preço de atacado e entrega ágil.`,
-    image: allImages[0] ? [allImages[0]] : [],
-    sku: product.sku || product.id,
-    brand: { "@type": "Brand", name: SITE.shortName },
-    offers: {
-      "@type": "Offer",
-      url: `${SITE.siteUrl}/produto/${product.slug}`,
-      priceCurrency: "BRL",
-      price: Number(product.price).toFixed(2),
-      availability: product.stock > 0
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
-      seller: { "@type": "Organization", name: SITE.legalName },
-    },
-    ...(reviews && reviews.length > 0
-      ? {
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: avgRating,
-            reviewCount: reviews.length,
-            bestRating: "5",
-            worstRating: "1",
-          },
-          review: reviews.slice(0, 5).map((r: Review) => ({
-            "@type": "Review",
-            reviewRating: {
-              "@type": "Rating",
-              ratingValue: r.rating,
-              bestRating: "5",
-            },
-            author: { "@type": "Person", name: r.customer_name },
-            reviewBody: r.comment,
-            datePublished: r.created_at.split("T")[0],
-          })),
-        }
-      : {}),
-  }
-
   return (
     <>
-      {/* ── JSON-LD Structured Data (SEO + Ads conformidade) ── */}
-      <Script
-        id={`product-ld-${product.id}`}
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <ProductStructuredData
-        name={product.name}
-        description={product.description || ""}
-        price={Number(product.price)}
-        sku={product.sku || product.id}
-        image={allImages[0] || ""}
-        originalPrice={product.original_price}
-        availability={product.stock > 0 ? "InStock" : "OutOfStock"}
-        rating={reviews && reviews.length > 0 ? Number(avgRating) : undefined}
-        reviewCount={reviews?.length}
-        url={`${SITE.siteUrl}/produto/${product.slug}`}
-      />
-
       <div className="mx-auto max-w-7xl px-4 py-6 sm:py-10 pb-28 md:pb-10">
         {/* Breadcrumb */}
         <nav
@@ -268,7 +204,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
             <div className="sticky top-24 space-y-4">
               {/* Imagem principal */}
               <div className={cn(
-                "relative aspect-square max-h-[420px] sm:max-h-none overflow-hidden rounded-[2.5rem] border border-slate-100 bg-white shadow-sm",
+                "relative aspect-square max-h-[420px] sm:max-h-none overflow-hidden rounded-[4px] border border-[#E5E5E3] bg-white",
                 "transition-shadow hover:shadow-md"
               )}>
                 {allImages.length > 0 ? (
@@ -289,12 +225,12 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                 {/* Badges */}
                 <div className="absolute left-5 top-5 flex flex-col gap-2">
                   {discount > 0 && (
-                    <span className="rounded-full bg-[#F47920] px-4 py-1.5 text-xs font-black text-white">
+                    <span className="rounded-[4px] bg-[#F47920] px-4 py-1.5 text-xs font-black text-white">
                       -{discount}%
                     </span>
                   )}
                   {product.is_new && (
-                    <span className="rounded-full bg-emerald-500 px-4 py-1.5 text-xs font-black text-white">
+                    <span className="rounded-[4px] bg-emerald-500 px-4 py-1.5 text-xs font-black text-white">
                       NOVO
                     </span>
                   )}
@@ -309,7 +245,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                       key={i}
                       onClick={() => setSelectedImage(i)}
                       className={cn(
-                        "relative w-20 h-20 shrink-0 rounded-2xl overflow-hidden border-2 transition-all",
+                        "relative w-20 h-20 shrink-0 rounded-[4px] overflow-hidden border-2 transition-all",
                         i === selectedImage
                           ? "border-[#C2410C] scale-105"
                           : "border-slate-100 hover:border-slate-300"
@@ -329,7 +265,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
             <div>
               {/* Categoria + Rating rápido */}
               <div className="flex items-center justify-between mb-4">
-                <span className="px-3 py-1 rounded-full bg-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                <span className="px-3 py-1 rounded-[4px] bg-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-500">
                   {product.categories?.name || "Produto"}
                 </span>
                 {reviews && reviews.length > 0 && (
@@ -354,7 +290,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
               </div>
 
               {/* Nome */}
-              <h1 className="text-3xl lg:text-[2.25rem] font-black text-slate-900 leading-[1.1] mb-6 tracking-tight min-w-0 overflow-hidden overflow-ellipsis whitespace-nowrap">
+              <h1 className="text-3xl lg:text-[2.25rem] font-black text-slate-900 leading-[1.1] mb-6 tracking-tight min-w-0 break-words">
                 {product.name}
               </h1>
 
@@ -393,7 +329,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
 
               {/* Disponibilidade */}
               <div className={cn(
-                "flex items-center gap-3 p-4 rounded-2xl mb-7 border",
+                "flex items-center gap-3 p-4 rounded-[4px] mb-7 border",
                 product.stock > 0
                   ? "bg-emerald-50 border-emerald-100"
                   : "bg-red-50 border-red-100"
@@ -428,17 +364,17 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                   Quantidade
                 </label>
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center bg-slate-50 rounded-2xl p-1 border border-slate-100">
+                  <div className="flex items-center bg-slate-50 rounded-[4px] p-1 border border-[#E5E5E3]">
                     <button
                       onClick={() => setQty(Math.max(1, qty - 1))}
-                      className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-sm transition-all text-slate-600"
+                      className="w-12 h-12 flex items-center justify-center rounded-[4px] hover:bg-white transition-all text-slate-600"
                     >
                       <Minus className="w-4 h-4" />
                     </button>
                     <span className="w-14 text-center font-black text-lg text-slate-900">{qty}</span>
                     <button
                       onClick={() => setQty(Math.min(product.stock, qty + 1))}
-                      className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white hover:shadow-sm transition-all text-slate-600"
+                      className="w-12 h-12 flex items-center justify-center rounded-[4px] hover:bg-white transition-all text-slate-600"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -513,7 +449,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                     <div className="w-1.5 h-7 bg-[#F47920] rounded-full" />
                     Descrição do Produto
                   </h2>
-                  <div className="bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
+                  <div className="bg-slate-50/50 rounded-[4px] p-6 border border-[#E5E5E3]">
                     <p className="text-slate-700 leading-relaxed text-[15px] whitespace-pre-line">
                       {product.description}
                     </p>
@@ -633,7 +569,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                     Avaliações dos Clientes
                   </h2>
                   {reviews && reviews.length > 0 && (
-                    <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-100 rounded-full">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-100 rounded-[4px]">
                       <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                       <span className="text-sm font-black text-amber-700">{avgRating}</span>
                       <span className="text-xs text-amber-500">({reviews.length} avaliações)</span>
@@ -643,7 +579,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
 
                 {/* Painel de rating */}
                 {reviews && reviews.length > 0 && (
-                  <div className="bg-[#002D5B] rounded-[2rem] p-8 text-white mb-10 flex flex-col md:flex-row items-center gap-10">
+                  <div className="bg-[#002D5B] rounded-[4px] p-8 text-white mb-10 flex flex-col md:flex-row items-center gap-10">
                     <div className="text-center md:border-r md:border-white/10 md:pr-10 shrink-0">
                       <p className="text-7xl font-black leading-none mb-2">{avgRating}</p>
                       <div className="flex items-center justify-center gap-1 mb-2">
@@ -690,12 +626,12 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                       return (
                         <div
                           key={r.id}
-                          className="p-6 rounded-[1.5rem] border border-slate-100 bg-white hover:border-slate-200 hover:shadow-sm transition-all"
+                          className="p-6 rounded-[4px] border border-[#E5E5E3] bg-white hover:border-slate-300 transition-all"
                         >
                           <div className="flex items-start gap-4 mb-4">
                             {/* Avatar colorido */}
                             <div className={cn(
-                              "w-11 h-11 rounded-2xl flex items-center justify-center font-black text-base shrink-0",
+                              "w-11 h-11 rounded-[4px] flex items-center justify-center font-black text-base shrink-0",
                               palette.bg, palette.text
                             )}>
                               {initial}
@@ -736,7 +672,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                       )
                     })
                   ) : (
-                    <div className="text-center py-16 bg-slate-50/50 rounded-[2rem] border-2 border-dashed border-slate-100">
+                    <div className="text-center py-16 bg-slate-50/50 rounded-[4px] border-2 border-dashed border-[#E5E5E3]">
                       <MessageSquare className="w-12 h-12 text-slate-200 mx-auto mb-4" />
                       <p className="text-slate-500 font-medium">Ainda não há avaliações para este produto.</p>
                       <p className="text-sm text-slate-400 mt-1">Seja o primeiro a avaliar!</p>
@@ -748,7 +684,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
 
             {/* Coluna direita: Form de avaliação */}
             <div className="lg:w-[380px] shrink-0 min-w-0">
-              <div className="sticky top-24 bg-slate-50/60 rounded-[2.5rem] p-8 border border-slate-100">
+              <div className="sticky top-24 bg-slate-50/60 rounded-[4px] p-8 border border-[#E5E5E3]">
                 <h3 className="text-xl font-black text-[#002D5B] mb-1">Deixe sua opinião</h3>
                 <p className="text-sm text-slate-500 mb-8 leading-relaxed">
                   Sua avaliação ajuda outros profissionais e construtores a escolherem os melhores materiais.
@@ -762,7 +698,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                     <input
                       value={reviewForm.name}
                       onChange={(e) => setReviewForm({ ...reviewForm, name: e.target.value })}
-                      className="w-full h-13 px-5 rounded-2xl border border-slate-200 bg-white focus:ring-2 focus:ring-[#002D5B]/10 focus:border-[#002D5B]/30 outline-none transition-all font-medium text-sm"
+                      className="w-full h-13 px-5 rounded-[4px] border border-[#E5E5E3] bg-white focus:ring-2 focus:ring-[#002D5B]/10 focus:border-[#002D5B]/30 outline-none transition-all font-medium text-sm"
                       placeholder="Como deseja ser identificado?"
                     />
                   </div>
@@ -771,7 +707,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">
                       Sua Nota *
                     </label>
-                    <div className="flex items-center gap-2 bg-white p-4 rounded-2xl border border-slate-200">
+                    <div className="flex items-center gap-2 bg-white p-4 rounded-[4px] border border-[#E5E5E3]">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <button
                           key={i}
@@ -800,7 +736,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                       value={reviewForm.comment}
                       onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
                       rows={4}
-                      className="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-white focus:ring-2 focus:ring-[#002D5B]/10 focus:border-[#002D5B]/30 outline-none transition-all font-medium resize-none text-sm"
+                      className="w-full px-5 py-4 rounded-[4px] border border-[#E5E5E3] bg-white focus:ring-2 focus:ring-[#002D5B]/10 focus:border-[#002D5B]/30 outline-none transition-all font-medium resize-none text-sm"
                       placeholder="Fale sobre a qualidade, entrega, aplicação... (mín. 20 caracteres)"
                     />
                     <p className="text-[10px] text-slate-400 mt-1 text-right">
@@ -812,9 +748,9 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                     onClick={handleSubmitReview}
                     disabled={submittingReview}
                     className={cn(
-                      "w-full h-14 rounded-2xl font-black text-base",
-                      "bg-[#F47920] text-white shadow-orange-500/20",
-                      "hover:bg-[#e06b10] hover:scale-[1.02] active:scale-95",
+                      "w-full h-14 rounded-[4px] font-black text-base",
+                      "bg-[#F47920] text-white",
+                      "hover:bg-[#e06b10] active:scale-95",
                       "transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     )}
                   >
