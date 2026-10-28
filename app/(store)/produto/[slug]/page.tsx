@@ -67,12 +67,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     : 0
 
   return {
-    title: `${product.name} | Preço de Atacado | Discibra`,
+    title: product.name,
     description: product.description || `${product.name} — ${SITE.shortName}. Compre com preço de atacado e entrega ágil.`,
     keywords: [product.name, product.categories?.name, "materiais de construção", "preço de atacado"],
     images: allImages.length > 0 ? allImages : undefined,
     openGraph: {
-      title: `${product.name} | Preço de Atacado | Discibra`,
+      title: product.name,
       description: product.description || `${product.name} — ${SITE.shortName}. Compre com preço de atacado e entrega ágil.`,
       images: allImages.length > 0 ? allImages : undefined,
       type: "article" as const,
@@ -80,7 +80,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: {
       card: "summary_large_image" as const,
-      title: `${product.name} | Preço de Atacado | Discibra`,
+      title: product.name,
       description: product.description || `${product.name} — ${SITE.shortName}`,
       images: allImages.length > 0 ? allImages : undefined,
     },

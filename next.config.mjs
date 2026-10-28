@@ -55,6 +55,7 @@ const nextConfig = {
       // Tráfego pago legado (Google Ads) - query params preservados automaticamente pelo Next.js
       { source: '/ofertas', destination: '/promocoes', permanent: true },
       { source: '/rastreamento', destination: '/rastrear-pedido', permanent: true },
+      { source: '/orcamento', destination: '/carrinho', permanent: true },
     ]
   },
   // Segurança: configurar headers de resposta

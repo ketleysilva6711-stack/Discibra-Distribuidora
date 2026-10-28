@@ -31,7 +31,7 @@ export function HeroBannerDesktop({ banners }: { banners: Banner[] }) {
 
   return (
     <section className="hidden md:block group/hero relative w-full" aria-label="Banners principais">
-      <div className="relative w-full overflow-hidden">
+      <div className="relative w-full overflow-hidden" onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
         <div className="flex snap-x snap-mandatory overflow-x-auto">
           {banners.map((banner, i) => (
             <div key={banner.id} className="relative flex-none w-full snap-center">
@@ -94,7 +94,7 @@ export function HeroBannerDesktop({ banners }: { banners: Banner[] }) {
                 aria-label={`Slide ${i + 1}`}
                 className={cn(
                   "rounded-full transition-all duration-300",
-                  i === selected ? "w-6 h-2 bg-white" : "w-2 h-2 bg-white/40 hover:bg-white/60",
+                  i === selected ? "w-6 h-2 bg-[var(--accent)]" : "w-1.5 h-1.5 rounded-full bg-[var(--line)] hover:bg-[var(--ink-muted)]",
                 )}
               />
             ))}
