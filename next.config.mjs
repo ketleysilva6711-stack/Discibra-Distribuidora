@@ -1,13 +1,16 @@
 /** @type {import('next').NextConfig} */
 // Env: Next.js carrega .env, .env.local, .env.development.local, etc. na raiz deste projeto.
 // Turbopack (next dev --turbo) usa as mesmas regras; reinicie o dev server após mudar variáveis.
-const origin = process.env.NEXT_PUBLIC_SITE_URL || "https://atacadodeconstrucao.com"
+const origin = process.env.NEXT_PUBLIC_SITE_URL || "https://www.discibradistribuidora.com"
 
 const nextConfig = {
   output: "standalone",
   typescript: {
     // NUNCA ignore erros TypeScript em produção - isso mascara bugs reais
     ignoreBuildErrors: false,
+  },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error"] } : false,
   },
   experimental: {
     optimizePackageImports: [

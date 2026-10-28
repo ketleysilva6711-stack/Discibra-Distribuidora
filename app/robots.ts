@@ -4,7 +4,7 @@
 import type { MetadataRoute } from "next"
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://discibradistribuidora.com"
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.discibradistribuidora.com"
 
   return {
     rules: [
