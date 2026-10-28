@@ -265,7 +265,7 @@ export default async function HomePage() {
         <HeroBanner initialSlides={initialSlides} />
       </div>
 
-      {/* OFERTAS PROMOCIONAIS RESPONSIVAS (mobile vs desktop) */}
+      {/* OFERTAS PROMOCIONAIS RESPONSIVAS (mobile vs desktop) */}
 
       {/* ── FAIXA ABERTO A TODOS — PÓS-HERO (corporativa) ── */}
       <section className="border-b border-slate-200/60 bg-[#002D5B] text-white">
