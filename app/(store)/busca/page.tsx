@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import ProductCard from "@/components/store/product-card"
 import Link from "next/link"
@@ -5,6 +6,48 @@ import { ArrowLeft, Search, PackageOpen } from "lucide-react"
 import { rawTokens, canonicalCementSearch, matchesSearch, escapeLike } from "@/lib/search-normalize"
 
 export const revalidate = 60
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>
+}): Promise<Metadata> {
+  const { q } = await searchParams
+  const query = q?.trim() ?? ""
+  return {
+    title: query ? `Resultados para "${query}"` : "Buscar Materiais",
+    description:
+      query ||
+      "Encontre produtos para construção e reforma no catálogo da Discibra.",
+    openGraph: {
+      title: query
+        ? `Resultados para "${query}" — Discibra Distribuidora`
+        : "Buscar Materiais — Discibra Distribuidora",
+      description:
+        query ||
+        "Encontre produtos para construção e reforma no catálogo da Discibra.",
+      type: "website",
+      siteName: "Discibra",
+      url: query
+        ? `https://www.discibradistribuidora.com/busca?q=${encodeURIComponent(query)}`
+        : "https://www.discibradistribuidora.com/busca",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: query
+        ? `Resultados para "${query}" — Discibra Distribuidora`
+        : "Buscar Materiais — Discibra Distribuidora",
+      description:
+        query ||
+        "Encontre produtos para construção e reforma no catálogo da Discibra.",
+    },
+    alternates: {
+      canonical: query
+        ? `https://www.discibradistribuidora.com/busca?q=${encodeURIComponent(query)}`
+        : "https://www.discibradistribuidora.com/busca",
+    },
+  }
+}
 
 export default async function BuscaPage({
   searchParams,

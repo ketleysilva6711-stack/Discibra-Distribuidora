@@ -1,9 +1,41 @@
+import type { Metadata } from "next"
 import ProductCard from "@/components/store/product-card"
 import Link from "next/link"
 import { ArrowLeft, Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { rawTokens, slugTokens, escapeLike } from "@/lib/search-normalize"
 import { cn } from "@/lib/utils"
+
+export const metadata: Metadata = {
+  title: "Catálogo de Materiais de Construção",
+  description:
+    "Mais de 4.700 itens direto da fábrica em Ribeirão Preto. Cimento, ferro, telhas, hidráulica e acabamento com preço de atacado e entrega programada.",
+  openGraph: {
+    title: "Catálogo de Materiais de Construção — Discibra Distribuidora",
+    description:
+      "Mais de 4.700 itens direto da fábrica em Ribeirão Preto. Cimento, ferro, telhas, hidráulica e acabamento com preço de atacado e entrega programada.",
+    type: "website",
+    siteName: "Discibra",
+    url: "https://www.discibradistribuidora.com/produtos",
+    images: [
+      {
+        url: "https://www.discibradistribuidora.com/og-default.png",
+        width: 1200,
+        height: 630,
+        alt: "Discibra — Catálogo de Materiais de Construção",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Catálogo de Materiais de Construção — Discibra Distribuidora",
+    description:
+      "Mais de 4.700 itens direto da fábrica em Ribeirão Preto. Cimento, ferro, telhas, hidráulica e acabamento com preço de atacado e entrega programada.",
+  },
+  alternates: {
+    canonical: "https://www.discibradistribuidora.com/produtos",
+  },
+}
 
 const PAGE_SIZE = 36
 export const revalidate = 300 // 5 min de cache edge/ISR

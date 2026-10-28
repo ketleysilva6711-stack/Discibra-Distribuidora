@@ -50,9 +50,42 @@ export async function generateMetadata({
     .order("sort_order")
 
   const cat = cats?.[0]
-  const slugCanonico = cat?.slug ?? (slug || "").toLowerCase().trim()
+
+  if (!cat) {
+    return {
+      title: "Categoria não encontrada",
+      description: "A categoria solicitada não existe em nosso catálogo.",
+      alternates: {
+        canonical: `https://www.discibradistribuidora.com/categoria/${(slug || "").toLowerCase().trim()}`,
+      },
+    }
+  }
+
+  const slugCanonico = cat.slug ?? (slug || "").toLowerCase().trim()
 
   return {
+    title: `${cat.name} no Atacado e Varejo`,
+    description: `Compre ${cat.name} com os melhores preços direto da fábrica. Entrega descarregada em Ribeirão Preto e região.`,
+    openGraph: {
+      title: `${cat.name} no Atacado e Varejo — Discibra Distribuidora`,
+      description: `Compre ${cat.name} com os melhores preços direto da fábrica. Entrega descarregada em Ribeirão Preto e região.`,
+      type: "website",
+      siteName: "Discibra",
+      url: `https://www.discibradistribuidora.com/categoria/${slugCanonico}`,
+      images: [
+        {
+          url: "https://www.discibradistribuidora.com/og-default.png",
+          width: 1200,
+          height: 630,
+          alt: `Discibra — ${cat.name}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${cat.name} no Atacado e Varejo — Discibra Distribuidora`,
+      description: `Compre ${cat.name} com os melhores preços direto da fábrica. Entrega descarregada em Ribeirão Preto e região.`,
+    },
     alternates: {
       canonical: `https://www.discibradistribuidora.com/categoria/${slugCanonico}`,
     },

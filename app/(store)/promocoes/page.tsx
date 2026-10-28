@@ -5,9 +5,41 @@
 
 export const revalidate = 300
 
+import type { Metadata } from "next"
 import ProductCard from "@/components/store/product-card"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
+
+export const metadata: Metadata = {
+  title: "Ofertas e Promoções da Semana",
+  description:
+    "Confira as melhores ofertas de materiais para sua obra com preço de atacado e entrega ágil. Cimento, telhas, argamassa e muito mais em Ribeirão Preto.",
+  openGraph: {
+    title: "Ofertas e Promoções da Semana — Discibra Distribuidora",
+    description:
+      "Confira as melhores ofertas de materiais para sua obra com preço de atacado e entrega ágil. Cimento, telhas, argamassa e muito mais em Ribeirão Preto.",
+    type: "website",
+    siteName: "Discibra",
+    url: "https://www.discibradistribuidora.com/promocoes",
+    images: [
+      {
+        url: "https://www.discibradistribuidora.com/og-default.png",
+        width: 1200,
+        height: 630,
+        alt: "Discibra — Ofertas e Promoções da Semana",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ofertas e Promoções da Semana — Discibra Distribuidora",
+    description:
+      "Confira as melhores ofertas de materiais para sua obra com preço de atacado e entrega ágil. Cimento, telhas, argamassa e muito mais em Ribeirão Preto.",
+  },
+  alternates: {
+    canonical: "https://www.discibradistribuidora.com/promocoes",
+  },
+}
 
 export default async function PromocoesPage() {
   let products: any[] = []
