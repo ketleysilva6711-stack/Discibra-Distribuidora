@@ -5,13 +5,13 @@
 // =============================================================================
 
 import { notFound } from "next/navigation"
+import { cache } from "react"
 import { createPublicClient } from "@/lib/supabase/public"
 import { SITE } from "@/lib/site-config"
 import { productSchema } from "@/lib/seo"
 import { ProductPageClient } from "./ProductPageClient"
 
 export const revalidate = 3600
-export const dynamicParams = true
 
 // ─── Tipos ────────────────────────────────────────────────────────────
 type Review = {
@@ -25,7 +25,6 @@ type Review = {
 
 // ─── Função de busca de produto no servidor ──────────────────────────
 export async function generateStaticParams() {
-  const { createPublicClient } = await import('@/lib/supabase/public')
   const supabase = createPublicClient()
   const { data } = await supabase
     .from('products')
@@ -36,7 +35,7 @@ export async function generateStaticParams() {
   return (data ?? []).map((p: { slug: string }) => ({ slug: p.slug }))
 }
 
-async function getProduct(slug: string) {
+const getProduct = cache(async (slug: string) => {
   const supabase = createPublicClient()
   const { data, error } = await supabase
     .from("products")
@@ -47,7 +46,7 @@ async function getProduct(slug: string) {
 
   if (error || !data) return null
   return data
-}
+})
 
 // ─── Gera metadados SEO no servidor ──────────────────────────────────
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
