@@ -19,6 +19,28 @@ type CartItem = {
   qty: number
 }
 
+// ── Regras B2B de desconto por volume e peso da carga ──
+function getItemDiscountRate(name: string, unit: string, qty: number): number {
+  const isBulkEligible =
+    unit === "saco" ||
+    unit === "sc" ||
+    /cimento|argamassa|rejunte|gesso/i.test(name)
+  if (isBulkEligible) {
+    if (qty >= 560) return 0.07 // 7% de desconto (Carga Fechada / Truck)
+    if (qty >= 40) return 0.03 // 3% de desconto (Palete Fechado)
+  }
+  return 0
+}
+
+function getItemUnitWeight(name: string, unit: string): number {
+  const match = name.match(/\b(\d+(?:[.,]\d+)?)\s*kg\b/i)
+  if (match) {
+    return parseFloat(match[1].replace(",", "."))
+  }
+  if (unit === "saco" || unit === "sc") return 50
+  return 0
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -42,13 +64,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Carrinho vazio." }, { status: 400 })
     }
 
-    // Recalcular total no servidor (nunca confiar no valor do client)
-    const total = items.reduce((sum, i) => {
+    // Recalcular total no servidor com regras B2B (desconto de palete/carga fechada)
+    let grossTotal = 0
+    let totalDiscount = 0
+    let totalWeight = 0
+    items.forEach((i) => {
       const price = Number(i.price)
       const qty = Math.max(1, Math.floor(Number(i.qty)))
-      if (!isFinite(price) || price <= 0) return sum
-      return sum + price * qty
-    }, 0)
+      if (isFinite(price) && price > 0) {
+        const itemGross = price * qty
+        const rate = getItemDiscountRate(i.name, i.unit, qty)
+        const itemDisc = itemGross * rate
+        grossTotal += itemGross
+        totalDiscount += itemDisc
+        totalWeight += getItemUnitWeight(i.name, i.unit) * qty
+      }
+    })
+    const total = Math.max(0, grossTotal - totalDiscount)
 
     if (total <= 0) {
       return NextResponse.json({ error: "Total inválido." }, { status: 400 })
@@ -65,9 +97,36 @@ export async function POST(request: NextRequest) {
       .filter(Boolean)
       .join("\n")
     const productLines = items
-      .map((i) => `- ${i.qty}x ${i.name} — R$ ${(Number(i.price) * i.qty).toFixed(2)}`)
+      .map((i) => {
+        const price = Number(i.price)
+        const qty = Math.max(1, Math.floor(Number(i.qty)))
+        const rate = getItemDiscountRate(i.name, i.unit, qty)
+        const itemTotal = (price * qty * (1 - rate)).toFixed(2)
+        const tag =
+          rate === 0.07
+            ? " (Carga Fechada: 7% OFF)"
+            : rate === 0.03
+              ? " (Palete Fechado: 3% OFF)"
+              : ""
+        return `- ${qty}x ${i.name} — R$ ${itemTotal}${tag}`
+      })
       .join("\n")
-    const itemsSummary = clientHeader ? `${clientHeader}\n${productLines}` : productLines
+    const b2bSummary = [
+      totalWeight > 0
+        ? `Peso Total Estimado: ~${
+            totalWeight >= 1000
+              ? `${(totalWeight / 1000).toFixed(1)} ton (${totalWeight.toLocaleString("pt-BR")} kg)`
+              : `${totalWeight.toLocaleString("pt-BR")} kg`
+          }`
+        : null,
+      totalDiscount > 0 ? `Desconto B2B Volume: - R$ ${totalDiscount.toFixed(2)}` : null,
+      `Total Final: R$ ${total.toFixed(2)}`,
+    ]
+      .filter(Boolean)
+      .join("\n")
+    const itemsSummary = clientHeader
+      ? `${clientHeader}\n${productLines}\n\n${b2bSummary}`
+      : `${productLines}\n\n${b2bSummary}`
 
     const code = generateOrderCode()
     const now = new Date().toISOString()

@@ -19,6 +19,28 @@ type CartItem = {
   qty: number
 }
 
+// ── Regras B2B de desconto por volume e peso da carga ──
+function getItemDiscountRate(name: string, unit: string, qty: number): number {
+  const isBulkEligible =
+    unit === "saco" ||
+    unit === "sc" ||
+    /cimento|argamassa|rejunte|gesso/i.test(name)
+  if (isBulkEligible) {
+    if (qty >= 560) return 0.07 // 7% de desconto (Carga Fechada / Truck)
+    if (qty >= 40) return 0.03 // 3% de desconto (Palete Fechado)
+  }
+  return 0
+}
+
+function getItemUnitWeight(name: string, unit: string): number {
+  const match = name.match(/\b(\d+(?:[.,]\d+)?)\s*kg\b/i)
+  if (match) {
+    return parseFloat(match[1].replace(",", "."))
+  }
+  if (unit === "saco" || unit === "sc") return 50
+  return 0
+}
+
 function getCart(): CartItem[] {
   try { return JSON.parse(localStorage.getItem("cart") || "[]") } catch { return [] }
 }
@@ -90,7 +112,17 @@ export default function CartPage() {
     setLoadingCep(false)
   }
 
-  const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0)
+  let grossTotal = 0
+  let totalDiscount = 0
+  let totalWeight = 0
+  cart.forEach((i) => {
+    const itemGross = i.price * i.qty
+    const rate = getItemDiscountRate(i.name, i.unit, i.qty)
+    grossTotal += itemGross
+    totalDiscount += itemGross * rate
+    totalWeight += getItemUnitWeight(i.name, i.unit) * i.qty
+  })
+  const total = Math.max(0, grossTotal - totalDiscount)
   const totalItems = cart.reduce((sum, i) => sum + i.qty, 0)
 
   async function finalizeWhatsApp() {
@@ -151,9 +183,30 @@ export default function CartPage() {
       itemsSummary: lines.join("\n"),
     })
     // Montar mensagem corporativa no WhatsApp
-    const whatsLines = cart.map(
-      (i) => `- ${i.qty}x ${i.name} (R$ ${Number(i.price).toFixed(2)} un) — R$ ${(i.price * i.qty).toFixed(2)}`
-    )
+    const whatsLines = cart.map((i) => {
+      const rate = getItemDiscountRate(i.name, i.unit, i.qty)
+      const itemNet = i.price * i.qty * (1 - rate)
+      const tag =
+        rate === 0.07
+          ? " *(Carga Fechada: 7% OFF)*"
+          : rate === 0.03
+            ? " *(Palete Fechado: 3% OFF)*"
+            : ""
+      return `- ${i.qty}x ${i.name} (R$ ${Number(i.price).toFixed(2)} un) — R$ ${itemNet.toFixed(2)}${tag}`
+    })
+    const b2bDetails = [
+      totalWeight > 0
+        ? `*Peso Total Estimado:* ~${
+            totalWeight >= 1000
+              ? `${(totalWeight / 1000).toFixed(1)} ton (${totalWeight.toLocaleString("pt-BR")} kg)`
+              : `${totalWeight.toLocaleString("pt-BR")} kg`
+          }`
+        : null,
+      totalWeight >= 1000
+        ? "*Logística Sugerida:* Caminhão Munck ou Carga Paletizada"
+        : null,
+      totalDiscount > 0 ? `*Desconto B2B Volume:* - R$ ${totalDiscount.toFixed(2)}` : null,
+    ].filter(Boolean)
     const msg = [
       `🏗️ *ORÇAMENTO DISCIBRA DISTRIBUIDORA*`,
       `*Código:* #${code}`,
@@ -169,9 +222,11 @@ export default function CartPage() {
       `*Itens Solicitados:*`,
       ...whatsLines,
       ``,
+      b2bDetails.length > 0 ? `*Resumo B2B:*` : null,
+      ...b2bDetails,
       `*Total Estimado:* R$ ${total.toFixed(2)}`,
       ``,
-      `Olá! Gostaria de confirmar a disponibilidade e o valor do frete para entrega.`,
+      `Olá! Gostaria de confirmar a disponibilidade e a rota de entrega para este volume de carga.`,
     ].filter((l) => l !== null).join("\n")
     trackWhatsAppClick("checkout_finalize", "/carrinho")
     window.open(waLink(msg), "_blank", "noopener,noreferrer")
@@ -255,6 +310,16 @@ export default function CartPage() {
                   {item.name}
                 </Link>
                 <p className="text-sm font-bold text-[#111318] mt-1">R$ {Number(item.price).toFixed(2)} <span className="text-xs text-slate-500 font-normal">/{item.unit}</span></p>
+                {getItemDiscountRate(item.name, item.unit, item.qty) === 0.03 && (
+                  <span className="inline-block mt-1 rounded-[2px] bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">
+                    Palete Fechado (40+ un): 3% OFF
+                  </span>
+                )}
+                {getItemDiscountRate(item.name, item.unit, item.qty) === 0.07 && (
+                  <span className="inline-block mt-1 rounded-[2px] bg-blue-50 px-1.5 py-0.5 text-[10px] font-bold text-blue-700">
+                    Carga Fechada (560+ un): 7% OFF
+                  </span>
+                )}
               </div>
               <div className="flex shrink-0 items-center overflow-hidden rounded-[4px] border border-[#E5E5E3]">
                 <button type="button" onClick={() => updateQty(item.id, -1)} className="p-2 text-[#111318] transition hover:bg-[#FAFAF9]">
@@ -265,7 +330,16 @@ export default function CartPage() {
                   <Plus className="h-3.5 w-3.5" />
                 </button>
               </div>
-              <p className="font-bold text-sm text-[#111318] shrink-0 w-24 text-right">R$ {(item.price * item.qty).toFixed(2)}</p>
+              <div className="shrink-0 w-24 text-right">
+                <p className="font-bold text-sm text-[#111318]">
+                  R$ {(item.price * item.qty * (1 - getItemDiscountRate(item.name, item.unit, item.qty))).toFixed(2)}
+                </p>
+                {getItemDiscountRate(item.name, item.unit, item.qty) > 0 && (
+                  <p className="text-[10px] text-slate-400 line-through">
+                    R$ {(item.price * item.qty).toFixed(2)}
+                  </p>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={() => removeItem(item.id)}
@@ -282,15 +356,36 @@ export default function CartPage() {
           <div className="space-y-3 mb-6">
             <div className="flex justify-between text-sm">
               <span className="text-slate-500">Subtotal ({totalItems} itens)</span>
-              <span className="text-[#111318] font-medium">R$ {total.toFixed(2)}</span>
+              <span className="text-[#111318] font-medium">R$ {grossTotal.toFixed(2)}</span>
             </div>
+            {totalDiscount > 0 && (
+              <div className="flex justify-between text-sm font-semibold text-[#15803D]">
+                <span>Desconto B2B Volume</span>
+                <span>- R$ {totalDiscount.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between text-sm">
               <span className="text-slate-500">Frete</span>
               <span className="text-[#15803D] font-medium">A calcular</span>
             </div>
-            <div className="border-t border-[#E5E5E3] pt-3 flex justify-between">
-              <span className="font-bold text-[#111318]">Total</span>
-              <span className="font-bold text-[#15803D] text-xl">R$ {total.toFixed(2)}</span>
+            {totalWeight > 0 && (
+              <div className="flex justify-between text-xs text-slate-600 border-t border-slate-100 pt-2">
+                <span>Peso Total Estimado</span>
+                <span className="font-bold font-mono">
+                  {totalWeight >= 1000
+                    ? `${(totalWeight / 1000).toFixed(1)} ton (${totalWeight.toLocaleString("pt-BR")} kg)`
+                    : `${totalWeight.toLocaleString("pt-BR")} kg`}
+                </span>
+              </div>
+            )}
+            {totalWeight >= 1000 && (
+              <div className="rounded-[4px] border border-amber-200 bg-amber-50 p-2 text-[10px] text-amber-800 leading-tight">
+                🚛 <strong>Carga Pesada:</strong> Sugerida entrega com caminhão munck ou descarga paletizada.
+              </div>
+            )}
+            <div className="border-t border-[#E5E5E3] pt-3 flex justify-between items-baseline">
+              <span className="font-bold text-[#111318]">Total Estimado</span>
+              <span className="font-black text-[#15803D] text-2xl font-mono">R$ {total.toFixed(2)}</span>
             </div>
           </div>
           {/* Bloco de Identificação Obrigatória B2B */}
