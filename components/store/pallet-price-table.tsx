@@ -30,9 +30,9 @@ export default function PalletPriceTable({ unitPrice }: PalletPriceTableProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+      <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100 overflow-hidden">
         {/* ── Coluna 1: Avulso ── */}
-        <div className="flex flex-col border-b md:border-b-0 md:border-r p-6 sm:p-8">
+        <div className="flex flex-col border-b md:border-b-0 md:border-r p-6 sm:p-8 min-w-0 overflow-hidden">
           <div className="flex items-center gap-2 mb-4">
             <span className="text-[11px] font-bold tracking-wider uppercase text-slate-500">
               Venda Avulsa
@@ -43,10 +43,10 @@ export default function PalletPriceTable({ unitPrice }: PalletPriceTableProps) {
           </h3>
           <div className="flex items-baseline gap-1">
             <span className="text-sm font-bold text-slate-500">R$</span>
-            <p className="text-3xl font-black text-[#002D5B] tracking-tight leading-none">
+            <p className="text-2xl font-black text-[#002D5B] tracking-tight leading-none truncate">
               {fmt(price)}
             </p>
-            <span className="text-xs font-bold text-slate-400 self-end">/saco</span>
+            <span className="text-xs font-bold text-slate-400 self-end shrink-0">/saco</span>
           </div>
           <p className="mt-6 text-[11px] text-slate-500 leading-relaxed">
             Para pequenos reparos ou amostra de qualidade.
@@ -54,7 +54,7 @@ export default function PalletPriceTable({ unitPrice }: PalletPriceTableProps) {
         </div>
 
         {/* ── Coluna 2: Palete Fechado ── */}
-        <div className="flex flex-col border-b md:border-b-0 md:border-r p-6 sm:p-8 bg-slate-50/70">
+        <div className="flex flex-col border-b md:border-b-0 md:border-r p-6 sm:p-8 bg-slate-50/70 min-w-0 overflow-hidden">
           <div className="flex items-center gap-2 mb-4">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700">
               Econ. de 3%
@@ -68,10 +68,10 @@ export default function PalletPriceTable({ unitPrice }: PalletPriceTableProps) {
           </p>
           <div className="flex items-baseline gap-1 mb-1">
             <span className="text-sm font-bold text-slate-500">R$</span>
-            <p className="text-3xl font-black text-[#002D5B] tracking-tight leading-none">
+            <p className="text-2xl font-black text-[#002D5B] tracking-tight leading-none truncate">
               {fmt(paleteTotal)}
             </p>
-            <span className="text-xs font-bold text-slate-400 self-end">/palete</span>
+            <span className="text-xs font-bold text-slate-400 self-end shrink-0">/palete</span>
           </div>
           <div className="mt-4 pb-1 border-b border-slate-100">
             <p className="text-xs font-bold text-slate-600">
@@ -90,7 +90,7 @@ export default function PalletPriceTable({ unitPrice }: PalletPriceTableProps) {
         </div>
 
         {/* ── Coluna 3: Carga Fechada ── */}
-        <div className="flex flex-col p-6 sm:p-8">
+        <div className="flex flex-col p-6 sm:p-8 min-w-0 overflow-hidden">
           <div className="flex items-center gap-2 mb-4">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-200 px-2.5 py-0.5 text-[10px] font-bold text-[#002D5B]">
               Melhor preço
@@ -104,10 +104,10 @@ export default function PalletPriceTable({ unitPrice }: PalletPriceTableProps) {
           </p>
           <div className="flex items-baseline gap-1 mb-1">
             <span className="text-sm font-bold text-slate-500">R$</span>
-            <p className="text-3xl font-black text-[#002D5B] tracking-tight leading-none">
+            <p className="text-2xl font-black text-[#002D5B] tracking-tight leading-none truncate">
               {fmt(cargaTotal)}
             </p>
-            <span className="text-xs font-bold text-slate-400 self-end">/carga</span>
+            <span className="text-xs font-bold text-slate-400 self-end shrink-0">/carga</span>
           </div>
           <div className="mt-4 pb-1 border-b border-slate-100">
             <p className="text-xs font-bold text-slate-600">
