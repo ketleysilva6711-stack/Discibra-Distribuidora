@@ -31,6 +31,16 @@
   --brand-terracota: #C2410C;
   --brand-amber: #F59E0B;
   --brand-concrete: #78716C;
+  --ink: #111318;
+  --ink-muted: #6B7280;
+  --surface: #FFFFFF;
+  --surface-alt: #FAFAF9;
+  --line: #E5E5E3;
+  --accent-industrial: #E8590C;
+  --accent-industrial-ink: #C2410C;
+  --dark: #12141A;
+  --ok: #15803D;
+  --r: 4px;
 }
 
 .dark {
