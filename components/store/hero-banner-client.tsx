@@ -1,106 +1,97 @@
-"use client"
-
-import { useState, useEffect, useCallback } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { cn } from "@/lib/utils"
-
-export type Banner = {
+'use client'
+import React, { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
+interface Banner {
   id: string
   image_url: string
-  link_url?: string | null
+  link?: string | null
   title?: string | null
-  subtitle?: string | null
 }
-
-export function HeroBannerDesktop({ banners }: { banners: Banner[] }) {
-  const [selected, setSelected] = useState(0)
+interface HeroBannerClientProps {
+  banners: Banner[]
+}
+export function HeroBannerClient({ banners }: HeroBannerClientProps) {
+  const [currentIndex, setCurrentIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
-
-  // Autoplay desktop
+  const total = banners.length
+  const nextSlide = useCallback(() => {
+    if (total <= 1) return
+    setCurrentIndex((prev) => (prev + 1) % total)
+  }, [total])
+  const prevSlide = useCallback(() => {
+    if (total <= 1) return
+    setCurrentIndex((prev) => (prev - 1 + total) % total)
+  }, [total])
   useEffect(() => {
-    if (banners.length <= 1 || isPaused) return
-    const interval = setInterval(() => {
-      setSelected((prev) => (prev + 1) % banners.length)
-    }, 6000)
+    if (isPaused || total <= 1) return
+    const interval = setInterval(nextSlide, 5000)
     return () => clearInterval(interval)
-  }, [banners.length, isPaused])
-
-  if (banners.length === 0) return null
-
+  }, [nextSlide, isPaused, total])
+  if (!banners || total === 0) return null
   return (
-    <section className="hidden md:block group/hero relative w-full" aria-label="Banners principais">
-      <div className="relative w-full overflow-hidden" onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
-        <div className="flex snap-x snap-mandatory overflow-x-auto">
-          {banners.map((banner, i) => (
-            <div key={banner.id} className="relative flex-none w-full snap-center">
+    <div
+      className="relative w-full overflow-hidden bg-[#111318]"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      {/* Container de Slides com Transição Suave */}
+      <div
+        className="flex transition-transform duration-500 ease-out"
+        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+      >
+        {banners.map((b, idx) => (
+          <div key={b.id || idx} className="w-full flex-shrink-0">
+            <a href={b.link || '#'} className="block w-full">
               <Image
-                src={banner.image_url}
-                alt={banner.title || `Banner ${i + 1}`}
+                src={b.image_url}
+                alt={b.title || 'Banner promocional Discibra'}
                 width={1920}
-                height={430}
+                height={500}
+                priority={idx === 0}
                 sizes="100vw"
-                className="w-full h-auto block"
-                priority={i === 0}
-                loading={i === 0 ? "eager" : "lazy"}
-                fetchPriority={i === 0 ? "high" : "auto"}
+                className="w-full h-auto block object-contain"
               />
-              {banner.link_url && (
-                <Link href={banner.link_url} className="absolute inset-0 z-10">
-                  <span className="sr-only">Ver detalhes</span>
-                </Link>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-      {banners.length > 1 && (
-        <>
-          <div className="absolute inset-x-4 md:inset-x-8 top-1/2 -translate-y-1/2 hidden md:flex justify-between pointer-events-none z-20">
-            <button
-              type="button"
-              onClick={() => setSelected((p) => (p === 0 ? banners.length - 1 : p - 1))}
-              className={cn(
-                "pointer-events-auto h-14 w-14 flex items-center justify-center rounded-[var(--r)]",
-                "bg-white/20 backdrop-blur-md text-white border border-white/20",
-                "opacity-0 group-hover/hero:opacity-100 -translate-x-4 group-hover/hero:translate-x-0",
-                "transition-all hover:bg-white hover:text-secondary",
-              )}
-              aria-label="Anterior"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelected((p) => (p + 1) % banners.length)}
-              className={cn(
-                "pointer-events-auto h-14 w-14 flex items-center justify-center rounded-2xl",
-                "bg-white/20 backdrop-blur-md text-white border border-white/20",
-                "opacity-0 group-hover/hero:opacity-100 translate-x-4 group-hover/hero:translate-x-0",
-                "transition-all hover:bg-white hover:text-secondary",
-              )}
-              aria-label="Proximo"
-            >
-              <ChevronRight className="h-6 w-6" />
-            </button>
+            </a>
           </div>
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
-            {banners.map((_, i) => (
+        ))}
+      </div>
+      {/* Controles de Navegação (Setas) */}
+      {total > 1 && (
+        <>
+          <button
+            onClick={prevSlide}
+            aria-label="Banner anterior"
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-sm transition-all opacity-80 hover:opacity-100"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <button
+            onClick={nextSlide}
+            aria-label="Próximo banner"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-sm transition-all opacity-80 hover:opacity-100"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          {/* Indicadores Minimalistas */}
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 bg-black/30 backdrop-blur-md rounded-full">
+            {banners.slice(0, 8).map((_, i) => (
               <button
                 key={i}
-                type="button"
-                onClick={() => setSelected(i)}
-                aria-label={`Slide ${i + 1}`}
-                className={cn(
-                  "rounded-full transition-all duration-300",
-                  i === selected ? "w-6 h-2 bg-[var(--accent)]" : "w-1.5 h-1.5 rounded-full bg-[var(--line)] hover:bg-[var(--ink-muted)]",
-                )}
+                onClick={() => setCurrentIndex(i)}
+                aria-label={`Ir para banner ${i + 1}`}
+                className={`h-1.5 transition-all rounded-full ${
+                  i === currentIndex ? 'w-5 bg-[#E8590C]' : 'w-1.5 bg-white/50 hover:bg-white'
+                }`}
               />
             ))}
+            {total > 8 && (
+              <span className="text-[10px] text-white/80 font-mono ml-1">
+                {currentIndex + 1}/{total}
+              </span>
+            )}
           </div>
         </>
       )}
-    </section>
+    </div>
   )
 }
