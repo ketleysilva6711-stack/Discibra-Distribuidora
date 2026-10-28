@@ -26,6 +26,15 @@ type Period = "all" | "today" | "7d" | "30d"
 
 const fetcher = async () => {
   const res = await fetch("/api/admin/whatsapp-analytics", { credentials: "include" })
+  const contentType = res.headers.get("content-type") || ""
+  if (!res.ok || !contentType.includes("application/json")) {
+    let detail = `Serviço de analytics temporariamente indisponível (HTTP ${res.status}).`
+    if (contentType.includes("text/html")) {
+      detail +=
+        " O endpoint retornou HTML em vez de JSON — verifique se a rota /api/admin/whatsapp-analytics está publicada e se a variável SUPABASE_SERVICE_ROLE_KEY está configurada no ambiente de produção."
+    }
+    throw new Error(detail)
+  }
   const json = (await res.json()) as {
     rows?: Row[]
     error?: string
