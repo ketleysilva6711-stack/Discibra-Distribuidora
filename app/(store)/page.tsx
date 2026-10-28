@@ -14,9 +14,7 @@ import TestimonialsCarousel from "@/components/store/testimonials-carousel"
 import Link from "next/link"
 import Image from "next/image"
 import {
-  Truck, ShieldCheck, CreditCard, MapPin,
-  ChevronRight, BadgeCheck, Zap, Package,
-  MessageSquare, FileText,
+  ChevronRight, MapPin, ShieldCheck, CreditCard, Truck, Zap, Package, MessageSquare, FileText,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SITE, waLink } from "@/lib/site-config"
@@ -252,10 +250,10 @@ export default async function HomePage() {
   const leaders = pickLeaders(data.cimentos || [])
 
   const trustPillars = [
-    { icon: CreditCard, title: "Preço de Atacado", desc: "Para pessoa física — sem exigência de CNPJ" },
-    { icon: Zap, title: "Parcele 12x", desc: "No cartão ou PIX parcelado sem acréscimos" },
-    { icon: Truck, title: "Entrega Descarregada", desc: "Munck ou paletizado direto na sua obra" },
-    { icon: Package, title: "Direto da Fábrica", desc: "Produtos certificados ABNT com laudos técnicos" },
+    { icon: <svg className="text-[var(--accent)] flex-none shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18V3H3z"/><path d="M3 9h18"/><path d="M9 21V9h6v12"/></svg>, title: "Preço de Atacado", desc: "Para pessoa física — sem exigência de CNPJ" },
+    { icon: <svg className="text-[var(--accent)] flex-none shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>, title: "Parcele 12x", desc: "No cartão ou PIX parcelado sem acréscimos" },
+    { icon: <svg className="text-[var(--accent)] flex-none shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10V7H4v3"/><path d="M20 20H4v2l3-3 3 3 3-3 3 3z"/><path d="M7 15h10"/></svg>, title: "Entrega Descarregada", desc: "Munck ou paletizado direto na sua obra" },
+    { icon: <svg className="text-[var(--accent)] flex-none shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>, title: "Direto da Fábrica", desc: "Produtos certificados ABNT com laudos técnicos" },
   ]
 
   return (
@@ -320,9 +318,7 @@ export default async function HomePage() {
                 key={item.title}
                 className="flex-none w-1/2 sm:flex-1 flex items-center gap-3 px-4 py-3 min-w-[160px]"
               >
-                <span className="text-[var(--accent)] flex-none shrink-0" aria-hidden="true">
-                  <item.icon className="h-4 w-4" />
-                </span>
+                {item.icon}
                 <div className="min-w-0">
                   <p className="text-xs font-semibold text-[var(--ink)] leading-tight truncate">
                     {item.title}
