@@ -261,10 +261,10 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
         </nav>
 
         {/* ── Grid principal ── */}
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16 min-w-0">
 
           {/* Coluna Esquerda: Imagens */}
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-7 min-w-0">
             <div className="sticky top-24 space-y-4">
               {/* Imagem principal */}
               <div className={cn(
@@ -325,7 +325,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
           </div>
 
           {/* Coluna Direita: Info */}
-          <div className="lg:col-span-5 space-y-7">
+          <div className="lg:col-span-5 space-y-7 min-w-0">
             <div>
               {/* Categoria + Rating rápido */}
               <div className="flex items-center justify-between mb-4">
@@ -354,7 +354,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
               </div>
 
               {/* Nome */}
-              <h1 className="text-3xl lg:text-[2.25rem] font-black text-slate-900 leading-[1.1] mb-6 tracking-tight">
+              <h1 className="text-3xl lg:text-[2.25rem] font-black text-slate-900 leading-[1.1] mb-6 tracking-tight min-w-0 overflow-hidden overflow-ellipsis whitespace-nowrap">
                 {product.name}
               </h1>
 
@@ -514,11 +514,11 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
         </div>
 
         {/* ── Seção inferior: Descrição + Reviews ── */}
-        <div className="mt-20 lg:mt-28">
+        <div className="mt-20 lg:mt-28 min-w-0">
           <div className="flex flex-col gap-16 lg:flex-row lg:gap-16">
 
             {/* Coluna esquerda: Descrição + Reviews */}
-            <div className="flex-1 space-y-14 min-w-0">
+            <div className="flex-1 space-y-14 min-w-0 overflow-hidden">
 
               {/* Descrição */}
               {product.description && (
@@ -676,7 +676,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
               </div>
 
             {/* Coluna direita: Form de avaliação */}
-            <div className="lg:w-[380px] shrink-0">
+            <div className="lg:w-[380px] shrink-0 min-w-0">
               <div className="sticky top-24 bg-slate-50/60 rounded-[2.5rem] p-8 border border-slate-100">
                 <h3 className="text-xl font-black text-[#002D5B] mb-1">Deixe sua opinião</h3>
                 <p className="text-sm text-slate-500 mb-8 leading-relaxed">
