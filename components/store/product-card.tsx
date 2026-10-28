@@ -105,17 +105,17 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
       <div className="absolute inset-x-4 top-4 z-10 flex items-start justify-between pointer-events-none" suppressHydrationWarning>
         <div className="flex flex-col gap-1.5" suppressHydrationWarning>
           {product.is_new && (
-            <span className="inline-flex items-center gap-1 bg-emerald-500 text-white px-2.5 py-1 rounded-full shadow-lg shadow-emerald-500/30 text-[10px] font-black uppercase tracking-widest" suppressHydrationWarning>
+            <span className="inline-flex items-center gap-1 bg-[var(--accent)] text-white px-2.5 py-1 rounded-[var(--r)] text-[10px] font-black uppercase tracking-widest" suppressHydrationWarning>
               NOVO
             </span>
           )}
           {discount > 0 && (
-            <span className="inline-flex items-center gap-1 bg-[var(--accent-industrial)] text-white px-2 py-0.5 rounded-[var(--r)] text-xs font-black uppercase tracking-widest" suppressHydrationWarning>
+            <span className="inline-flex items-center gap-1 bg-[var(--accent)] text-white px-2 py-0.5 rounded-[var(--r)] text-xs font-black uppercase tracking-widest" suppressHydrationWarning>
               -{discount}%
             </span>
           )}
           {isLowStock && (
-            <span className="inline-flex items-center gap-1 bg-red-500/90 text-white px-2.5 py-1 rounded-full shadow-lg shadow-red-500/30 text-[10px] font-black uppercase tracking-widest" suppressHydrationWarning>
+            <span className="inline-flex items-center gap-1 bg-[var(--accent)] text-white px-2.5 py-1 rounded-[var(--r)] text-[10px] font-black uppercase tracking-widest" suppressHydrationWarning>
               <Zap className="w-2.5 h-2.5 fill-current" />
               Últimas un.
             </span>
@@ -130,7 +130,7 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
             setIsWishlist(!isWishlist)
           }}
           className={cn(
-            "pointer-events-auto h-9 w-9 flex items-center justify-center rounded-full transition-all duration-300",
+            "pointer-events-auto h-9 w-9 flex items-center justify-center rounded-[var(--r)] transition-all duration-300",
             "backdrop-blur-md border shadow-xs",
             isWishlist
               ? "bg-blue-600 text-white border-blue-600 scale-110 shadow-sm"
@@ -173,7 +173,7 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
         <div className="mb-2 sm:mb-3 flex items-center justify-between">
           <div className="flex items-center gap-1">
             <div className={cn(
-              "w-1.5 h-1.5 rounded-full",
+              "w-1.5 h-1.5 rounded-[var(--r)]",
               product.stock > 0 ? "bg-emerald-500 animate-pulse" : "bg-red-400"
             )} />
             <span className={cn(
@@ -233,7 +233,7 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
               aria-label="Pedir pelo WhatsApp"
               onClick={() => trackWhatsAppClick("product_card", `/produto/${product.slug}`)}
               className={cn(
-                "flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#25D366]/20 transition-all hover:bg-[#1EBE5B] active:scale-95 whitespace-nowrap btn-whatsapp-track",
+                "flex h-11 w-full items-center justify-center gap-2 rounded-[var(--r)] bg-[#25D366] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#25D366]/20 transition-all hover:bg-[#1EBE5B] active:scale-95 whitespace-nowrap btn-whatsapp-track",
               )}
             >
               <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
