@@ -1,25 +1,54 @@
-"use client"
-
-import { useSearchParams } from "next/navigation"
-import { Suspense } from "react"
-import useSWR from "swr"
-import { createClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/server"
 import ProductCard from "@/components/store/product-card"
 import Link from "next/link"
 import { ArrowLeft, Search, PackageOpen } from "lucide-react"
 import { rawTokens, canonicalCementSearch, matchesSearch, escapeLike } from "@/lib/search-normalize"
 
-const supabase = createClient()
+export const revalidate = 60
 
-async function searchProducts(query: string) {
-  if (!query || query.trim().length === 0) return []
+export default async function BuscaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>
+}) {
+  const { q } = await searchParams
+  const query = q?.trim() ?? ""
 
-  const q = query.trim()
-  const tokens = rawTokens(q)
+  if (!query) {
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-4 sm:py-10">
+        <Link
+          href="/"
+          className="mb-5 inline-flex min-h-10 items-center gap-2 text-sm font-medium text-muted-foreground transition hover:text-primary"
+        >
+          <ArrowLeft className="h-4 w-4 shrink-0" /> Voltar
+        </Link>
+        <div className="mb-6 flex items-center gap-3 sm:mb-8">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Search className="h-5 w-5" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+              Buscar produtos
+            </h1>
+            <p className="text-xs text-muted-foreground sm:text-sm">
+              Digite o nome do produto ou marca para pesquisar
+            </p>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  const supabase = await createClient()
+
+  const tokens = rawTokens(query)
 
   let queryBuilder = supabase
     .from("products")
-    .select("id, name, slug, price, original_price, image_url, images, unit, stock, is_new, is_discount, featured")
+    .select(
+      "id, name, slug, price, original_price, image_url, images, unit, stock, is_new, is_discount, featured"
+    )
     .eq("active", true)
     .order("featured", { ascending: false })
     .order("name", { ascending: true })
@@ -36,73 +65,44 @@ async function searchProducts(query: string) {
 
   if (error) {
     console.error("Erro na busca:", error)
-    return []
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-8">
+        <p className="text-slate-500">Erro ao buscar produtos.</p>
+      </main>
+    )
   }
 
-  const products = (data || []).filter((p: any) => matchesSearch(p, q))
-  return products
-}
-
-function SearchResults() {
-  const searchParams = useSearchParams()
-  const qRaw = searchParams.get("q") || ""
-  const q = qRaw.trim()
-
-  const { data: products, isLoading } = useSWR(
-    q ? `search-products-${q}` : null,
-    () => searchProducts(q),
-    { revalidateOnFocus: false }
-  )
-
-  const results = products || []
+  const products = (data || []).filter((p: any) => matchesSearch(p, query))
 
   return (
-    <div className="mx-auto max-w-7xl px-3 py-6 sm:px-4 sm:py-10">
+    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-4 sm:py-10">
       <Link
         href="/"
         className="mb-5 inline-flex min-h-10 items-center gap-2 text-sm font-medium text-muted-foreground transition hover:text-primary"
       >
         <ArrowLeft className="h-4 w-4 shrink-0" /> Voltar
       </Link>
-      
+
       <div className="mb-6 flex items-center gap-3 sm:mb-8">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
           <Search className="h-5 w-5" />
         </div>
         <div>
           <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-            {q ? (
-              <>
-                Resultados para <span className="text-primary font-black">"{q}"</span>
-              </>
-            ) : (
-              "Buscar produtos"
-            )}
+            Resultados para <span className="text-primary font-black">"{query}"</span>
           </h1>
           <p className="text-xs text-muted-foreground sm:text-sm">
-            {isLoading
-              ? "Buscando materiais no estoque..."
-              : q
-              ? `${results.length} produto${results.length === 1 ? "" : "s"} encontrado${results.length === 1 ? "" : "s"}`
-              : "Digite o nome do produto ou marca para pesquisar"}
+            {products.length} produto{products.length === 1 ? "" : "s"} encontrado{products.length === 1 ? "" : "s"}
           </p>
         </div>
       </div>
 
-      {isLoading && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:gap-6">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-64 rounded-2xl bg-slate-100 animate-pulse border border-slate-200/60" />
-          ))}
-        </div>
-      )}
-
-      {!isLoading && q && results.length === 0 && (
+      {products.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <PackageOpen className="w-16 h-16 text-slate-300 mb-4" />
           <h3 className="text-lg font-bold text-slate-800 mb-1">Nenhum produto encontrado</h3>
           <p className="text-sm text-slate-500 max-w-md mb-6">
-            Não encontramos resultados para "{q}". Verifique a ortografia ou tente pesquisar termos mais genéricos como "cimento", "ferro" ou "tinta".
+            Não encontramos resultados para "{query}". Verifique a ortografia ou tente pesquisar termos mais genéricos como "cimento", "ferro" ou "tinta".
           </p>
           <Link
             href="/produtos"
@@ -112,9 +112,11 @@ function SearchResults() {
           </Link>
           <div className="mt-8 rounded-2xl border border-[#25D366]/30 bg-[#f0fdf4] p-6 text-center">
             <p className="font-black text-slate-900 mb-1">Não encontrou o que procurava?</p>
-            <p className="text-sm text-slate-500 mb-4">Nosso time pode te ajudar a encontrar exatamente o que precisa para sua obra.</p>
+            <p className="text-sm text-slate-500 mb-4">
+              Nosso time pode te ajudar a encontrar exatamente o que precisa para sua obra.
+            </p>
             <a
-              href={`https://wa.me/5516996447972?text=${encodeURIComponent(`Olá! Procurei por "${q}" no site e não encontrei. Vocês têm este material?`)}`}
+              href={`https://wa.me/5516996447972?text=${encodeURIComponent(`Olá! Procurei por "${query}" no site e não encontrei. Vocês têm este material?`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 h-12 px-6 rounded-xl bg-[#25D366] text-white font-black text-sm hover:bg-[#1fba58] transition-all active:scale-95"
@@ -126,21 +128,13 @@ function SearchResults() {
         </div>
       )}
 
-      {!isLoading && results.length > 0 && (
+      {products.length > 0 && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:gap-6">
-          {results.map((product) => (
+          {products.map((product) => (
             <ProductCard key={product.id} product={product as any} />
           ))}
         </div>
       )}
-    </div>
-  )
-}
-
-export default function SearchPage() {
-  return (
-    <Suspense fallback={<div className="min-h-[40vh] p-8 text-center text-sm text-slate-400">Carregando busca...</div>}>
-      <SearchResults />
-    </Suspense>
+    </main>
   )
 }
