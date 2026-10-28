@@ -103,7 +103,7 @@ export function HeroBanner({ initialSlides }: { initialSlides?: Slide[] }) {
         <div className="flex snap-x snap-mandatory overflow-x-auto gap-3 pb-2 [scrollbar-width:none]">
           {CAMPAIGN_BANNERS.map((banner, i) => (
             <a key={banner.key} href={banner.link!} className="relative flex-none w-full snap-center">
-              <Image src={String(banner.image_url!)} alt={String(banner.title || `Banner ${i + 1}`)} width={1920} height={430} sizes="100vw" priority={i === 0} className="w-full h-auto" loading={i === 0 ? "eager" : "lazy"} fetchPriority={i === 0 ? "high" : "auto"} />
+              <Image src={banner.image_url!} alt={banner.title || `Banner ${i + 1}`} width={1920} height={430} sizes="100vw" priority={i === 0} className="w-full h-auto" loading={i === 0 ? "eager" : "lazy"} fetchPriority={i === 0 ? "high" : "auto"} />
               <div className="absolute inset-0 z-10 flex flex-col justify-between p-4 sm:p-6 bg-gradient-to-t from-black/70 via-black/10 to-transparent">
                 <span className="inline-flex items-center gap-1 rounded-full bg-[#E8590C]/90 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">{banner.title}</span>
                 <p className="mt-1 text-sm sm:text-base font-bold text-white leading-tight">{banner.subtitle}</p>
