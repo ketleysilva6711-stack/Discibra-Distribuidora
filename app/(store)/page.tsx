@@ -257,7 +257,15 @@ export default async function HomePage() {
       {data?.cimentos && data.cimentos.length > 0 && (
         <section className="py-14 sm:py-20 bg-white border-b border-slate-100">
           <div className="mx-auto max-w-7xl px-6">
-            <SectionHeader title="Cimentos e Básicos" subtitle="Preço direto da fábrica" href="/cimento" linkLabel="Ver cimentos" />
+            <div className="flex items-end justify-between mb-4">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#E8590C]">Cimentos e Básicos</p>
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#111318]">Preço direto da fábrica</h2>
+            </div>
+            <Link href="/cimento" className="text-xs font-semibold text-[#111318] hover:text-[#E8590C] transition-colors whitespace-nowrap">
+              Ver cimentos →
+            </Link>
+          </div>
             <div className="mx-auto max-w-7xl px-6">
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                 {data.cimentos.slice(0, 12).map((p: any) => (
@@ -273,7 +281,15 @@ export default async function HomePage() {
       {data?.acabamento && data.acabamento.length > 0 && (
         <section className="py-14 sm:py-20 bg-white border-b border-slate-100">
           <div className="mx-auto max-w-7xl px-6">
-            <SectionHeader title="Telhas e Impermeabilizantes" subtitle="Argamassas, rejuntes e impermeabilizantes" href="/categoria/telhas-e-coberturas" linkLabel="Ver categoria" />
+            <div className="flex items-end justify-between mb-4">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#E8590C]">Telhas e Impermeabilizantes</p>
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#111318]">Argamassas, rejuntes e impermeabilizantes</h2>
+            </div>
+            <Link href="/categoria/telhas-e-coberturas" className="text-xs font-semibold text-[#111318] hover:text-[#E8590C] transition-colors whitespace-nowrap">
+              Ver categoria →
+            </Link>
+          </div>
             <div className="mx-auto max-w-7xl px-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {data.acabamento.slice(0, 8).map((p: any) => (
@@ -300,21 +316,21 @@ export default async function HomePage() {
                 Distribuidora legalmente constituída com centro de distribuição próprio em Ribeirão Preto. Atendimento direto e sem intermediários.
               </p>
             </div>
-            <div className="mt-8 pt-8 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-6 text-left">
+            <div className="mt-8 pt-8 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">CNPJ</p>
+                <p className="text-[10px] font-mono tracking-wider text-white/50 uppercase">CNPJ</p>
                 <p className="mt-1 text-base font-black text-white whitespace-nowrap">59.566.414/0001-25</p>
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Centro de Distribuição</p>
+                <p className="text-[10px] font-mono tracking-wider text-white/50 uppercase">Centro de Distribuição</p>
                 <p className="mt-1 text-base font-black text-white whitespace-nowrap">Ribeirão Preto — SP</p>
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Expedição & Cargas</p>
+                <p className="text-[10px] font-mono tracking-wider text-white/50 uppercase">Expedição & Cargas</p>
                 <p className="mt-1 text-sm font-semibold text-white">Seg a Sex 07h-18h | Sáb 07h-12h</p>
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Central Telefônica</p>
+                <p className="text-[10px] font-mono tracking-wider text-white/50 uppercase">Central Telefônica</p>
                 <p className="mt-1 text-base font-black text-white whitespace-nowrap">(16) 99644-7972</p>
               </div>
             </div>
