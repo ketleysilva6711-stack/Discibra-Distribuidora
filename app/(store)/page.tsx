@@ -9,8 +9,8 @@ import { createPublicClient } from "@/lib/supabase/public"
 import { HeroBanner } from "@/components/store/hero-banner"
 import CategoriesCarousel from "@/components/store/categories-carousel"
 import ProductsCarousel from "@/components/store/products-carousel"
+import ProductCard from "@/components/store/product-card"
 import InstitutionalSection from "@/components/store/institutional-section"
-import TestimonialsCarousel from "@/components/store/testimonials-carousel"
 import Link from "next/link"
 import Image from "next/image"
 import {
@@ -355,7 +355,11 @@ export default async function HomePage() {
               href="/produtos"
               linkLabel="Ver todos"
             />
-            <ProductsCarousel products={data.featured} autoplayDelay={5500} />
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {data.featured.map((p: any) => (
+                <ProductCard key={p.id} product={p as any} />
+              ))}
+            </div>
           </div>
         </section>
       )}
@@ -438,7 +442,11 @@ export default async function HomePage() {
               href="/categoria/aco-e-ferragens"
               linkLabel="Ver aço"
             />
-            <ProductsCarousel products={data.aco} autoplayDelay={6000} />
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {data.aco.map((p: any) => (
+                <ProductCard key={p.id} product={p as any} />
+              ))}
+            </div>
           </div>
         </section>
       )}
@@ -453,7 +461,11 @@ export default async function HomePage() {
               href="/categoria/materiais-hidraulicos"
               linkLabel="Ver hidráulica"
             />
-            <ProductsCarousel products={data.hidraulica} autoplayDelay={6500} />
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {data.hidraulica.map((p: any) => (
+                <ProductCard key={p.id} product={p as any} />
+              ))}
+            </div>
           </div>
         </section>
       )}
@@ -468,7 +480,11 @@ export default async function HomePage() {
               href="/produtos"
               linkLabel="Ver acabamento"
             />
-            <ProductsCarousel products={data.acabamento} autoplayDelay={7000} />
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {data.acabamento.map((p: any) => (
+                <ProductCard key={p.id} product={p as any} />
+              ))}
+            </div>
           </div>
         </section>
       )}
@@ -555,14 +571,6 @@ export default async function HomePage() {
       <div className="py-10">
         <InstitutionalSection />
       </div>
-
-      <section className="relative my-12 overflow-hidden bg-secondary py-16 sm:py-24">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
-        <div className="absolute right-0 top-0 h-[500px] w-[500px] -translate-y-1/2 translate-x-1/2 rounded-full bg-primary/10 blur-[120px]" />
-        <div className="relative z-10">
-          <TestimonialsCarousel />
-        </div>
-      </section>
 
       {/* ── CTA B2B ── */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
