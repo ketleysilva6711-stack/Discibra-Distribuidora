@@ -262,7 +262,7 @@ export default async function HomePage() {
     <div className="relative pb-20 sm:pb-32 bg-mesh">
       {/* ── HERO B2B ── */}
       <div className="w-full">
-        <HeroBanner initialSlides={initialSlides} />
+        <HeroBanner />
       </div>
 
       {/* OFERTAS PROMOCIONAIS RESPONSIVAS (mobile vs desktop) */}
