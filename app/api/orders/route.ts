@@ -22,7 +22,21 @@ type CartItem = {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { items, email } = body as { items: CartItem[]; email?: string }
+    const {
+      items,
+      email,
+      customerName,
+      customerPhone,
+      customerCep,
+      customerCity,
+    } = body as {
+      items: CartItem[]
+      email?: string
+      customerName?: string
+      customerPhone?: string
+      customerCep?: string
+      customerCity?: string
+    }
 
     if (!Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: "Carrinho vazio." }, { status: 400 })
@@ -40,9 +54,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Total inválido." }, { status: 400 })
     }
 
-    const itemsSummary = items
-      .map((i) => `- ${i.name} (x${i.qty}) — R$ ${(Number(i.price) * i.qty).toFixed(2)}`)
+    const clientHeader = [
+      customerName ? `Cliente: ${customerName.trim()}` : null,
+      customerPhone ? `WhatsApp: ${customerPhone.trim()}` : null,
+      customerCity || customerCep
+        ? `Entrega: ${customerCity || ""} (CEP: ${customerCep || ""})`.trim()
+        : null,
+      `----------------------------------------`,
+    ]
+      .filter(Boolean)
       .join("\n")
+    const productLines = items
+      .map((i) => `- ${i.qty}x ${i.name} — R$ ${(Number(i.price) * i.qty).toFixed(2)}`)
+      .join("\n")
+    const itemsSummary = clientHeader ? `${clientHeader}\n${productLines}` : productLines
 
     const code = generateOrderCode()
     const now = new Date().toISOString()
@@ -61,7 +86,15 @@ export async function POST(request: NextRequest) {
       email: email?.trim() || null,
       status: "received",
       total,
-      items,
+      items: {
+        customer: {
+          name: customerName?.trim() || null,
+          phone: customerPhone?.trim() || null,
+          cep: customerCep?.trim() || null,
+          city: customerCity?.trim() || null,
+        },
+        products: items,
+      },
       items_summary: itemsSummary,
       created_at: now,
       updated_at: now,
@@ -70,6 +103,22 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error("orders insert error:", error)
       return NextResponse.json({ error: "Falha ao salvar pedido." }, { status: 500 })
+    }
+
+    // Gravação defensiva na tabela quotation_leads (se existir) para preservar o lead
+    // mesmo quando a tabela ainda não foi criada no Supabase.
+    try {
+      if (customerName && customerPhone) {
+        await supabase.from("quotation_leads").insert({
+          name: customerName.trim(),
+          phone: customerPhone.trim(),
+          email: email?.trim() || null,
+          address_city: customerCity?.trim() || null,
+          address_zip: customerCep?.trim() || null,
+        })
+      }
+    } catch (_) {
+      // Ignora se a tabela quotation_leads ainda não existir ou não houver permissão
     }
 
     return NextResponse.json({ ok: true, code, total })

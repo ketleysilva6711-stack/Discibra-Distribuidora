@@ -30,8 +30,26 @@ function saveCart(cart: CartItem[]) {
 
 export default function CartPage() {
   const [cart, setCart] = useState<CartItem[]>([])
+  const [customerName, setCustomerName] = useState("")
+  const [customerPhone, setCustomerPhone] = useState("")
+  const [customerCep, setCustomerCep] = useState("")
+  const [customerCity, setCustomerCity] = useState("")
+  const [loadingCep, setLoadingCep] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() => { setCart(getCart()) }, [])
+  useEffect(() => {
+    setCart(getCart())
+    try {
+      const savedLead = localStorage.getItem("discibra_customer_lead")
+      if (savedLead) {
+        const lead = JSON.parse(savedLead)
+        if (lead.name) setCustomerName(lead.name)
+        if (lead.phone) setCustomerPhone(lead.phone)
+        if (lead.cep) setCustomerCep(lead.cep)
+        if (lead.city) setCustomerCity(lead.city)
+      }
+    } catch (_) {}
+  }, [])
 
   function updateQty(id: string, delta: number) {
     const updated = cart.map((i) => i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i)
@@ -45,57 +63,120 @@ export default function CartPage() {
 
   function clearCart() { setCart([]); saveCart([]) }
 
+  function handlePhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
+    let v = e.target.value.replace(/\D/g, "")
+    if (v.length > 11) v = v.slice(0, 11)
+    if (v.length > 6) {
+      v = `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`
+    } else if (v.length > 2) {
+      v = `(${v.slice(0, 2)}) ${v.slice(2)}`
+    } else if (v.length > 0) {
+      v = `(${v}`
+    }
+    setCustomerPhone(v)
+  }
+
+  async function handleCepBlur() {
+    const raw = customerCep.replace(/\D/g, "")
+    if (raw.length !== 8) return
+    setLoadingCep(true)
+    try {
+      const res = await fetch(`/api/cep?cep=${raw}`)
+      const data = await res.json()
+      if (data && data.localidade) {
+        setCustomerCity(`${data.localidade} - ${data.uf}`)
+      }
+    } catch (_) {}
+    setLoadingCep(false)
+  }
+
   const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0)
   const totalItems = cart.reduce((sum, i) => sum + i.qty, 0)
 
   async function finalizeWhatsApp() {
-    // 1. Salvar pedido no banco via API (total recalculado no servidor)
+    if (!customerName.trim()) {
+      toast.error("Informe seu Nome ou Empresa para gerar o orçamento.")
+      return
+    }
+    const cleanPhone = customerPhone.replace(/\D/g, "")
+    if (cleanPhone.length < 10) {
+      toast.error("Informe um WhatsApp válido com DDD para contato.")
+      return
+    }
+    setSubmitting(true)
     let code = generateOrderCode()
     let email: string | undefined
     try {
+      // Salvar lead no localStorage para próximas visitas
+      localStorage.setItem(
+        "discibra_customer_lead",
+        JSON.stringify({
+          name: customerName.trim(),
+          phone: customerPhone.trim(),
+          cep: customerCep.trim(),
+          city: customerCity.trim(),
+        })
+      )
       const supabase = createClient()
       const { data: userData } = await supabase.auth.getUser()
       email = userData.user?.email ?? undefined
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: cart, email }),
+        body: JSON.stringify({
+          items: cart,
+          email,
+          customerName: customerName.trim(),
+          customerPhone: customerPhone.trim(),
+          customerCep: customerCep.trim(),
+          customerCity: customerCity.trim(),
+        }),
       })
       if (res.ok) {
         const json = await res.json()
         code = json.code ?? code
       }
     } catch (_) {
-      // Fallback: continua com código local mesmo se a API falhar
+      // Fallback: prossegue com código local
+    } finally {
+      setSubmitting(false)
     }
-    // 2. Salvar localmente (rastreamento no "Minha Conta")
-    const lines = cart.map((i) => `- ${i.name} (x${i.qty}) — R$ ${(i.price * i.qty).toFixed(2)}`)
-    const summary = lines.join("\n")
+    // Salvar localmente (rastreamento no "Minha Conta")
+    const lines = cart.map((i) => `- ${i.qty}x ${i.name} — R$ ${(i.price * i.qty).toFixed(2)}`)
     saveLocalOrder({
       code,
       email,
       status: "received",
       total,
-      itemsSummary: summary,
+      itemsSummary: lines.join("\n"),
     })
-    // 3. Abrir WhatsApp com mensagem formatada
+    // Montar mensagem corporativa no WhatsApp
     const whatsLines = cart.map(
-      (i) =>
-        `- ${i.qty}x ${i.name} (R$ ${Number(i.price).toFixed(2)} un) — R$ ${(i.price * i.qty).toFixed(2)}`
+      (i) => `- ${i.qty}x ${i.name} (R$ ${Number(i.price).toFixed(2)} un) — R$ ${(i.price * i.qty).toFixed(2)}`
     )
     const msg = [
-      `Olá Discibra! Gostaria de cotar o seguinte orçamento pelo site:`,
+      `🏗️ *ORÇAMENTO DISCIBRA DISTRIBUIDORA*`,
+      `*Código:* #${code}`,
       ``,
+      `*Cliente:* ${customerName.trim()}`,
+      `*WhatsApp:* ${customerPhone.trim()}`,
+      customerCity || customerCep
+        ? `*Local de Entrega:* ${customerCity || ""} ${
+            customerCep ? `(CEP: ${customerCep})` : ""
+          }`
+        : null,
+      ``,
+      `*Itens Solicitados:*`,
       ...whatsLines,
       ``,
-      `Total Estimado: R$ ${total.toFixed(2)}`,
+      `*Total Estimado:* R$ ${total.toFixed(2)}`,
       ``,
-      `Gostaria de verificar o frete e prazo de entrega para meu CEP.`,
-    ].join("\n")
+      `Olá! Gostaria de confirmar a disponibilidade e o valor do frete para entrega.`,
+    ].filter((l) => l !== null).join("\n")
     trackWhatsAppClick("checkout_finalize", "/carrinho")
     window.open(waLink(msg), "_blank", "noopener,noreferrer")
     clearCart()
-    toast.success("Pedido gerado! Abrindo WhatsApp...")
+    toast.success("Orçamento gerado com sucesso! Abrindo WhatsApp...")
   }
 
   if (cart.length === 0) {
@@ -212,16 +293,76 @@ export default function CartPage() {
               <span className="font-bold text-[#15803D] text-xl">R$ {total.toFixed(2)}</span>
             </div>
           </div>
+          {/* Bloco de Identificação Obrigatória B2B */}
+          <div className="mb-6 rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] p-4">
+            <h3 className="mb-3 text-xs font-black uppercase tracking-wider text-slate-800">
+              Dados para Entrega e Contato
+            </h3>
+            <div className="space-y-3">
+              <div>
+                <label className="mb-1 block text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Seu Nome ou Construtora *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="Ex: João Silva ou Construtora Alfa"
+                  className="h-10 w-full rounded-[4px] border border-[#E5E5E3] bg-white px-3 text-xs font-medium text-slate-900 outline-none transition focus:border-[#002D5B]"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Seu WhatsApp para Retorno *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={customerPhone}
+                  onChange={handlePhoneChange}
+                  placeholder="(16) 99999-9999"
+                  className="h-10 w-full rounded-[4px] border border-[#E5E5E3] bg-white px-3 text-xs font-medium text-slate-900 outline-none transition focus:border-[#002D5B]"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  CEP da Obra (opcional)
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={customerCep}
+                    onChange={(e) => setCustomerCep(e.target.value)}
+                    onBlur={handleCepBlur}
+                    placeholder="14000-000"
+                    className="h-10 w-full rounded-[4px] border border-[#E5E5E3] bg-white px-3 text-xs font-medium text-slate-900 outline-none transition focus:border-[#002D5B]"
+                  />
+                </div>
+                {loadingCep && (
+                  <span className="mt-1 block text-[10px] text-slate-400">
+                    Buscando cidade...
+                  </span>
+                )}
+                {customerCity && !loadingCep && (
+                  <span className="mt-1 block text-[10px] font-bold text-[#15803D]">
+                    📍 {customerCity}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
           <button
             type="button"
             data-track="btn_whatsapp"
             data-button-name="btn_whatsapp"
             data-source="checkout_finalize"
             onClick={() => void finalizeWhatsApp()}
-            className="mb-3 flex min-h-[56px] w-full items-center justify-center gap-2 rounded-[4px] bg-[#15803D] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#166534] btn-whatsapp-track"
+            disabled={submitting}
+            className="mb-3 flex min-h-[56px] w-full items-center justify-center gap-2 rounded-[4px] bg-[#15803D] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#166534] disabled:opacity-50 disabled:cursor-not-allowed btn-whatsapp-track"
           >
             <MessageCircle className="h-5 w-5 shrink-0" aria-hidden />
-            Enviar Orçamento pelo WhatsApp
+            {submitting ? "Gerando orçamento..." : "Enviar Orçamento pelo WhatsApp"}
           </button>
           <p className="text-[11px] text-slate-500 text-center mb-4 leading-snug">
             Um código de pedido será gerado para você acompanhar em &quot;Minha conta&quot; e em &quot;Rastrear pedido&quot;.
