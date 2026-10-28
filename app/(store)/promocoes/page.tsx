@@ -24,24 +24,31 @@ type Promo = {
   unit: string
   stock: number
   category_id: string | null
+  is_discount?: boolean | null
+  featured?: boolean | null
 }
 
 async function fetchPromotions(): Promise<Promo[]> {
   const supabase = await createClient()
-  // Desconto real = original_price > price. O PostgREST não compara
-  // coluna-com-coluna, então filtra candidatos no banco e valida no servidor.
+  // Busca candidatos com desconto ou em destaque; valida desconto real no servidor.
   const { data, error } = await supabase
     .from("products")
-    .select("id, name, slug, price, original_price, image_url, unit, stock, category_id")
+    .select("id, name, slug, price, original_price, image_url, unit, stock, category_id, is_discount, featured")
     .eq("active", true)
     .not("image_url", "is", null)
-    .or("is_discount.eq.true,original_price.not.is.null")
+    .or("is_discount.eq.true,original_price.not.is.null,featured.eq.true")
     .order("created_at", { ascending: false })
     .limit(48)
   if (error) throw error
-  return ((data || []) as Promo[]).filter(
-    (p) => p.original_price != null && Number(p.original_price) > Number(p.price)
-  )
+  const rows = (data || []) as Promo[]
+  // 1. Prioriza desconto real (original_price > price)
+  const reais = rows.filter((p) => p.original_price != null && Number(p.original_price) > Number(p.price))
+  if (reais.length > 0) return reais
+  // 2. Fallback: produtos marcados como desconto/destaque
+  const destaques = rows.filter((p) => p.is_discount === true || p.featured === true)
+  if (destaques.length > 0) return destaques
+  // 3. Último recurso: os mais recentes ativos com imagem
+  return rows
 }
 
 const pct = (p: Promo) =>
