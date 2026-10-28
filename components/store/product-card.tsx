@@ -96,26 +96,25 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
   return (
     <div
       className={cn(
-        "group relative flex flex-col h-full overflow-hidden rounded-[var(--r)] border border-[var(--line)] bg-white",
-        "transition-all duration-300",
-        "hover:-translate-y-0.5 hover:border-[var(--accent-industrial)]",
+        "group relative flex flex-col h-full overflow-hidden rounded-[4px] border border-[#E5E5E3] bg-white",
+        "transition-colors hover:border-[#111318]",
       )}
     >
       {/* ── Badges flutuantes ── */}
       <div className="absolute inset-x-4 top-4 z-10 flex items-start justify-between pointer-events-none" suppressHydrationWarning>
         <div className="flex flex-col gap-1.5" suppressHydrationWarning>
           {product.is_new && (
-            <span className="inline-flex items-center gap-1 bg-[var(--accent)] text-white px-2.5 py-1 rounded-[var(--r)] text-[10px] font-black uppercase tracking-widest" suppressHydrationWarning>
+            <span className="inline-flex items-center gap-1 bg-[#E8590C] text-white px-2.5 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest" suppressHydrationWarning>
               NOVO
             </span>
           )}
           {discount > 0 && (
-            <span className="inline-flex items-center gap-1 bg-[var(--accent)] text-white px-2 py-0.5 rounded-[var(--r)] text-xs font-black uppercase tracking-widest" suppressHydrationWarning>
+            <span className="inline-flex items-center gap-1 bg-[#E8590C] text-white px-2 py-0.5 rounded-[4px] text-xs font-black uppercase tracking-widest" suppressHydrationWarning>
               -{discount}%
             </span>
           )}
           {isLowStock && (
-            <span className="inline-flex items-center gap-1 bg-[var(--accent)] text-white px-2.5 py-1 rounded-[var(--r)] text-[10px] font-black uppercase tracking-widest" suppressHydrationWarning>
+            <span className="inline-flex items-center gap-1 bg-[#E8590C] text-white px-2.5 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest" suppressHydrationWarning>
               <Zap className="w-2.5 h-2.5 fill-current" />
               Últimas un.
             </span>
@@ -130,11 +129,11 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
             setIsWishlist(!isWishlist)
           }}
           className={cn(
-            "pointer-events-auto h-9 w-9 flex items-center justify-center rounded-[var(--r)] transition-all duration-300",
-            "backdrop-blur-md border shadow-xs",
+            "pointer-events-auto h-9 w-9 flex items-center justify-center rounded-[4px] transition-all duration-300",
+            "backdrop-blur-md border border-[#E5E5E3]",
             isWishlist
-              ? "bg-blue-600 text-white border-blue-600 scale-110 shadow-sm"
-              : "bg-white/90 text-slate-400 border-slate-200/80 hover:bg-white hover:text-blue-600 hover:scale-105"
+              ? "bg-[#111318] text-white border-[#111318] scale-110"
+              : "bg-white/90 text-slate-400 border-slate-200/80 hover:bg-white hover:text-[#111318] hover:scale-105"
           )}
           aria-label={isWishlist ? "Remover da carriola" : "Salvar na carriola"}
           title={isWishlist ? "Remover da carriola" : "Salvar na carriola"}
@@ -149,7 +148,7 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
         className="relative block aspect-square w-full overflow-hidden"
         aria-label={`Ver ${product.name}`}
       >
-        <div className="absolute inset-0 bg-slate-50" />
+        <div className="absolute inset-0 bg-[#FAFAF9]" />
 
         {imgSrc ? (
           <Image
@@ -157,11 +156,11 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
             alt={product.name}
             fill
             sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
-            className="object-contain p-4 sm:p-5 transition-transform duration-500 group-hover:scale-[1.04]"
+            className="object-contain w-full h-full p-3 transition-transform duration-300 group-hover:scale-[1.02]"
             onError={() => setImgSrc(null)}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-slate-50/50">
+          <div className="flex h-full w-full items-center justify-center bg-[#FAFAF9]">
             <Package className="h-12 w-12 text-slate-300" />
           </div>
         )}
@@ -173,12 +172,12 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
         <div className="mb-2 sm:mb-3 flex items-center justify-between">
           <div className="flex items-center gap-1">
             <div className={cn(
-              "w-1.5 h-1.5 rounded-[var(--r)]",
-              product.stock > 0 ? "bg-emerald-500 animate-pulse" : "bg-red-400"
+              "w-1.5 h-1.5 rounded-[4px]",
+              product.stock > 0 ? "bg-[#15803D] animate-pulse" : "bg-[#6B7280]"
             )} />
             <span className={cn(
               "text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em]",
-              product.stock > 0 ? "text-emerald-600" : "text-red-500"
+              product.stock > 0 ? "text-[#15803D]" : "text-slate-500"
             )}>
               {product.stock > 0 ? "Em estoque" : "Esgotado"}
             </span>
@@ -186,19 +185,19 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
 
           {/* Rating */}
           <div className="flex items-center gap-0.5">
-            <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-amber-400 text-amber-400" />
+            <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-[#E8590C] text-[#E8590C]" />
             <span className="text-[10px] sm:text-[10px] font-bold text-slate-700">{ratingDisplay}</span>
           </div>
         </div>
 
         {/* Nome — tipografia institucional de atacado */}
         <Link href={`/produto/${product.slug}`} className="mb-2 block group/title">
-          <h3 className="line-clamp-2 min-h-[2.75rem] text-[14px] sm:text-[15px] font-semibold leading-snug text-slate-800 group-hover:text-[#C2410C] transition-colors">
+          <h3 className="line-clamp-2 min-h-[2.75rem] text-[14px] sm:text-[15px] font-semibold leading-snug text-[#111318] group-hover:text-[#C2410C] transition-colors">
             {product.name}
           </h3>
         </Link>
         {product.sku && (
-          <p className="mb-2 text-[11px] font-medium tracking-wide text-slate-400">Cód. {product.sku}</p>
+          <p className="mb-2 text-[11px] font-medium tracking-wide text-slate-500">Cód. {product.sku}</p>
         )}
 
         {/* Preço de atacado */}
@@ -212,7 +211,7 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
             )}
             <div className="flex items-baseline gap-1">
               <span className="text-xs font-bold text-slate-500">R$</span>
-              <p className="text-[26px] font-extrabold text-[var(--ink)] tracking-tight leading-none font-mono tabular-nums">
+              <p className="font-mono font-bold text-lg tabular-nums text-[#111318] leading-none">
                 {Number(product.price).toFixed(2).replace(".", ",")}
               </p>
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider self-end pb-0.5">
@@ -232,20 +231,21 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
               data-source="product_card"
               aria-label="Pedir pelo WhatsApp"
               onClick={() => trackWhatsAppClick("product_card", `/produto/${product.slug}`)}
-              className={cn(
-                "flex h-11 w-full items-center justify-center gap-2 rounded-[var(--r)] bg-[#25D366] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#25D366]/20 transition-all hover:bg-[#1EBE5B] active:scale-95 whitespace-nowrap btn-whatsapp-track",
-              )}
+              className="w-full py-2.5 px-3 bg-[#15803D] hover:bg-[#166534] text-white text-xs font-semibold rounded-[4px] flex items-center justify-center gap-2 transition-colors"
             >
-              <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                className="shrink-0"
+              >
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
               </svg>
               Falar no WhatsApp
             </a>
             <Link
               href={`/produto/${product.slug}`}
-              className="block w-full h-9 rounded-[var(--r)] border border-[var(--line)] text-[var(--ink)] text-xs font-medium mt-1.5 transition-colors hover:bg-[var(--surface-alt)]"
+              className="block w-full py-1.5 text-xs text-[#6B7280] underline hover:text-[#111318] text-center transition-colors"
             >
-              Adicionar ao orçamento
+              Ver detalhes
             </Link>
           </div>
         </div>
