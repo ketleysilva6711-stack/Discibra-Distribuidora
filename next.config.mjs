@@ -52,6 +52,9 @@ const nextConfig = {
     return [
       { source: '/categoria/cimento', destination: '/categoria/cimentos', permanent: true },
       { source: '/cimento/atacado', destination: '/cimento', permanent: false },
+      // Tráfego pago legado (Google Ads) - query params preservados automaticamente pelo Next.js
+      { source: '/ofertas', destination: '/promocoes', permanent: true },
+      { source: '/rastreamento', destination: '/rastrear-pedido', permanent: true },
     ]
   },
   // Segurança: configurar headers de resposta
