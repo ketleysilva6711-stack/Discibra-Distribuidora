@@ -289,12 +289,12 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                 {/* Badges */}
                 <div className="absolute left-5 top-5 flex flex-col gap-2">
                   {discount > 0 && (
-                    <span className="rounded-full bg-[#F47920] px-4 py-1.5 text-xs font-black text-white shadow-lg shadow-orange-500/30">
+                    <span className="rounded-full bg-[#F47920] px-4 py-1.5 text-xs font-black text-white">
                       -{discount}%
                     </span>
                   )}
                   {product.is_new && (
-                    <span className="rounded-full bg-emerald-500 px-4 py-1.5 text-xs font-black text-white shadow-lg">
+                    <span className="rounded-full bg-emerald-500 px-4 py-1.5 text-xs font-black text-white">
                       NOVO
                     </span>
                   )}
@@ -311,7 +311,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                       className={cn(
                         "relative w-20 h-20 shrink-0 rounded-2xl overflow-hidden border-2 transition-all",
                         i === selectedImage
-                          ? "border-[#C2410C] shadow-lg scale-105"
+                          ? "border-[#C2410C] scale-105"
                           : "border-slate-100 hover:border-slate-300"
                       )}
                       aria-label={`Imagem ${i + 1}`}
@@ -460,7 +460,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
               {/* Botões de ação — WhatsApp é o CTA primário */}
               <div className="flex flex-col gap-3">
                 <a
-                  href={waLink(`Olá! Tenho interesse no produto: ${product.name} (Cód. ${product.sku || product.id}) — R$ ${Number(product.price).toFixed(2).replace(".", ",")}/${product.unit}. Página: ${SITE.siteUrl}/produto/${product.slug}`)}
+                  href={waLink(`Olá! Gostaria de cotar o produto: ${product.name} (Cód. ${product.sku || product.id}) visto no site da Discibra. Qual o preço de atacado e condições de entrega?`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   data-track="btn_whatsapp"
@@ -469,25 +469,24 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                   data-source="product_page"
                   onClick={() => trackWhatsAppClick("product_page", `/produto/${product.slug}`)}
                   className={cn(
-                    "flex h-16 w-full items-center justify-center gap-3 rounded-2xl",
-                    "bg-[#25D366] text-lg font-bold text-white",
-                    "shadow-[0_16px_36px_-10px_rgba(37,211,102,0.7)]",
-                    "transition-all hover:bg-[#1EBE5B] hover:scale-[1.02] active:scale-95",
+                    "flex h-16 w-full items-center justify-center gap-3 rounded-[4px]",
+                    "bg-[#15803D] text-lg font-semibold text-white",
+                    "transition-colors hover:bg-[#166534]",
                     "btn-whatsapp-track"
                   )}
                 >
                   <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current text-white">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                   </svg>
-                  Pedir / Cotar pelo WhatsApp
+                  Falar no WhatsApp
                 </a>
                 <button
                   onClick={() => addToCart(product, qty)}
                   disabled={product.stock <= 0}
                   className={cn(
-                    "flex h-14 w-full items-center justify-center gap-3 rounded-2xl",
-                    "bg-[#C2410C] text-white text-base font-bold",
-                    "transition-all hover:bg-[#9a3409] active:scale-95 shadow-md shadow-[#C2410C]/25",
+                    "flex h-14 w-full items-center justify-center gap-3 rounded-[4px]",
+                    "bg-[#111318] text-white text-base font-bold",
+                    "transition-colors hover:bg-[#000000] active:scale-95",
                     "disabled:opacity-30 disabled:cursor-not-allowed"
                   )}
                 >
@@ -521,6 +520,110 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                   </div>
                 </section>
               )}
+
+              {/* Especificações Técnicas B2B */}
+              <section>
+                <h2 className="text-2xl font-black text-[#002D5B] mb-6 flex items-center gap-3">
+                  <Package className="w-5 h-5" />
+                  Especificações Técnicas
+                </h2>
+                <div className="rounded-[4px] border border-[#E5E5E3] bg-white overflow-hidden">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-slate-50">
+                      <tr>
+                        <th className="px-4 py-3 font-bold text-slate-900 border-b border-[#E5E5E3]">
+                          Especificação
+                        </th>
+                        <th className="px-4 py-3 font-bold text-slate-900 border-b border-[#E5E5E3]">
+                          Valor
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#E5E5E3]">
+                      <tr>
+                        <td className="px-4 py-3 font-medium text-slate-700 border-b border-[#E5E5E3]">
+                          SKU / Código
+                        </td>
+                        <td className="px-4 py-3 font-mono font-bold text-slate-900 border-b border-[#E5E5E3]">
+                          {product.sku || product.id}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-3 font-medium text-slate-700 border-b border-[#E5E5E3]">
+                          Unidade de Venda
+                        </td>
+                        <td className="px-4 py-3 font-medium text-slate-900 border-b border-[#E5E5E3]">
+                          {product.unit}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-3 font-medium text-slate-700 border-b border-[#E5E5E3]">
+                          Preço de Atacado
+                        </td>
+                        <td className="px-4 py-3 font-mono font-bold text-slate-900 border-b border-[#E5E5E3]">
+                          R$ {Number(product.price).toFixed(2).replace(".", ",")}/{product.unit}
+                        </td>
+                      </tr>
+                      {product.original_price && product.original_price > product.price && (
+                        <tr>
+                          <td className="px-4 py-3 font-medium text-slate-700 border-b border-[#E5E5E3]">
+                            Preço de Lista
+                          </td>
+                          <td className="px-4 py-3 font-medium text-slate-500 line-through border-b border-[#E5E5E3]">
+                            R$ {Number(product.original_price).toFixed(2).replace(".", ",")}
+                          </td>
+                        </tr>
+                      )}
+                      <tr>
+                        <td className="px-4 py-3 font-medium text-slate-700 border-b border-[#E5E5E3]">
+                          Disponibilidade
+                        </td>
+                        <td className="px-4 py-3 font-medium text-slate-900 border-b border-[#E5E5E3]">
+                          {product.stock > 0 ? "Em estoque — Pronta entrega" : "Consultar prazo"}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-3 font-medium text-slate-700 border-b border-[#E5E5E3]">
+                          Normativa
+                        </td>
+                        <td className="px-4 py-3 font-medium text-slate-900 border-b border-[#E5E5E3]">
+                          Produto certificado ABNT
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-3 font-medium text-slate-700">
+                          Garantia
+                        </td>
+                        <td className="px-4 py-3 font-medium text-slate-900">
+                          Direto da fábrica com laudo técnico
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Vantagens da Distribuidora */}
+                <div className="mt-6 grid gap-3 rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] p-4 sm:grid-cols-3">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                      Preço de Atacado
+                    </span>
+                    <span className="text-sm font-bold text-slate-900">Sem exigência de CNPJ</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                      Entrega na Obra
+                    </span>
+                    <span className="text-sm font-bold text-slate-900">Munck ou paletizado</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                      Faturamento
+                    </span>
+                    <span className="text-sm font-bold text-slate-900">Pessoa física e construtor</span>
+                  </div>
+                </div>
+              </section>
 
               {/* Avaliações */}
               <section id="avaliacoes">
@@ -710,7 +813,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
                     disabled={submittingReview}
                     className={cn(
                       "w-full h-14 rounded-2xl font-black text-base",
-                      "bg-[#F47920] text-white shadow-lg shadow-orange-500/20",
+                      "bg-[#F47920] text-white shadow-orange-500/20",
                       "hover:bg-[#e06b10] hover:scale-[1.02] active:scale-95",
                       "transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     )}
@@ -734,15 +837,16 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
             <p className="text-sm text-slate-500 mt-1">Fale com um especialista da Discibra agora — respondemos em minutos.</p>
           </div>
           <a
-            href={waLink(`Olá! Tenho uma dúvida sobre o produto: ${product.name}. Podem me ajudar?`)}
+            href={waLink(`Olá! Gostaria de cotar o produto: ${product.name} (Cód. ${product.sku || product.id}) visto no site da Discibra. Qual o preço de atacado e condições de entrega?`)}
             target="_blank"
             rel="noopener noreferrer"
             data-track="btn_whatsapp"
+            data-button-name="btn_whatsapp"
             data-source="post_reviews_cta"
-            className="btn-whatsapp-track shrink-0 inline-flex items-center justify-center gap-2 h-12 px-6 rounded-[var(--r)] bg-[#25D366] text-white font-black text-sm hover:bg-[#1fba58] transition-all active:scale-95 whitespace-nowrap"
+            className="btn-whatsapp-track shrink-0 inline-flex items-center justify-center gap-2 h-12 px-6 rounded-[4px] bg-[#15803D] text-white font-semibold text-sm transition-colors hover:bg-[#166534] whitespace-nowrap"
           >
             <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            Tirar dúvida no WhatsApp
+            Falar no WhatsApp
           </a>
         </div>
 
@@ -792,13 +896,13 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
             </div>
           </div>
           <a
-            href={waLink(`Olá! Gostaria de solicitar um orçamento para o produto ${product.name} (R$ ${Number(product.price).toFixed(2)}/${product.unit}).`)}
+            href={waLink(`Olá! Gostaria de cotar o produto: ${product.name} (Cód. ${product.sku || product.id}) visto no site da Discibra. Qual o preço de atacado e condições de entrega?`)}
             target="_blank"
             rel="noopener noreferrer"
             data-track="btn_whatsapp"
             data-button-name="btn_whatsapp"
             data-source="product_sticky_mobile"
-            className="btn-whatsapp-track flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-[#25D366] text-white text-xs font-black uppercase tracking-wider shadow-md hover:bg-[#20bd5a] active:scale-95 transition-all"
+            className="btn-whatsapp-track flex-1 flex items-center justify-center gap-2 h-11 rounded-[4px] bg-[#15803D] text-white text-xs font-semibold transition-colors hover:bg-[#166534] active:scale-95"
           >
             Pedir no WhatsApp
           </a>
