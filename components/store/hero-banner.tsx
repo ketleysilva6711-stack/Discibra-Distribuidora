@@ -7,23 +7,23 @@ import { HeroBannerDesktop } from "@/components/store/hero-banner-client"
 // Mobile mostra apenas estes, independente do CMS
 const CAMPAIGN_BANNERS = [
   {
-    key: "promo-verao",
+    id: "fb-promo-verao",
     image_url: "/banners/mobile/banner-02-solucoes-verao.webp",
-    link: "/promocoes",
+    link_url: "/promocoes",
     title: "Solucoes para o Verao",
     subtitle: "Precos especiais para voce",
   },
   {
-    key: "promo-telhas",
+    id: "fb-promo-telhas",
     image_url: "/banners/mobile/banner-03-telhas-coberturas.webp",
-    link: "/categoria/telhas-e-coberturas",
+    link_url: "/categoria/telhas-e-coberturas",
     title: "Telhas a partir de R$ 47,90",
     subtitle: "Compre hoje, receba amanha",
   },
   {
-    key: "promo-impermeabilizantes",
+    id: "fb-promo-impermeabilizantes",
     image_url: "/banners/mobile/banner-04-impermeabilizantes-viaplus.webp",
-    link: "/categoria/impermeabilizantes",
+    link_url: "/categoria/impermeabilizantes",
     title: "Impermeabilizantes a partir de R$ 53,90",
     subtitle: "Viapol Bianco Vedacit",
   },
@@ -31,11 +31,14 @@ const CAMPAIGN_BANNERS = [
 
 async function fetchCmsBanners() {
   const supabase = await createClient()
+  // Coluna de link se chama "link" (não "link_url") na tabela banners
+  // Aceita active = true OU active IS NULL para nao excluir banners sem o campo preenchido
   const { data } = await supabase
     .from("banners")
-    .select("id, image_url, link_url, title, subtitle, sort_order")
-    .eq("active", true)
+    .select("id, image_url, link, title, subtitle, sort_order")
+    .or("active.eq.true,active.is.null")
     .order("sort_order", { ascending: true })
+    .limit(10)
   return (data || []).map((b: any) => ({
     id: b.id,
     image_url: b.image_url,
@@ -48,6 +51,10 @@ async function fetchCmsBanners() {
 export async function HeroBanner() {
   const cmsBanners = await fetchCmsBanners()
 
+  // Fallback: se o CMS nao retornou banners, usa os 3 de campanha
+  const slides = cmsBanners.length > 0 ? cmsBanners : CAMPAIGN_BANNERS
+  if (slides.length === 0) return null
+
   // =========================================================================
   // MOBILE (<=768px): 3 banners de campanha (4:3), sem corte: w-full h-auto
   // Sempre renderiza — nao depende do CMS.
@@ -56,8 +63,8 @@ export async function HeroBanner() {
     <section className="block md:hidden relative w-full" aria-label="Ofertas da campanha">
       <div className="relative w-full overflow-hidden">
         <div className="flex snap-x snap-mandatory overflow-x-auto gap-3 pb-2 [scrollbar-width:none]">
-          {CAMPAIGN_BANNERS.map((banner, i) => (
-            <a key={banner.key} href={banner.link} className="relative flex-none w-full snap-center">
+          {slides.slice(0, 3).map((banner, i) => (
+            <a key={banner.id} href={banner.link_url || "/"} className="relative flex-none w-full snap-center">
               <Image
                 src={banner.image_url}
                 alt={banner.title || `Banner ${i + 1}`}
@@ -75,7 +82,7 @@ export async function HeroBanner() {
                 </span>
                 <p className="mt-1 text-sm sm:text-base font-bold text-white leading-tight">{banner.subtitle}</p>
               </div>
-              <Link href={banner.link} className="absolute inset-0 z-10">
+              <Link href={banner.link_url || "/"} className="absolute inset-0 z-10">
                 <span className="sr-only">Ver detalhes</span>
               </Link>
             </a>
@@ -88,8 +95,8 @@ export async function HeroBanner() {
   // =========================================================================
   // DESKTOP (>=769px): carrossel institucional com banners do CMS (Supabase)
   // =========================================================================
-  const desktopHero = cmsBanners.length > 0 ? (
-    <HeroBannerDesktop banners={cmsBanners} />
+  const desktopHero = slides.length > 0 ? (
+    <HeroBannerDesktop banners={slides} />
   ) : null
 
   return (

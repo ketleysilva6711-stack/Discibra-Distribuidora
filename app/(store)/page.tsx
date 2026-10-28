@@ -311,20 +311,29 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── PILARES DE CONFIANÇA — PREMIUM 2×2 ── */}
-      <section className="border-t-4 border-t-[#C2410C] border-b border-slate-200/70 bg-white">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-y divide-slate-100 lg:grid-cols-4 lg:divide-y-0">
-          {trustPillars.map((item) => (
-            <div key={item.title} className="flex flex-col items-center gap-3 px-6 py-8 text-center sm:flex-row sm:text-left sm:px-8 sm:py-10">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#C2410C] text-white shadow-sm">
-                <item.icon className="h-5 w-5" />
+      {/* ── PILARES DE CONFIANÇA — FAIXA HORIZONTAL COMPACTA ── */}
+      <section className="border-b border-[var(--line)] bg-[var(--surface-alt)]">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="flex overflow-x-auto [scrollbar-width:none] [-webkit-overflow-scrolling:touch] divide-x divide-[var(--line)]">
+            {trustPillars.map((item) => (
+              <div
+                key={item.title}
+                className="flex-none w-1/2 sm:flex-1 flex items-center gap-3 px-4 py-3 min-w-[160px]"
+              >
+                <span className="text-[var(--accent)] flex-none shrink-0" aria-hidden="true">
+                  <item.icon className="h-4 w-4" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-[var(--ink)] leading-tight truncate">
+                    {item.title}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-[var(--ink-muted)] leading-tight truncate">
+                    {item.desc}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="text-sm font-black leading-snug tracking-tight text-slate-900">{item.title}</h4>
-                <p className="mt-0.5 text-xs font-medium leading-relaxed text-slate-500">{item.desc}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
