@@ -1,14 +1,23 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createAdminClient, isAdminServerConfigured } from "@/lib/supabase/admin"
+import { createPublicClient } from "@/lib/supabase/public"
+
+function matchByIdOrCode(supabase: any, id: string) {
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+  if (isUuid) {
+    return supabase.eq("id", id)
+  }
+  return supabase.eq("code", id.toUpperCase())
+}
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  if (!isAdminServerConfigured()) return NextResponse.json({ error: "Não configurado" }, { status: 503 })
+  const isAdmin = isAdminServerConfigured()
+  const supabase = isAdmin ? createAdminClient() : createPublicClient()
   const { id } = await params
-  const supabase = createAdminClient()
-  const { data, error } = await supabase
-    .from("quotations")
-    .select("*, quotation_leads(*), quotation_items(*)")
-    .eq("id", id)
+  const { data, error } = await matchByIdOrCode(
+    supabase.from("quotations").select("*, quotation_leads(*), quotation_items(*)"),
+    id,
+  )
     .maybeSingle()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   if (!data) return NextResponse.json({ error: "Orçamento não encontrado." }, { status: 404 })
@@ -16,11 +25,11 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  if (!isAdminServerConfigured()) return NextResponse.json({ error: "Não configurado" }, { status: 503 })
+  const isAdmin = isAdminServerConfigured()
+  const supabase = isAdmin ? createAdminClient() : createPublicClient()
   const { id } = await params
   const body = await req.json()
   const allowed = [
-    "created_by",
     "status",
     "discount_pct",
     "shipping_value",
@@ -30,17 +39,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     "payment_terms",
     "lead_id",
     "converted_order_id",
+    "pix_key",
   ]
   const patch: Record<string, unknown> = { updated_at: new Date().toISOString() }
   for (const k of allowed) {
     if (k in body) patch[k] = body[k]
   }
-  const supabase = createAdminClient()
-  const { data, error } = await supabase
-    .from("quotations")
-    .update(patch)
-    .eq("id", id)
-    .select("*, quotation_leads(*), quotation_items(*)")
+  const { data, error } = await matchByIdOrCode(
+    supabase.from("quotations").update(patch).select("*, quotation_leads(*), quotation_items(*)"),
+    id,
+  )
     .single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 

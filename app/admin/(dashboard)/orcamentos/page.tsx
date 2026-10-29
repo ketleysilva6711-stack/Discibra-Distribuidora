@@ -19,6 +19,8 @@ import {
   Minus,
   X,
   ExternalLink,
+  ShieldCheck,
+  CreditCard,
 } from "lucide-react"
 import { toast } from "sonner"
 import { SITE } from "@/lib/site-config"
@@ -26,26 +28,28 @@ import { SITE } from "@/lib/site-config"
 function brl(n: number) {
   return "R$ " + (Number(n) || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
-
 export default function OrcamentosPage() {
   const [quotations, setQuotations] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
-  // Modal Express
+  // Modal Cotação Express
   const [openExpress, setOpenExpress] = useState(false)
   const [clientName, setClientName] = useState("")
   const [clientPhone, setClientPhone] = useState("")
   const [clientCompany, setClientCompany] = useState("")
   const [shippingValue, setShippingValue] = useState("0")
-  const [paymentTerms, setPaymentTerms] = useState("À vista via PIX (desconto aplicado) ou Faturado para PJ")
+  const [paymentTerms, setPaymentTerms] = useState("À vista na autorização ou Faturado para PJ")
   const [validDays, setValidDays] = useState("5")
   const [creating, setCreating] = useState(false)
   // Itens da cotação express
   const [items, setItems] = useState<any[]>([])
   const [productQuery, setProductQuery] = useState("")
-  const [searchingProducts, setSearchingProducts] = useState(false)
   const [productResults, setProductResults] = useState<any[]>([])
+  // Modal de Liberação de Pagamento Dinâmico (PIX por Transação)
+  const [releasingQuote, setReleasingQuote] = useState<any | null>(null)
+  const [customPix, setCustomPix] = useState("")
+  const [savingPayment, setSavingPayment] = useState(false)
   const fetchQuotations = async () => {
     setLoading(true)
     try {
@@ -72,7 +76,6 @@ export default function OrcamentosPage() {
       return
     }
     const timer = setTimeout(async () => {
-      setSearchingProducts(true)
       try {
         const res = await fetch(`/api/search-products?q=${encodeURIComponent(productQuery.trim())}`)
         if (res.ok) {
@@ -81,8 +84,6 @@ export default function OrcamentosPage() {
         }
       } catch (err) {
         console.error(err)
-      } finally {
-        setSearchingProducts(false)
       }
     }, 250)
     return () => clearTimeout(timer)
@@ -126,6 +127,20 @@ export default function OrcamentosPage() {
   const subtotalProducts = items.reduce((acc, i) => acc + Number(i.unit_price) * Number(i.qty), 0)
   const freightTotal = Number(shippingValue) || 0
   const grandTotal = subtotalProducts + freightTotal
+  // Estimativa de peso da cotação
+  let estimatedWeightKg = 0
+  items.forEach((i) => {
+    const name = (i.product_name || "").toLowerCase()
+    const qty = Number(i.qty) || 1
+    const match = name.match(/\b(\d+(?:[.,]\d+)?)\s*kg\b/)
+    if (match) {
+      estimatedWeightKg += parseFloat(match[1].replace(",", ".")) * qty
+    } else if (i.unit === "sc" || i.unit === "saco" || name.includes("cimento")) {
+      estimatedWeightKg += 50 * qty
+    } else if (name.includes("argamassa")) {
+      estimatedWeightKg += 20 * qty
+    }
+  })
   async function handleCreateExpress() {
     if (!clientName.trim()) {
       toast.error("Informe o nome do cliente ou obra.")
@@ -156,7 +171,7 @@ export default function OrcamentosPage() {
       }
       const json = await res.json()
       const created = json.quotation
-      toast.success(`Orçamento ${created.code} gerado com sucesso!`)
+      toast.success(`Proposta ${created.code} gerada com sucesso!`)
       const pdfUrl = `${window.location.origin}/api/orcamentos/${created.code}/pdf`
       window.open(pdfUrl, "_blank")
       if (clientPhone.trim()) {
@@ -165,7 +180,7 @@ export default function OrcamentosPage() {
         const msg = encodeURIComponent(
           `Olá ${clientName.trim()}! Segue sua Proposta Comercial da Discibra Distribuidora (${created.code}) no valor de ${brl(
             grandTotal
-          )}.\n\nVocê pode visualizar os detalhes e a proposta oficial timbrada neste link:\n${pdfUrl}\n\nFicamos à disposição para faturamento e agendamento da entrega!`,
+          )}.\n\nVocê pode visualizar os detalhes e o documento oficial neste link:\n${pdfUrl}\n\nApós sua avaliação, confirme a aprovação por aqui para realizarmos a reserva da frota e liberação dos dados de liquidação!`,
         )
         window.open(`https://wa.me/${phoneFormatted}?text=${msg}`, "_blank")
       }
@@ -180,6 +195,44 @@ export default function OrcamentosPage() {
       toast.error(err.message || "Erro ao gerar orçamento")
     } finally {
       setCreating(false)
+    }
+  }
+  // Libera chave PIX da transação específica
+  async function handleReleasePayment() {
+    if (!releasingQuote) return
+    if (!customPix.trim()) {
+      toast.error("Informe a chave PIX desta transação.")
+      return
+    }
+    setSavingPayment(true)
+    try {
+      const res = await fetch(`/api/orcamentos/${releasingQuote.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: "approved",
+          notes_client: `PIX: ${customPix.trim()}`,
+        }),
+      })
+      if (!res.ok) throw new Error("Erro ao salvar")
+      toast.success("Protocolo de pagamento liberado com sucesso!")
+      const pdfUrl = `${window.location.origin}/api/orcamentos/${releasingQuote.code}/pdf`
+      const leadPhone = releasingQuote.quotation_leads?.phone
+      if (leadPhone) {
+        const cleanPhone = leadPhone.replace(/\D/g, "")
+        const phoneFormatted = cleanPhone.startsWith("55") ? cleanPhone : `55${cleanPhone}`
+        const msg = encodeURIComponent(
+          `Olá ${releasingQuote.quotation_leads?.name || ""}! Os dados de liquidação e a chave PIX da sua Proposta ${releasingQuote.code} foram liberados pelo Financeiro da Discibra com reserva da frota.\n\nChave PIX desta transação: ${customPix.trim()}\n\nAcesse o comprovante oficial e detalhes aqui:\n${pdfUrl}`,
+        )
+        window.open(`https://wa.me/${phoneFormatted}?text=${msg}`, "_blank")
+      }
+      setReleasingQuote(null)
+      setCustomPix("")
+      fetchQuotations()
+    } catch (e: any) {
+      toast.error(e.message || "Erro ao liberar pagamento")
+    } finally {
+      setSavingPayment(false)
     }
   }
   async function handleDelete(id: string) {
@@ -219,10 +272,9 @@ export default function OrcamentosPage() {
             className="rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] px-3 py-2 text-sm text-[#111318] outline-none focus:border-[#111318]"
           >
             <option value="all">Todos os status</option>
+            <option value="sent">Proposta Enviada</option>
+            <option value="approved">Pagamento Liberado / Aprovado</option>
             <option value="draft">Rascunho</option>
-            <option value="sent">Enviado</option>
-            <option value="approved">Aprovado</option>
-            <option value="lost">Cancelado</option>
           </select>
         </div>
         <button
@@ -240,7 +292,7 @@ export default function OrcamentosPage() {
             <tr className="border-b border-[#E5E5E3] bg-[#FAFAF9] text-left text-[11px] font-bold uppercase tracking-wider text-[#6B7280]">
               <th className="px-4 py-3">Código</th>
               <th className="px-4 py-3">Cliente / Obra</th>
-              <th className="px-4 py-3 text-center">Itens</th>
+              <th className="px-4 py-3 text-center">Status</th>
               <th className="px-4 py-3 text-right">Valor Total</th>
               <th className="px-4 py-3 text-center">Data</th>
               <th className="px-4 py-3 text-right">Ações</th>
@@ -250,7 +302,7 @@ export default function OrcamentosPage() {
             {loading && (
               <tr>
                 <td colSpan={6} className="px-4 py-12 text-center text-[#6B7280]">
-                  Carregando orçamentos...
+                  Carregando propostas comerciais...
                 </td>
               </tr>
             )}
@@ -265,7 +317,7 @@ export default function OrcamentosPage() {
               quotations.map((q) => {
                 const total = getQuoteTotal(q)
                 const lead = q.quotation_leads
-                const itemCount = (q.quotation_items || []).length
+                const isApproved = q.status === "approved"
                 return (
                   <tr key={q.id} className="hover:bg-[#FAFAF9] transition-colors">
                     <td className="px-4 py-3.5 font-mono font-bold text-[#111318]">
@@ -277,8 +329,16 @@ export default function OrcamentosPage() {
                         {lead?.phone || lead?.company || "Sem telefone"}
                       </div>
                     </td>
-                    <td className="px-4 py-3.5 text-center text-xs text-[#6B7280]">
-                      {itemCount} {itemCount === 1 ? "item" : "itens"}
+                    <td className="px-4 py-3.5 text-center">
+                      {isApproved ? (
+                        <span className="inline-flex items-center gap-1 rounded-[4px] bg-[#F0FDF4] border border-[#BBF7D0] px-2 py-0.5 text-[10px] font-bold text-[#15803D]">
+                          <ShieldCheck className="h-3 w-3" /> Pagamento Liberado
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-[4px] bg-slate-100 border border-slate-200 px-2 py-0.5 text-[10px] font-bold text-slate-700">
+                          Proposta Enviada
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3.5 text-right font-mono font-bold text-[#111318]">
                       {brl(total)}
@@ -288,29 +348,28 @@ export default function OrcamentosPage() {
                     </td>
                     <td className="px-4 py-3.5 text-right">
                       <div className="inline-flex items-center gap-1.5">
+                        <button
+                          onClick={() => {
+                            setReleasingQuote(q)
+                            const currentPix = q.notes_client?.replace("PIX:", "").trim() || ""
+                            setCustomPix(currentPix)
+                          }}
+                          title="Liberar Dados de Pagamento / PIX da Transação"
+                          className="inline-flex items-center gap-1 rounded-[4px] bg-[#111318] text-white px-2.5 py-1.5 text-xs font-bold hover:bg-black"
+                        >
+                          <CreditCard className="h-3.5 w-3.5" />
+                          {isApproved ? "Alterar PIX" : "Liberar PIX"}
+                        </button>
                         <a
                           href={`/api/orcamentos/${q.code}/pdf`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          title="Visualizar Proposta / PDF Timbrado"
+                          title="Visualizar Proposta Oficial"
                           className="inline-flex items-center gap-1 rounded-[4px] border border-[#E5E5E3] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#111318] hover:bg-[#FAFAF9]"
                         >
                           <Printer className="h-3.5 w-3.5 text-slate-600" />
                           PDF
                         </a>
-                        {lead?.phone && (
-                          <a
-                            href={`https://wa.me/${lead.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
-                              `Olá ${lead.name}! Segue sua Proposta Comercial da Discibra (${q.code}): ${window.location.origin}/api/orcamentos/${q.code}/pdf`,
-                            )}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title="Reenviar no WhatsApp"
-                            className="inline-flex items-center rounded-[4px] bg-[#15803D] p-1.5 text-white hover:bg-[#166534]"
-                          >
-                            <MessageCircle className="h-3.5 w-3.5" />
-                          </a>
-                        )}
                         <button
                           onClick={() => handleDelete(q.id)}
                           title="Excluir Cotação"
@@ -326,7 +385,7 @@ export default function OrcamentosPage() {
           </tbody>
         </table>
       </div>
-      {/* MODAL COTAÇÃO EXPRESS */}
+      {/* MODAL COTAÇÃO EXPRESS COM CÁLCULO DE TONELADAS */}
       {openExpress && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="relative flex flex-col w-full max-w-3xl max-h-[90vh] rounded-[4px] border border-[#E5E5E3] bg-white shadow-2xl overflow-hidden">
@@ -337,8 +396,8 @@ export default function OrcamentosPage() {
                   <Zap className="h-4 w-4" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-[#111318]">Cotação Express — Discibra B2B</h3>
-                  <p className="text-xs text-[#6B7280]">Elaboração rápida e proposta timbrada pronta para envio</p>
+                  <h3 className="text-base font-bold text-[#111318]">Cotação Express — Discibra Distribuidora</h3>
+                  <p className="text-xs text-[#6B7280]">Elaboração rápida com catálogo real e frete proporcional</p>
                 </div>
               </div>
               <button
@@ -348,9 +407,9 @@ export default function OrcamentosPage() {
                 <X className="h-5 w-5" />
               </button>
             </div>
-            {/* Corpo do Modal (com scroll) */}
+            {/* Corpo com scroll */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              {/* Dados do Cliente */}
+              {/* Cliente */}
               <div>
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-3">
                   1. Dados do Cliente / Obra
@@ -363,7 +422,7 @@ export default function OrcamentosPage() {
                     <input
                       value={clientName}
                       onChange={(e) => setClientName(e.target.value)}
-                      placeholder="Ex: Construtora Alfa / Eng. Ricardo"
+                      placeholder="Ex: Construtora Alfa / Eng. Marcos"
                       className="w-full rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] px-3 py-2 text-sm text-[#111318] outline-none focus:border-[#111318]"
                     />
                   </div>
@@ -380,20 +439,19 @@ export default function OrcamentosPage() {
                   </div>
                 </div>
               </div>
-              {/* Busca e Adição de Produtos do Catálogo Real */}
+              {/* Produtos */}
               <div>
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-3">
-                  2. Adicionar Produtos do Catálogo Real
+                  2. Itens do Catálogo Oficial
                 </h4>
                 <div className="relative">
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                   <input
                     value={productQuery}
                     onChange={(e) => setProductQuery(e.target.value)}
-                    placeholder="Digite para buscar produtos: cimento, argamassa, ferro..."
+                    placeholder="Digite para buscar: cimento votoran, argamassa ac3, tijolo..."
                     className="w-full rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] pl-9 pr-3 py-2 text-sm text-[#111318] outline-none focus:border-[#111318]"
                   />
-                  {/* Resultados da busca suspensa */}
                   {productResults.length > 0 && (
                     <div className="absolute left-0 right-0 top-full mt-1 z-20 max-h-56 overflow-y-auto rounded-[4px] border border-[#E5E5E3] bg-white shadow-lg divide-y divide-[#E5E5E3]">
                       {productResults.map((p) => (
@@ -401,7 +459,7 @@ export default function OrcamentosPage() {
                           key={p.id}
                           type="button"
                           onClick={() => addItem(p)}
-                          className="w-full flex items-center justify-between p-3 text-left hover:bg-[#FAFAF9] transition-colors"
+                          className="w-full flex items-center justify-between p-3 text-left hover:bg-[#FAFAF9]"
                         >
                           <div>
                             <p className="text-sm font-bold text-[#111318]">{p.name}</p>
@@ -413,14 +471,13 @@ export default function OrcamentosPage() {
                             <span className="text-sm font-mono font-bold text-[#15803D]">
                               {brl(p.price)}
                             </span>
-                            <span className="block text-[10px] text-[#6B7280]">+ Adicionar</span>
+                            <span className="block text-[10px] text-[#6B7280]">+ Incluir</span>
                           </div>
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
-                {/* Grade de Itens Adicionados */}
                 <div className="mt-4 rounded-[4px] border border-[#E5E5E3] overflow-hidden">
                   <table className="w-full text-sm">
                     <thead>
@@ -436,7 +493,7 @@ export default function OrcamentosPage() {
                       {items.length === 0 ? (
                         <tr>
                           <td colSpan={5} className="p-6 text-center text-xs text-[#6B7280]">
-                            Nenhum produto adicionado. Busque acima para incluir materiais na cotação.
+                            Nenhum item adicionado ainda.
                           </td>
                         </tr>
                       ) : (
@@ -444,7 +501,7 @@ export default function OrcamentosPage() {
                           <tr key={idx} className="hover:bg-[#FAFAF9]">
                             <td className="px-3 py-2.5">
                               <p className="font-bold text-[#111318] text-xs leading-tight">{it.product_name}</p>
-                              <p className="text-[10px] text-[#6B7280]">Unidade: {it.unit}</p>
+                              <p className="text-[10px] text-[#6B7280]">Un: {it.unit}</p>
                             </td>
                             <td className="px-3 py-2.5 text-center">
                               <div className="inline-flex items-center border border-[#E5E5E3] rounded-[4px] bg-white">
@@ -492,16 +549,27 @@ export default function OrcamentosPage() {
                     </tbody>
                   </table>
                 </div>
+                {/* Badge de Toneladas / Peso */}
+                {estimatedWeightKg > 0 && (
+                  <div className="mt-2.5 flex items-center justify-between text-xs text-[#6B7280] bg-[#FAFAF9] border border-[#E5E5E3] rounded-[4px] px-3 py-2">
+                    <span>Peso Total Estimado:</span>
+                    <span className="font-bold font-mono text-[#111318]">
+                      {estimatedWeightKg >= 1000
+                        ? `${(estimatedWeightKg / 1000).toFixed(1)} toneladas (${estimatedWeightKg.toLocaleString("pt-BR")} kg)`
+                        : `${estimatedWeightKg.toLocaleString("pt-BR")} kg`}
+                    </span>
+                  </div>
+                )}
               </div>
-              {/* Condições e Frete */}
+              {/* Logística */}
               <div>
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-3">
-                  3. Logística e Pagamento
+                  3. Logística e Validade
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-[#111318] mb-1">
-                      Valor do Frete / Descarga (R$)
+                      Valor do Frete com Descarga (R$)
                     </label>
                     <input
                       type="number"
@@ -524,17 +592,16 @@ export default function OrcamentosPage() {
                       <option value="3">3 dias úteis</option>
                       <option value="5">5 dias úteis (Padrão)</option>
                       <option value="10">10 dias úteis</option>
-                      <option value="15">15 dias úteis</option>
                     </select>
                   </div>
                 </div>
               </div>
             </div>
-            {/* Rodapé do Modal com Totais e Botão de Ação */}
+            {/* Rodapé do Modal */}
             <div className="border-t border-[#E5E5E3] bg-[#FAFAF9] p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-xs text-[#6B7280]">Total da Proposta:</span>
+                  <span className="text-xs text-[#6B7280]">Total da Cotação:</span>
                   <span className="text-xl font-mono font-black text-[#15803D]">
                     {brl(grandTotal)}
                   </span>
@@ -558,9 +625,65 @@ export default function OrcamentosPage() {
                   className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-[4px] bg-[#15803D] px-6 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#166534] disabled:opacity-60"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  {creating ? "Emitindo..." : "Gerar Proposta e Enviar no WhatsApp"}
+                  {creating ? "Emitindo..." : "Gerar Proposta Oficial"}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* MODAL PARA LIBERAR PAGAMENTO / DEFINIR CHAVE PIX DA TRANSAÇÃO */}
+      {releasingQuote && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-md rounded-[4px] border border-[#E5E5E3] bg-white p-6 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[#E5E5E3] pb-3 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-[4px] bg-[#111318] text-white">
+                  <CreditCard className="h-4 w-4" />
+                </div>
+                <h3 className="font-bold text-[#111318] text-sm">
+                  Liberar Pagamento — {releasingQuote.code}
+                </h3>
+              </div>
+              <button
+                onClick={() => setReleasingQuote(null)}
+                className="text-slate-400 hover:text-[#111318]"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="text-xs text-[#6B7280] mb-4">
+              Insira a chave PIX exclusiva informada pelo financeiro para esta operação. A proposta será atualizada imediatamente com o protocolo seguro de faturamento.
+            </p>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-[#111318] mb-1">
+                  Chave PIX Desta Transação *
+                </label>
+                <input
+                  value={customPix}
+                  onChange={(e) => setCustomPix(e.target.value)}
+                  placeholder="Ex: financeiro@discibra.com ou chave aleatória"
+                  className="w-full rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] px-3 py-2 text-sm font-mono text-[#111318] outline-none focus:border-[#111318]"
+                />
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end gap-2 border-t border-[#E5E5E3] pt-4">
+              <button
+                type="button"
+                onClick={() => setReleasingQuote(null)}
+                className="rounded-[4px] border border-[#E5E5E3] px-4 py-2 text-xs font-bold text-[#111318] hover:bg-[#FAFAF9]"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleReleasePayment}
+                disabled={savingPayment}
+                className="inline-flex items-center gap-2 rounded-[4px] bg-[#15803D] px-5 py-2 text-xs font-bold text-white hover:bg-[#166534] disabled:opacity-60"
+              >
+                {savingPayment ? "Liberando..." : "Confirmar e Enviar no WhatsApp"}
+              </button>
             </div>
           </div>
         </div>
