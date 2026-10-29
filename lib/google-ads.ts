@@ -14,7 +14,7 @@
 // IDs de conversão do Google Ads (configuráveis via .env)
 export const GOOGLE_ADS = {
   // Conversão "WhatsApp Click" — cada clique no WhatsApp
-  whatsappConversionId: process.env.NEXT_PUBLIC_GOOGLE_ADS_WHATSAPP_ID || "AW-16526087847/O9LwCKLG96odEKetoMg9",
+  whatsappConversionId: process.env.NEXT_PUBLIC_GOOGLE_ADS_WHATSAPP_ID || "AW-16526087847/KtiYCLC_9_coEketoMg9",
 
   // Conversão "Lead Form" — preenchimento de formulário de contato
   leadFormConversionId: process.env.NEXT_PUBLIC_GOOGLE_ADS_LEAD_FORM_ID || "",
