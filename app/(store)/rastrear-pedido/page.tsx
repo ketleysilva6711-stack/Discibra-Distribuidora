@@ -168,7 +168,7 @@ export default function RastrearPedidoPage() {
       <div className="max-w-2xl mx-auto px-4 py-8 md:py-10">
         <form
           onSubmit={handleSearch}
-          className="rounded-2xl border border-border bg-card p-5 md:p-6 shadow-sm space-y-4"
+          className="rounded-[4px] border border-[#E5E5E3] bg-white p-5 md:p-6 space-y-4"
         >
           <div>
             <label htmlFor="code" className="block text-sm font-medium text-foreground mb-1.5">
@@ -179,7 +179,7 @@ export default function RastrearPedidoPage() {
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder="CCC-00000"
-              className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/25"
+              className="w-full rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/25"
             />
           </div>
           <p className="text-xs text-muted-foreground text-center">ou</p>
@@ -193,12 +193,12 @@ export default function RastrearPedidoPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
-              className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/25"
+              className="w-full rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/25"
             />
           </div>
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 rounded-xl bg-secondary py-3 text-sm font-semibold text-secondary-foreground hover:bg-secondary/90 transition"
+            className="w-full flex items-center justify-center gap-2 rounded-[4px] bg-[#111318] py-3 text-sm font-semibold text-white hover:bg-black transition-colors"
           >
             <Search className="w-4 h-4" />
             Consultar status
@@ -206,7 +206,7 @@ export default function RastrearPedidoPage() {
         </form>
 
         {searched && result === null && (
-          <div className="mt-8 rounded-2xl border border-dashed border-border bg-card p-6 text-center">
+          <div className="mt-8 rounded-[4px] border border-dashed border-[#E5E5E3] bg-white p-6 text-center">
             <p className="text-foreground font-medium">Não encontramos pedido com esses dados.</p>
             <p className="text-sm text-muted-foreground mt-2">
               Pedidos feitos só pelo WhatsApp podem não aparecer aqui até serem integrados ao sistema. Fale com
@@ -224,7 +224,7 @@ export default function RastrearPedidoPage() {
         )}
 
         {searched && result && !Array.isArray(result) && (
-          <div className="mt-8 rounded-2xl border border-border bg-card p-5 md:p-6 shadow-sm">
+          <div className="mt-8 rounded-[4px] border border-[#E5E5E3] bg-white p-5 md:p-6">
             <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-border pb-4">
               <div>
                 <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Pedido</p>
@@ -247,7 +247,7 @@ export default function RastrearPedidoPage() {
           <div className="mt-8 space-y-6">
             <p className="text-sm font-medium text-foreground">{result.length} pedido(s) encontrado(s)</p>
             {result.map((o) => (
-              <div key={o.id} className="rounded-2xl border border-border bg-card p-5 md:p-6 shadow-sm">
+              <div key={o.id} className="rounded-[4px] border border-[#E5E5E3] bg-white p-5 md:p-6">
                 <p className="font-heading font-bold text-lg">{o.code}</p>
                 <p className="text-xs text-muted-foreground mt-1">
                   {new Date(o.createdAt).toLocaleString("pt-BR")} — R$ {Number(o.total).toFixed(2)}

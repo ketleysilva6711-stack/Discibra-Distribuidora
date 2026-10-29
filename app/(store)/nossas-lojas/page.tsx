@@ -30,13 +30,13 @@ export default function LojasPage() {
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         {/* Endereço + horários */}
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+        <div className="rounded-[4px] border border-[#E5E5E3] bg-white p-6 sm:p-8">
           <h2 className="text-lg font-black text-slate-900">Onde estamos</h2>
           <p className="mt-3 text-lg font-bold text-slate-800">{SITE.address.street}</p>
           <p className="text-slate-600">{SITE.address.district} — {SITE.address.city}</p>
           <p className="text-slate-500 text-sm">{SITE.address.zip}</p>
 
-          <div className="mt-6 space-y-3 rounded-2xl bg-slate-50 border border-slate-100 p-5 text-sm">
+          <div className="mt-6 space-y-3 rounded-[4px] bg-[#FAFAF9] border border-[#E5E5E3] p-5 text-sm">
             <div className="flex justify-between gap-4">
               <span className="font-semibold text-slate-600">Segunda a Sexta</span>
               <span className="font-black text-slate-900">07:00 às 18:00</span>
@@ -56,7 +56,7 @@ export default function LojasPage() {
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-[52px] flex-1 items-center justify-center rounded-2xl border-2 border-slate-900 px-6 text-sm font-black text-slate-900 transition-all hover:bg-slate-900 hover:text-white"
+              className="inline-flex min-h-[52px] flex-1 items-center justify-center rounded-[4px] border border-[#111318] px-6 text-sm font-black text-slate-900 transition-all hover:bg-slate-900 hover:text-white"
             >
               Como chegar →
             </a>
@@ -67,7 +67,7 @@ export default function LojasPage() {
               data-track="btn_whatsapp"
               data-button-name="btn_whatsapp"
               data-source="contact_page"
-              className="btn-whatsapp-track inline-flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-6 text-sm font-black text-white shadow-lg transition-all hover:bg-[#1EBE5B] active:scale-95"
+              className="btn-whatsapp-track inline-flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-[4px] bg-[#15803D] px-6 text-sm font-black text-white transition-colors hover:bg-[#166534]"
             >
               Agendar no WhatsApp
             </a>
@@ -77,17 +77,17 @@ export default function LojasPage() {
 
         {/* Modalidades */}
         <div className="flex flex-col gap-4">
-          <div className="rounded-[2rem] bg-[#0A1628] p-6 sm:p-8 text-white">
+          <div className="rounded-[4px] bg-[#111318] p-6 sm:p-8 text-white">
             <h2 className="text-lg font-black">Modalidades de atendimento</h2>
             <div className="mt-4 space-y-3">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <div className="rounded-[4px] border border-white/10 bg-white/5 p-5">
                 <p className="font-black text-[#25D366]">🚚 Entrega programada</p>
                 <p className="mt-1 text-sm text-white/65">
                   Caminhão munck com descarga paletizada na obra. Rota para Ribeirão Preto, Franca,
                   Araraquara, São Carlos, Campinas, Uberlândia e Triângulo Mineiro.
                 </p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <div className="rounded-[4px] border border-white/10 bg-white/5 p-5">
                 <p className="font-black text-[#25D366]">🏗️ Retirada rápida</p>
                 <p className="mt-1 text-sm text-white/65">
                   Pátio preparado para carretas e caminhões. Carregamento em até 40 min com romaneio
@@ -103,7 +103,7 @@ export default function LojasPage() {
               { t: "Descarga inclusa", d: "Munck + palete" },
               { t: "NF-e + laudo", d: "ABNT na hora" },
             ].map((s) => (
-              <div key={s.t} className="rounded-2xl border border-slate-200 bg-white p-4">
+              <div key={s.t} className="rounded-[4px] border border-slate-200 bg-white p-4">
                 <p className="text-sm font-black text-slate-900">✓ {s.t}</p>
                 <p className="mt-1 text-xs text-slate-500">{s.d}</p>
               </div>
@@ -112,7 +112,7 @@ export default function LojasPage() {
         </div>
       </div>
 
-      <div className="mt-8 rounded-[2rem] border border-dashed border-slate-300 bg-slate-50 p-6 text-center sm:p-8">
+      <div className="mt-8 rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] p-6 text-center sm:p-8">
         <p className="font-bold text-slate-800">É construtora ou revenda? Fale com o consultor B2B antes de vir.</p>
         <p className="mt-1 text-sm text-slate-500">Confirmamos estoque, preço por rota e janela de carregamento.</p>
         <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
@@ -123,13 +123,13 @@ export default function LojasPage() {
             data-track="btn_whatsapp"
             data-button-name="btn_whatsapp"
             data-source="contact_page"
-            className="btn-whatsapp-track inline-flex min-h-[56px] items-center justify-center rounded-2xl bg-[#25D366] px-8 font-black text-white transition-all hover:bg-[#1EBE5B] active:scale-95"
+            className="btn-whatsapp-track inline-flex min-h-[56px] items-center justify-center rounded-[4px] bg-[#15803D] px-8 font-black text-white transition-colors hover:bg-[#166534]"
           >
             Agendar visita ou carregamento
           </a>
           <Link
             href="/cimento"
-            className="inline-flex min-h-[56px] items-center justify-center rounded-2xl border-2 border-slate-300 px-8 font-black text-slate-700 hover:bg-white"
+            className="inline-flex min-h-[56px] items-center justify-center rounded-[4px] border border-[#111318] px-8 font-black text-slate-700 hover:bg-white"
           >
             Ver tabela de atacado
           </Link>

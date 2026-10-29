@@ -10,7 +10,7 @@ import { trackWhatsAppClick } from "@/lib/track-whatsapp"
 const PaymentCard = ({ children, label }: { children: React.ReactNode; label: string }) => (
   <div
     title={label}
-    className="h-10 px-3 bg-white rounded-xl flex items-center justify-center shadow-sm border border-white/20 hover:scale-105 transition-all duration-200"
+    className="h-10 px-3 bg-white rounded-[4px] flex items-center justify-center border border-white/10 transition-colors duration-200"
   >
     {children}
   </div>
@@ -36,7 +36,7 @@ export default function StoreFooter() {
   ]
 
   return (
-    <footer className="bg-gradient-to-b from-[#020B1D] via-[#01081A] to-[#010510] text-white font-sans mt-20 relative overflow-hidden border-t border-[#0055FF]/25 shadow-2xl pb-20 lg:pb-0">
+    <footer className="bg-gradient-to-b from-[#020B1D] via-[#01081A] to-[#010510] text-white font-sans mt-20 relative overflow-hidden border-t border-[#0055FF]/25 pb-20 lg:pb-0">
 
       {/* Top gradient accent */}
       <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#F47920] via-[#FFB347] to-[#F47920]" />
@@ -48,13 +48,13 @@ export default function StoreFooter() {
             <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#F47920] mb-1">Newsletter</p>
             <h4 className="text-base font-bold text-white">Receba ofertas e cotações exclusivas</h4>
           </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto bg-white/5 border border-white/10 rounded-xl p-1.5">
+          <div className="flex items-center gap-2 w-full sm:w-auto bg-white/5 border border-white/10 rounded-[4px] p-1.5">
             <input
               type="email"
               placeholder="Seu melhor e-mail..."
               className="bg-transparent px-4 py-2 outline-none text-sm font-medium flex-1 sm:w-64 text-white placeholder:text-white/30"
             />
-            <button className="h-9 px-6 rounded-lg bg-[#F47920] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#e06810] transition-colors whitespace-nowrap">
+            <button className="h-9 px-6 rounded-[4px] bg-[#F47920] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#e06810] transition-colors whitespace-nowrap">
               Cadastrar
             </button>
           </div>
@@ -83,9 +83,9 @@ export default function StoreFooter() {
               data-track="btn_whatsapp"
               data-button-name="btn_whatsapp"
               data-name="btn_whatsapp"
-              className="inline-flex items-center gap-3 bg-[#25D366]/10 border border-[#25D366]/20 hover:bg-[#25D366]/20 transition-all rounded-2xl px-4 py-3 group btn-whatsapp-track"
+              className="inline-flex items-center gap-3 bg-[#25D366]/10 border border-[#25D366]/20 hover:bg-[#25D366]/20 transition-all rounded-[4px] px-4 py-3 group btn-whatsapp-track"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#25D366] text-white shadow-md">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[4px] bg-[#25D366] text-white">
                 <Phone className="h-5 w-5" />
               </span>
               <div>
@@ -98,13 +98,13 @@ export default function StoreFooter() {
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-3">Redes Sociais</p>
               <div className="flex items-center gap-2">
-                <a href="#" className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/50 hover:bg-[#E1306C] hover:border-[#E1306C] hover:text-white transition-all">
+                <a href="#" className="flex h-9 w-9 items-center justify-center rounded-[4px] bg-white/5 border border-white/10 text-white/50 hover:bg-[#E1306C] hover:border-[#E1306C] hover:text-white transition-all">
                   <Instagram className="h-4 w-4" />
                 </a>
-                <a href="#" className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/50 hover:bg-[#FF0000] hover:border-[#FF0000] hover:text-white transition-all">
+                <a href="#" className="flex h-9 w-9 items-center justify-center rounded-[4px] bg-white/5 border border-white/10 text-white/50 hover:bg-[#FF0000] hover:border-[#FF0000] hover:text-white transition-all">
                   <Youtube className="h-4 w-4" />
                 </a>
-                <a href="#" className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/50 hover:bg-[#1877F2] hover:border-[#1877F2] hover:text-white transition-all">
+                <a href="#" className="flex h-9 w-9 items-center justify-center rounded-[4px] bg-white/5 border border-white/10 text-white/50 hover:bg-[#1877F2] hover:border-[#1877F2] hover:text-white transition-all">
                   <Facebook className="h-4 w-4" />
                 </a>
               </div>
@@ -154,10 +154,10 @@ export default function StoreFooter() {
 
               {/* Pix + InfinitePay Oficiais */}
               <div className="flex items-center gap-2.5 flex-wrap">
-                <div className="h-10 px-3.5 bg-white rounded-xl flex items-center justify-center shadow-sm border border-white/20 hover:scale-105 transition-all" title="Pix à Vista">
+                <div className="h-10 px-3.5 bg-white rounded-[4px] flex items-center justify-center border border-white/10 transition-colors" title="Pix à Vista">
                   <Image src="/images/payments/pix.png" alt="Pix" width={80} height={26} className="h-6 w-auto object-contain" />
                 </div>
-                <div className="h-10 px-3.5 bg-white rounded-xl flex items-center justify-center shadow-sm border border-white/20 hover:scale-105 transition-all" title="InfinitePay">
+                <div className="h-10 px-3.5 bg-white rounded-[4px] flex items-center justify-center border border-white/10 transition-colors" title="InfinitePay">
                   <Image src="/images/payments/infinitepay.png" alt="InfinitePay" width={95} height={26} className="h-5 w-auto object-contain" />
                 </div>
               </div>
@@ -200,15 +200,15 @@ export default function StoreFooter() {
               <h4 className="text-[11px] font-black uppercase tracking-[0.25em] text-white/50">Segurança e Confiança</h4>
               <div className="flex flex-wrap gap-3">
                 {/* Reclame Aqui Oficial */}
-                <div className="flex items-center gap-2.5 bg-white rounded-xl px-3.5 py-2 shadow-sm border border-white/20 hover:scale-105 transition-all">
+                <div className="flex items-center gap-2.5 bg-white rounded-[4px] px-3.5 py-2 border border-white/10 transition-colors">
                   <Image src="/images/trust/reclame-aqui.png" alt="Reclame Aqui" width={90} height={22} className="h-4 w-auto object-contain" />
                   <div className="border-l border-slate-200 pl-2">
                     <p className="text-[8px] font-black uppercase text-[#00B057] leading-none">RA 1000</p>
-                    <p className="text-[11px] font-black text-slate-800 leading-tight">�"timo · 9.8</p>
+                    <p className="text-[11px] font-black text-slate-800 leading-tight">Ótimo · 9.8</p>
                   </div>
                 </div>
                 {/* Certisign Site Seguro Oficial */}
-                <div className="flex items-center gap-2.5 bg-white rounded-xl px-3.5 py-2 shadow-sm border border-white/20 hover:scale-105 transition-all">
+                <div className="flex items-center gap-2.5 bg-white rounded-[4px] px-3.5 py-2 border border-white/10 transition-colors">
                   <Image src="/images/trust/certisign.png" alt="Certisign Site Seguro" width={28} height={28} className="h-6 w-auto object-contain" />
                   <div>
                     <p className="text-[8px] font-black uppercase text-purple-700 leading-none">Certisign</p>

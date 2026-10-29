@@ -72,11 +72,11 @@ export default function FaqPage() {
           <details
             key={f.q}
             open={i === 0}
-            className="group rounded-2xl border border-slate-200 bg-white p-5 open:border-[#25D366]/60 open:shadow-md transition-all"
+            className="group rounded-[4px] border border-[#E5E5E3] bg-white p-5 open:border-[#15803D] transition-colors"
           >
             <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-bold text-slate-900">
               {f.q}
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 font-black text-slate-500 transition-all group-open:bg-[#25D366] group-open:text-white">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[4px] bg-[#FAFAF9] border border-[#E5E5E3] font-black text-slate-600 transition-colors group-open:bg-[#15803D] group-open:text-white group-open:border-[#15803D]">
                 +
               </span>
             </summary>
@@ -85,7 +85,7 @@ export default function FaqPage() {
         ))}
       </div>
 
-      <div className="mt-10 rounded-[2rem] bg-[#0A1628] p-8 text-center text-white">
+      <div className="mt-10 rounded-[4px] bg-[#111318] p-8 text-center text-white">
         <h2 className="text-xl font-black sm:text-2xl">Ainda tem dúvidas sobre sua carga?</h2>
         <p className="mt-2 text-sm text-white/65">Envie o CEP da obra e a quantidade — cotação com frete em minutos.</p>
         <a
@@ -95,7 +95,7 @@ export default function FaqPage() {
           data-track="btn_whatsapp"
           data-button-name="btn_whatsapp"
           data-source="contact_page"
-          className="btn-whatsapp-track mt-5 inline-flex min-h-[56px] items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-8 font-black text-white transition-all hover:bg-[#1EBE5B] active:scale-95"
+          className="btn-whatsapp-track mt-5 inline-flex min-h-[56px] items-center justify-center gap-2 rounded-[4px] bg-[#15803D] px-8 font-black text-white transition-colors hover:bg-[#166534]"
         >
           Chamar no WhatsApp
         </a>

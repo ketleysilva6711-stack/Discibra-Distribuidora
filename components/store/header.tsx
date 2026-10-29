@@ -97,7 +97,7 @@ export default function StoreHeader() {
 
             {/* Desktop Search */}
             <div className="hidden lg:flex flex-1 max-w-2xl mx-10">
-              <Suspense fallback={<div className="h-14 w-full animate-pulse rounded-2xl bg-slate-50" />}>
+              <Suspense fallback={<div className="h-14 w-full animate-pulse rounded-[4px] bg-[#FAFAF9] border border-[#E5E5E3]" />}>
                 <StoreSearch />
               </Suspense>
             </div>
@@ -147,7 +147,7 @@ export default function StoreHeader() {
 
           {/* Search Row Mobile */}
           <div className="pb-4 lg:hidden">
-            <Suspense fallback={<div className="h-14 w-full animate-pulse rounded-2xl bg-slate-50" />}>
+            <Suspense fallback={<div className="h-14 w-full animate-pulse rounded-[4px] bg-[#FAFAF9] border border-[#E5E5E3]" />}>
               <StoreSearch />
             </Suspense>
           </div>
