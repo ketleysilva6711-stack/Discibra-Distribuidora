@@ -185,8 +185,8 @@ export default function CimentoLandingPage() {
 
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-14 lg:items-center">
             <div>
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#25D366]/40 bg-[#25D366]/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#25D366]">
-                <span className="h-2 w-2 rounded-full bg-[#25D366] animate-pulse" />
+              <div className="mb-5 inline-flex items-center gap-2 rounded-[4px] border border-[#25D366]/40 bg-[#25D366]/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#25D366]">
+                <span className="h-2 w-2 rounded-[4px] bg-[#25D366] animate-pulse" />
                 Entrega rápida com descarga inclusa
               </div>
               <h1 className="text-3xl font-black leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.4rem]">
@@ -200,7 +200,7 @@ export default function CimentoLandingPage() {
 
               <div className="mt-6 flex flex-wrap gap-2 text-xs font-semibold">
                 {["Palete 40 sacos", "Carga fechada 560–640 sacos", "Frota própria + Munck", "NF-e + Laudo ABNT"].map((s) => (
-                  <span key={s} className="rounded-full bg-white/10 border border-white/15 px-3 py-1.5 text-white/85">
+                  <span key={s} className="rounded-[4px] bg-white/10 border border-white/15 px-3 py-1.5 text-white/85">
                     ✓ {s}
                   </span>
                 ))}
@@ -214,7 +214,7 @@ export default function CimentoLandingPage() {
                   data-track="btn_whatsapp"
                   data-button-name="btn_whatsapp"
                   data-source="cimento_hero"
-                  className="btn-whatsapp-track inline-flex min-h-[64px] flex-1 items-center justify-center gap-3 rounded-2xl bg-[#25D366] px-8 text-lg font-black text-white shadow-[0_16px_40px_-8px_rgba(37,211,102,0.7)] transition-all hover:bg-[#1EBE5B] hover:scale-[1.02] active:scale-95 sm:flex-none sm:px-10"
+                  className="btn-whatsapp-track inline-flex min-h-[64px] flex-1 items-center justify-center gap-3 rounded-[4px] bg-[#25D366] px-8 text-lg font-black text-white transition-all hover:bg-[#1EBE5B] hover:scale-[1.02] active:scale-95 sm:flex-none sm:px-10"
                 >
                   <WhatsAppSvg className="h-7 w-7" />
                   Cotar Carga Fechada ou Palete no WhatsApp
@@ -226,7 +226,7 @@ export default function CimentoLandingPage() {
             </div>
 
             {/* Card resumo atacado */}
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.06] p-6 backdrop-blur sm:p-8">
+            <div className="rounded-[4px] border border-white/10 bg-white/[0.06] p-6 backdrop-blur sm:p-8">
               <p className="text-xs font-black uppercase tracking-[0.25em] text-white/50">Tabela de atacado</p>
               <div className="mt-4 space-y-3">
                 {[
@@ -234,7 +234,7 @@ export default function CimentoLandingPage() {
                   { k: "Palete · 40 sacos", v: "a partir de R$ 33,90/saco", d: "preço de atacado + descarga" },
                   { k: "Carga fechada · 560–640 sacos", v: "a partir de R$ 33,90/saco", d: "maior desconto direto da fábrica" },
                 ].map((r) => (
-                  <div key={r.k} className="flex items-center justify-between gap-4 rounded-2xl bg-white/5 border border-white/10 px-5 py-4">
+                  <div key={r.k} className="flex items-center justify-between gap-4 rounded-[4px] bg-white/5 border border-white/10 px-5 py-4">
                     <div>
                       <p className="font-bold text-white">{r.k}</p>
                       <p className="text-xs text-white/55">{r.d}</p>
@@ -244,9 +244,9 @@ export default function CimentoLandingPage() {
                 ))}
               </div>
               <div className="mt-5 grid grid-cols-3 gap-2 text-center text-[11px] font-bold text-white/70">
-                <div className="rounded-xl bg-white/5 border border-white/10 px-2 py-3">ABNT<br /><span className="text-white">NBR 16697</span></div>
-                <div className="rounded-xl bg-white/5 border border-white/10 px-2 py-3">Frete<br /><span className="text-white">SP + interior</span></div>
-                <div className="rounded-xl bg-white/5 border border-white/10 px-2 py-3">Descarga<br /><span className="text-white">inclusa</span></div>
+                <div className="rounded-[4px] bg-white/5 border border-white/10 px-2 py-3">ABNT<br /><span className="text-white">NBR 16697</span></div>
+                <div className="rounded-[4px] bg-white/5 border border-white/10 px-2 py-3">Frete<br /><span className="text-white">SP + interior</span></div>
+                <div className="rounded-[4px] bg-white/5 border border-white/10 px-2 py-3">Descarga<br /><span className="text-white">inclusa</span></div>
               </div>
             </div>
           </div>
@@ -270,19 +270,19 @@ export default function CimentoLandingPage() {
           {OFFERS.map((o) => (
             <article
               key={o.name}
-              className="flex flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-lg hover:border-[#25D366]/50"
+              className="flex flex-col rounded-[4px] border border-slate-200 bg-white p-5 border border-slate-200 bg-white p-5 transition-all hover:border-[#25D366]/50"
             >
               {o.tag && (
-                <span className="mb-3 inline-flex w-fit rounded-full bg-[#0A1628] px-3 py-1 text-[10px] font-black uppercase tracking-widest text-[#25D366]">
+                <span className="mb-3 inline-flex w-fit rounded-[4px] bg-[#0A1628] px-3 py-1 text-[10px] font-black uppercase tracking-widest text-[#25D366]">
                   {o.tag}
                 </span>
               )}
               <h3 className="font-black leading-snug text-slate-900">{o.name}</h3>
               <p className="mt-1 text-xs text-slate-500">{o.spec}</p>
-              <p className="mt-2 inline-flex w-fit rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-600">
+              <p className="mt-2 inline-flex w-fit rounded-[4px] bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-600">
                 Saco {o.weight} · {o.use}
               </p>
-              <div className="mt-4 space-y-2 rounded-2xl bg-slate-50 border border-slate-100 p-4 text-sm">
+              <div className="mt-4 space-y-2 rounded-[4px] bg-slate-50 border border-slate-100 p-4 text-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500 font-medium">Carga fechada</span>
                   <span className="font-black text-[#0A7A3D]">A partir de {o.cargaFechada}</span>
@@ -299,7 +299,7 @@ export default function CimentoLandingPage() {
                 data-track="btn_whatsapp"
                 data-button-name="btn_whatsapp"
                 data-source="cimento_card"
-                className="btn-whatsapp-track mt-4 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-4 text-sm font-black text-white shadow-lg shadow-green-500/25 transition-all hover:bg-[#1EBE5B] active:scale-95"
+                className="btn-whatsapp-track mt-4 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-[4px] bg-[#25D366] px-4 text-sm font-black text-white  transition-all hover:bg-[#1EBE5B] active:scale-95"
               >
                 <WhatsAppSvg className="h-5 w-5" />
                 Cotar este cimento no WhatsApp
@@ -314,7 +314,7 @@ export default function CimentoLandingPage() {
           ))}
         </div>
 
-        <div className="mt-8 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center sm:p-8">
+        <div className="mt-8 rounded-[4px] border border-dashed border-slate-300 bg-slate-50 p-6 text-center sm:p-8">
           <p className="font-bold text-slate-800">Precisa de volume maior ou entrega programada?</p>
           <p className="mt-1 text-sm text-slate-500">
             Construtoras e revendas têm condição exclusiva por rota e recorrência. Faturamento no CNPJ.
@@ -326,7 +326,7 @@ export default function CimentoLandingPage() {
             data-track="btn_whatsapp"
             data-button-name="btn_whatsapp"
             data-source="cimento_b2b"
-            className="btn-whatsapp-track mt-4 inline-flex min-h-[56px] items-center justify-center gap-2 rounded-2xl bg-[#0A1628] px-8 font-black text-white transition-all hover:bg-[#16294a] active:scale-95"
+            className="btn-whatsapp-track mt-4 inline-flex min-h-[56px] items-center justify-center gap-2 rounded-[4px] bg-[#0A1628] px-8 font-black text-white transition-all hover:bg-[#16294a] active:scale-95"
           >
             <WhatsAppSvg className="h-5 w-5 text-[#25D366]" />
             Falar com consultor B2B
@@ -347,21 +347,21 @@ export default function CimentoLandingPage() {
                 { t: "Frete SP e interior", d: "Ribeirão, Franca, Campinas e + " },
                 { t: "Descarga inclusa", d: "Munck + paletizado na obra" },
               ].map((s) => (
-                <div key={s.t} className="rounded-2xl border border-slate-200 bg-white p-4">
+                <div key={s.t} className="rounded-[4px] border border-slate-200 bg-white p-4">
                   <p className="font-black text-slate-900 text-sm">✓ {s.t}</p>
                   <p className="mt-1 text-xs text-slate-500">{s.d}</p>
                 </div>
               ))}
             </div>
-            <div className="mt-6 rounded-2xl bg-white border border-slate-200 p-5 text-sm text-slate-600">
+            <div className="mt-6 rounded-[4px] bg-white border border-slate-200 p-5 text-sm text-slate-600">
               <p className="font-black text-slate-900">Central de Distribuição</p>
               <p className="mt-1">Rua Igarapava, 73 — Vila Albertina, Ribeirão Preto/SP</p>
               <p className="mt-1">Seg–Sex 07:00–18:00 · Sáb 07:00–12:00</p>
               <div className="mt-3 flex flex-wrap gap-2">
-                <Link href="/nossas-lojas" className="rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-700">
+                <Link href="/nossas-lojas" className="rounded-[4px] bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-700">
                   Ver logística e retirada
                 </Link>
-                <Link href="/faq" className="rounded-full border border-slate-300 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-white">
+                <Link href="/faq" className="rounded-[4px] border border-slate-300 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-white">
                   Dúvidas frequentes
                 </Link>
               </div>
@@ -372,10 +372,10 @@ export default function CimentoLandingPage() {
             <h2 className="text-2xl font-black text-slate-900 sm:text-3xl">Perguntas frequentes do atacado</h2>
             <div className="mt-6 space-y-3">
               {FAQS.map((f) => (
-                <details key={f.q} className="group rounded-2xl border border-slate-200 bg-white p-5 open:border-[#25D366]/50 open:shadow-md">
+                <details key={f.q} className="group rounded-[4px] border border-slate-200 bg-white p-5 open:border-[#25D366]/50 open:">
                   <summary className="cursor-pointer list-none font-bold text-slate-900 flex items-center justify-between gap-4">
                     {f.q}
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 font-black text-slate-500 group-open:bg-[#25D366] group-open:text-white transition-all">+</span>
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[4px] bg-slate-100 font-black text-slate-500 group-open:bg-[#25D366] group-open:text-white transition-all">+</span>
                   </summary>
                   <p className="mt-3 text-sm leading-relaxed text-slate-600">{f.a}</p>
                 </details>
@@ -387,7 +387,7 @@ export default function CimentoLandingPage() {
 
       {/* ── CTA FINAL ── */}
       <section className="mx-auto max-w-7xl px-4 pb-14 sm:px-6 sm:pb-20">
-        <div className="rounded-[2rem] bg-[#0A1628] p-8 text-center text-white sm:p-12">
+        <div className="rounded-[4px] bg-[#0A1628] p-8 text-center text-white sm:p-12">
           <h2 className="text-2xl font-black sm:text-4xl">Pronto para travar o preço da sua obra?</h2>
           <p className="mx-auto mt-3 max-w-xl text-white/65">
             Envie o CEP da obra e a quantidade (palete ou carga fechada). Retornamos em minutos com frete, prazo e condição PIX/CNPJ.
@@ -399,7 +399,7 @@ export default function CimentoLandingPage() {
             data-track="btn_whatsapp"
             data-button-name="btn_whatsapp"
             data-source="cimento_footer"
-            className="btn-whatsapp-track mx-auto mt-6 inline-flex min-h-[64px] items-center justify-center gap-3 rounded-2xl bg-[#25D366] px-10 text-lg font-black text-white shadow-xl transition-all hover:bg-[#1EBE5B] hover:scale-[1.02] active:scale-95"
+            className="btn-whatsapp-track mx-auto mt-6 inline-flex min-h-[64px] items-center justify-center gap-3 rounded-[4px] bg-[#25D366] px-10 text-lg font-black text-white shadow-xl transition-all hover:bg-[#1EBE5B] hover:scale-[1.02] active:scale-95"
           >
             <WhatsAppSvg className="h-7 w-7" />
             Cotar agora no WhatsApp
