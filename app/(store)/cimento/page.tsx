@@ -37,8 +37,11 @@ type Offer = {
   weight: string
   cargaFechada: string
   palete: string
+  paletePromo: string
+  economia: string
   tag?: string
   use: string
+  searchSlug: string
 }
 
 const OFFERS: Offer[] = [
@@ -48,8 +51,11 @@ const OFFERS: Offer[] = [
     weight: "50kg",
     cargaFechada: "R$ 34,90",
     palete: "R$ 36,90",
+    paletePromo: "R$ 26,90",
+    economia: "R$ 400,00",
     tag: "Mais vendido",
     use: "Obras residenciais e reformas",
+    searchSlug: "votoran",
   },
   {
     name: "Votoran Obras Estruturais CP III-40",
@@ -57,8 +63,11 @@ const OFFERS: Offer[] = [
     weight: "50kg",
     cargaFechada: "R$ 35,90",
     palete: "R$ 37,90",
+    paletePromo: "R$ 27,90",
+    economia: "R$ 400,00",
     tag: "Para estrutura",
     use: "Lajes, vigas, pilares e fundações",
+    searchSlug: "votoran cp iii",
   },
   {
     name: "Votoran Alta Resistência CP V ARI",
@@ -66,8 +75,11 @@ const OFFERS: Offer[] = [
     weight: "50kg",
     cargaFechada: "R$ 41,90",
     palete: "R$ 41,90",
+    paletePromo: "R$ 31,90",
+    economia: "R$ 400,00",
     tag: "Desforma rápida",
     use: "Pré-moldados, industrial e obra acelerada",
+    searchSlug: "votoran ari",
   },
   {
     name: "Cauê Uso Geral CP II-E-32",
@@ -75,8 +87,11 @@ const OFFERS: Offer[] = [
     weight: "50kg",
     cargaFechada: "R$ 34,50",
     palete: "R$ 36,20",
+    paletePromo: "R$ 26,20",
+    economia: "R$ 400,00",
     tag: "Custo-benefício",
     use: "Alvenaria, reboco e contrapiso",
+    searchSlug: "caue",
   },
   {
     name: "Montes Claros CP II-E-32",
@@ -84,8 +99,11 @@ const OFFERS: Offer[] = [
     weight: "50kg",
     cargaFechada: "R$ 33,90",
     palete: "R$ 35,50",
+    paletePromo: "R$ 25,50",
+    economia: "R$ 400,00",
     tag: "Menor preço",
     use: "Obras e reformas em geral",
+    searchSlug: "montes claros",
   },
   {
     name: "Cimento CSN CP II-F-32",
@@ -93,7 +111,10 @@ const OFFERS: Offer[] = [
     weight: "50kg",
     cargaFechada: "R$ 34,20",
     palete: "R$ 35,90",
+    paletePromo: "R$ 25,90",
+    economia: "R$ 400,00",
     use: "Alvenaria, reboco e concreto simples",
+    searchSlug: "csn",
   },
   {
     name: "Cimento Mauá CP II-E-32",
@@ -101,7 +122,10 @@ const OFFERS: Offer[] = [
     weight: "50kg",
     cargaFechada: "R$ 34,90",
     palete: "R$ 36,50",
+    paletePromo: "R$ 26,50",
+    economia: "R$ 400,00",
     use: "Obras residenciais e comerciais",
+    searchSlug: "maua",
   },
   {
     name: "Cimento Branco Estrutural",
@@ -109,8 +133,11 @@ const OFFERS: Offer[] = [
     weight: "25kg",
     cargaFechada: "R$ 58,90",
     palete: "R$ 58,90",
+    paletePromo: "R$ 48,90",
+    economia: "R$ 400,00",
     tag: "Especial",
     use: "Revestimentos, mármores e acabamento fino",
+    searchSlug: "cimento branco",
   },
 ]
 
@@ -201,7 +228,7 @@ export default function CimentoLandingPage() {
               <div className="mt-6 flex flex-wrap gap-2 text-xs font-semibold">
                 {["Palete 40 sacos", "Carga fechada 560–640 sacos", "Frota própria + Munck", "NF-e + Laudo ABNT"].map((s) => (
                   <span key={s} className="rounded-[4px] bg-white/10 border border-white/15 px-3 py-1.5 text-white/85">
-                    ✓ {s}
+                    {s}
                   </span>
                 ))}
               </div>
@@ -217,7 +244,8 @@ export default function CimentoLandingPage() {
                   className="btn-whatsapp-track inline-flex min-h-[64px] flex-1 items-center justify-center gap-3 rounded-[4px] bg-[#25D366] px-8 text-lg font-black text-white transition-all hover:bg-[#1EBE5B] hover:scale-[1.02] active:scale-95 sm:flex-none sm:px-10"
                 >
                   <WhatsAppSvg className="h-7 w-7" />
-                  Cotar Carga Fechada ou Palete no WhatsApp
+                  <span className="hidden sm:inline">Cotar Carga Fechada ou Palete no WhatsApp</span>
+                  <span className="sm:hidden">Cotar no WhatsApp</span>
                 </a>
               </div>
               <p className="mt-3 text-xs text-white/50">
@@ -255,6 +283,61 @@ export default function CimentoLandingPage() {
 
       {/* ── TABELA COMPARATIVA ── */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
+        {/* SUPER OFERTA PALETE */}
+        <div className="mb-8 rounded-[4px] border-l-4 border-l-[#15803D] border border-[#E5E5E3] bg-[#FAFAF9] p-5 sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-6">
+            <div className="flex-1 min-w-0">
+              <div className="mb-3 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center rounded-[4px] bg-[#15803D] px-3 py-1 text-[11px] font-black uppercase tracking-widest text-white">
+                  Oferta Especial
+                </span>
+                <span className="inline-flex items-center rounded-[4px] border border-[#E5E5E3] bg-white px-3 py-1 text-[11px] font-bold text-[#111318]">
+                  Palete Fechado · 40 sacos
+                </span>
+              </div>
+              <p className="text-[1.6rem] font-black leading-tight text-[#111318]">
+                R$ 10,00 OFF por saco no Palete Fechado
+              </p>
+              <p className="mt-1 text-sm font-semibold text-[#15803D]">
+                Economia de até R$ 400,00 por palete · Válido por tempo limitado
+              </p>
+              <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+                {[
+                  "Frete incluso na rota",
+                  "Descarga paletizada na obra",
+                  "NF-e + Laudo ABNT",
+                  "PIX · Boleto · CNPJ",
+                ].map((s) => (
+                  <span
+                    key={s}
+                    className="flex items-center gap-1.5 rounded-[4px] border border-[#E5E5E3] bg-white px-3 py-1.5 text-xs font-medium text-[#111318]"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#15803D] shrink-0" />
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col items-stretch gap-2 shrink-0 w-full sm:w-auto">
+              <a
+                href={waLink("Olá! Vi a Oferta Especial de Palete Fechado com R$10 OFF por saco e frete incluso. Quero garantir o meu palete de cimento.")}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-track="btn_whatsapp"
+                data-button-name="btn_whatsapp"
+                data-source="cimento_super_oferta"
+                className="btn-whatsapp-track inline-flex min-h-[54px] items-center justify-center gap-2 rounded-[4px] bg-[#15803D] px-8 text-sm font-black text-white transition-colors hover:bg-[#166534]"
+              >
+                <WhatsAppSvg className="h-5 w-5 shrink-0" />
+                Garantir Oferta no WhatsApp
+              </a>
+              <p className="text-center text-xs text-[#6B7280]">
+                Resposta em minutos · Seg–Sex 07h–18h · Sáb 07h–12h
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="mb-8 max-w-3xl">
           <p className="text-xs font-black uppercase tracking-[0.3em] text-[#F47920]">Tipos e preços</p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900 sm:text-4xl">
@@ -282,14 +365,25 @@ export default function CimentoLandingPage() {
               <p className="mt-2 inline-flex w-fit rounded-[4px] bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-600">
                 Saco {o.weight} · {o.use}
               </p>
-              <div className="mt-4 space-y-2 rounded-[4px] bg-slate-50 border border-slate-100 p-4 text-sm">
+              <div className="mt-4 space-y-1.5 rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] p-4 text-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 font-medium">Carga fechada</span>
-                  <span className="font-black text-[#0A7A3D]">A partir de {o.cargaFechada}</span>
+                  <span className="text-[#6B7280] font-medium">Carga fechada</span>
+                  <span className="font-black text-[#15803D]">A partir de {o.cargaFechada}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-500 font-medium">Palete (40 sc)</span>
-                  <span className="font-black text-slate-900">{o.palete}</span>
+                <div className="border-t border-[#E5E5E3] pt-1.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <span className="block text-xs font-bold text-[#111318] uppercase tracking-wide">Palete · 40 sc</span>
+                      <span className="block text-xs font-bold uppercase tracking-wide text-[#15803D]">Oferta Especial</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="block text-xs text-[#9CA3AF] line-through">{o.palete}/sc</span>
+                      <span className="block text-lg font-black text-[#111318]">{o.paletePromo}/sc</span>
+                      <span className="block text-[10px] font-semibold text-[#15803D]">
+                        Economize {o.economia} no palete
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
               <a
@@ -305,7 +399,7 @@ export default function CimentoLandingPage() {
                 Cotar este cimento no WhatsApp
               </a>
               <Link
-                href="/produtos"
+                href={`/busca?q=${encodeURIComponent(o.searchSlug)}`}
                 className="mt-2 text-center text-xs font-semibold text-slate-400 hover:text-slate-700"
               >
                 Ver no catálogo →
@@ -314,22 +408,22 @@ export default function CimentoLandingPage() {
           ))}
         </div>
 
-        <div className="mt-8 rounded-[4px] border border-dashed border-slate-300 bg-slate-50 p-6 text-center sm:p-8">
-          <p className="font-bold text-slate-800">Precisa de volume maior ou entrega programada?</p>
-          <p className="mt-1 text-sm text-slate-500">
-            Construtoras e revendas têm condição exclusiva por rota e recorrência. Faturamento no CNPJ.
+        <div className="mt-8 rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] p-6 text-center sm:p-8">
+          <p className="font-black text-[#111318] text-lg">Construtora, revenda ou obra de grande porte?</p>
+          <p className="mt-1 text-sm text-[#6B7280]">
+            Conta corrente com faturamento no CNPJ · Condição exclusiva por rota e volume · Entrega programada semanal
           </p>
           <a
-            href={waLink("Olá! Sou construtora/revenda e preciso de condição exclusiva para entrega programada de cimento.")}
+            href={waLink("Olá! Sou construtora ou revenda e tenho interesse em abrir conta B2B na Discibra para compras recorrentes de cimento.")}
             target="_blank"
             rel="noopener noreferrer"
             data-track="btn_whatsapp"
             data-button-name="btn_whatsapp"
             data-source="cimento_b2b"
-            className="btn-whatsapp-track mt-4 inline-flex min-h-[56px] items-center justify-center gap-2 rounded-[4px] bg-[#0A1628] px-8 font-black text-white transition-all hover:bg-[#16294a] active:scale-95"
+            className="btn-whatsapp-track mt-4 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-[4px] bg-[#15803D] px-8 font-black text-white transition-colors hover:bg-[#166534]"
           >
-            <WhatsAppSvg className="h-5 w-5 text-[#25D366]" />
-            Falar com consultor B2B
+            <WhatsAppSvg className="h-5 w-5" />
+            Abrir conta B2B no WhatsApp
           </a>
         </div>
       </section>
@@ -348,7 +442,7 @@ export default function CimentoLandingPage() {
                 { t: "Descarga inclusa", d: "Munck + paletizado na obra" },
               ].map((s) => (
                 <div key={s.t} className="rounded-[4px] border border-slate-200 bg-white p-4">
-                  <p className="font-black text-slate-900 text-sm">✓ {s.t}</p>
+                  <p className="font-black text-slate-900 text-sm">{s.t}</p>
                   <p className="mt-1 text-xs text-slate-500">{s.d}</p>
                 </div>
               ))}
@@ -381,6 +475,24 @@ export default function CimentoLandingPage() {
                 </details>
               ))}
             </div>
+            <div className="mt-6 rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] p-5">
+              <p className="font-black text-[#111318]">Ficou com alguma dúvida?</p>
+              <p className="mt-1 text-sm text-[#6B7280]">
+                Nosso time responde em minutos — Segunda a Sábado, horário comercial.
+              </p>
+              <a
+                href={waLink("Olá! Tenho uma dúvida sobre compra de cimento no atacado e gostaria de falar com um especialista da Discibra.")}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-track="btn_whatsapp"
+                data-button-name="btn_whatsapp"
+                data-source="cimento_faq_cta"
+                className="btn-whatsapp-track mt-4 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[4px] bg-[#15803D] px-6 text-sm font-bold text-white transition-colors hover:bg-[#166534]"
+              >
+                <WhatsAppSvg className="h-4 w-4" />
+                Falar com Especialista
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -390,7 +502,8 @@ export default function CimentoLandingPage() {
         <div className="rounded-[4px] bg-[#0A1628] p-8 text-center text-white sm:p-12">
           <h2 className="text-2xl font-black sm:text-4xl">Pronto para travar o preço da sua obra?</h2>
           <p className="mx-auto mt-3 max-w-xl text-white/65">
-            Envie o CEP da obra e a quantidade (palete ou carga fechada). Retornamos em minutos com frete, prazo e condição PIX/CNPJ.
+            Aproveite a Oferta Especial de Palete com R$ 10,00 OFF por saco enquanto durar o estoque.
+            Envie o CEP da obra e a quantidade — retornamos em minutos com frete, prazo e condição PIX/CNPJ.
           </p>
           <a
             href={waLink(WHATSAPP_MAIN)}
