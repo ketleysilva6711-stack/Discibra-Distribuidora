@@ -65,7 +65,7 @@ function OrderTimeline({ order }: { order: LocalOrder }) {
           <div key={step.key} className="flex gap-4">
             <div className="flex flex-col items-center">
               <div
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 transition ${
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[4px] border-2 transition ${
                   done
                     ? "border-primary bg-primary/15 text-primary"
                     : "border-border bg-muted text-muted-foreground"

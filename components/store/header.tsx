@@ -65,7 +65,7 @@ export default function StoreHeader() {
 
   const barSurface = scrolled
     ? "bg-white/85 backdrop-blur-2xl border-b border-slate-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.06)]"
-    : "bg-white border-b border-slate-50 shadow-sm"
+    : "bg-white border-b border-slate-50"
 
   return (
     <header className="z-50 shrink-0 w-full fixed inset-x-0 top-0 lg:sticky lg:top-0">
@@ -178,7 +178,7 @@ export default function StoreHeader() {
               {isMounted && (
                 <li>
 <ContactPopup>
-                     <button className="flex items-center gap-2 px-5 py-3 text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] hover:bg-slate-50 rounded-xl transition-all border border-slate-100 hover:border-primary/30">
+                     <button className="flex items-center gap-2 px-5 py-3 text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] hover:bg-slate-50 rounded-[4px] transition-all border border-slate-100 hover:border-primary/30">
                        <Headset className="h-4 w-4 text-primary" />
                        Atendimento Consultivo
                      </button>
@@ -194,7 +194,7 @@ export default function StoreHeader() {
       {menuOpen && (
         <div className="fixed inset-x-0 bottom-0 top-[125px] z-50 bg-white lg:hidden overflow-y-auto animate-in slide-in-from-top-2 duration-200">
           <div className="p-6 space-y-6">
-            <Link href="/produtos" onClick={() => setMenuOpen(false)} className="flex items-center justify-between p-5 rounded-[24px] bg-slate-50 text-[11px] font-black uppercase tracking-widest text-slate-900 shadow-sm border border-slate-100">
+            <Link href="/produtos" onClick={() => setMenuOpen(false)} className="flex items-center justify-between p-5 rounded-[4px] bg-slate-50 text-[11px] font-black uppercase tracking-widest text-slate-900 border border-slate-100">
               Catálogo Completo
               <ChevronDown className="h-4 w-4 -rotate-90 opacity-40" />
             </Link>
@@ -213,7 +213,7 @@ export default function StoreHeader() {
                 data-track="btn_whatsapp"
                 data-button-name="btn_whatsapp"
                 data-name="btn_whatsapp"
-                className="flex items-center justify-center gap-3 w-full h-14 rounded-2xl bg-secondary text-white font-black uppercase tracking-widest text-[11px] btn-whatsapp-track"
+                className="flex items-center justify-center gap-3 w-full h-14 rounded-[4px] bg-secondary text-white font-black uppercase tracking-widest text-[11px] btn-whatsapp-track"
               >
               <Phone className="h-4 w-4" />
               {SITE.phoneDisplay}

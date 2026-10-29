@@ -225,7 +225,7 @@ export default function StoreFooter() {
               </h4>
               <a
                 href="#"
-                className="inline-block transition-transform hover:scale-105 active:scale-95 shadow-lg"
+                className="inline-block transition-transform hover:scale-105 active:scale-95"
                 title="Disponível no Google Play"
               >
                 <Image
