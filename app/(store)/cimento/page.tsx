@@ -312,7 +312,7 @@ export default function CimentoLandingPage() {
                     key={s}
                     className="flex items-center gap-1.5 rounded-[4px] border border-[#E5E5E3] bg-white px-3 py-1.5 text-xs font-medium text-[#111318]"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#15803D] shrink-0" />
+                    <span className="h-1.5 w-1.5 rounded-[4px] bg-[#15803D] shrink-0" />
                     {s}
                   </span>
                 ))}
@@ -512,7 +512,7 @@ export default function CimentoLandingPage() {
             data-track="btn_whatsapp"
             data-button-name="btn_whatsapp"
             data-source="cimento_footer"
-            className="btn-whatsapp-track mx-auto mt-6 inline-flex min-h-[64px] items-center justify-center gap-3 rounded-[4px] bg-[#25D366] px-10 text-lg font-black text-white shadow-xl transition-all hover:bg-[#1EBE5B] hover:scale-[1.02] active:scale-95"
+            className="btn-whatsapp-track mx-auto mt-6 inline-flex min-h-[64px] items-center justify-center gap-3 rounded-[4px] bg-[#15803D] px-10 text-lg font-black text-white transition-colors hover:bg-[#166534] hover:scale-[1.02] active:scale-95"
           >
             <WhatsAppSvg className="h-7 w-7" />
             Cotar agora no WhatsApp
