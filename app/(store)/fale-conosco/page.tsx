@@ -4,6 +4,8 @@ import InstitutionalLayout from "@/components/store/institutional-layout"
 import WhatsAppCta from "@/components/store/whatsapp-cta"
 import { SITE } from "@/lib/site-config"
 
+export const dynamic = "force-static"
+
 export const metadata: Metadata = {
   title: "Fale conosco",
 }

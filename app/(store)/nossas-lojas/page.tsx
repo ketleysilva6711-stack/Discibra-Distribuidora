@@ -2,6 +2,8 @@
 import Link from "next/link"
 import { waLink, SITE } from "@/lib/site-config"
 
+export const dynamic = "force-static"
+
 export const metadata: Metadata = {
   title: "Nossas Lojas — Central de Distribuição Logística em Ribeirão Preto",
   description:

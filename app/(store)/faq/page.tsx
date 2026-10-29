@@ -2,6 +2,8 @@
 import Link from "next/link"
 import { waLink } from "@/lib/site-config"
 
+export const dynamic = "force-static"
+
 export const metadata: Metadata = {
   title: "Perguntas Frequentes — Atacado de Cimento, Entrega e Pagamento",
   description:

@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/server"
 import { rawTokens, slugTokens, escapeLike } from "@/lib/search-normalize"
 import { cn } from "@/lib/utils"
 
+export const dynamic = "force-static"
+
 export const metadata: Metadata = {
   title: "Catálogo de Materiais de Construção",
   description:

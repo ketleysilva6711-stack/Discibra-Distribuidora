@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import InstitutionalLayout from "@/components/store/institutional-layout"
 import WhatsAppCta from "@/components/store/whatsapp-cta"
 
+export const dynamic = "force-static"
+
 export const metadata: Metadata = {
   title: "Formas de pagamento",
 }

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ArrowLeft, Search, PackageOpen } from "lucide-react"
 import { rawTokens, canonicalCementSearch, matchesSearch, escapeLike } from "@/lib/search-normalize"
 
+export const dynamic = "force-static"
 export const revalidate = 60
 
 export async function generateMetadata({

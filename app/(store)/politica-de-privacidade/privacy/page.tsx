@@ -10,6 +10,8 @@
 import { Metadata } from "next"
 import { SITE } from "@/lib/site-config"
 
+export const dynamic = "force-static"
+
 export const metadata: Metadata = {
   title: `Política de Privacidade | ${SITE.shortName}`,
   description: `Política de privacidade do ${SITE.shortName}. Saiba como coletamos, usamos e protegemos seus dados.`,

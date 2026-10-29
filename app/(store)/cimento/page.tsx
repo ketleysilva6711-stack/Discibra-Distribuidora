@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { waLink, SITE } from "@/lib/site-config"
 
+export const dynamic = "force-static"
+
 export const metadata: Metadata = {
   title: "Distribuidora de Cimento no Atacado — Direto da Fábrica | Saco 50kg, Palete e Carga Fechada",
   description:

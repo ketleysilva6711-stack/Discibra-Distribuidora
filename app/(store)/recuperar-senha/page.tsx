@@ -4,6 +4,8 @@ import { Lock, ArrowLeft, Headphones } from "lucide-react"
 import DynamicBrandLogo from "@/components/store/dynamic-brand-logo"
 import WhatsAppCta from "@/components/store/whatsapp-cta"
 
+export const dynamic = "force-static"
+
 export const metadata: Metadata = {
   title: "Recuperar Senha",
 }

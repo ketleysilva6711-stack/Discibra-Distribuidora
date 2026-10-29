@@ -11,6 +11,7 @@ import { SITE } from "@/lib/site-config"
 import { productSchema } from "@/lib/seo"
 import { ProductPageClient } from "./ProductPageClient"
 
+export const dynamic = "force-static"
 export const revalidate = 3600
 
 // ─── Tipos ────────────────────────────────────────────────────────────

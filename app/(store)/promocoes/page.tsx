@@ -10,6 +10,8 @@ import ProductCard from "@/components/store/product-card"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 
+export const dynamic = "force-static"
+
 export const metadata: Metadata = {
   title: "Ofertas e Promoções da Semana",
   description:

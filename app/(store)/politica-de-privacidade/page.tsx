@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import InstitutionalLayout from "@/components/store/institutional-layout"
 import { SITE } from "@/lib/site-config"
 
+export const dynamic = "force-static"
+
 export const metadata: Metadata = {
   title: "Política de privacidade",
 }
