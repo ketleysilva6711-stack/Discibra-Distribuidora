@@ -4,10 +4,10 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, CheckCircle2, Clock, FileText, MessageCircle, Printer, Package, Truck } from "lucide-react"
-import { createAdminClient } from "@/lib/supabase/admin"
+import { createPublicClient } from "@/lib/supabase/public"
 import { toast } from "sonner"
 
-const supabase = createAdminClient()
+const supabase = createPublicClient()
 
 const brl = (n: number) =>
   "R$ " + (Number(n) || 0).toLocaleString("pt-BR", {
