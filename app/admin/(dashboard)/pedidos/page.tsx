@@ -26,7 +26,9 @@ const STATUSES = [
   { key: "confirmed", label: "Confirmado", cls: "bg-blue-50 text-blue-700 border-blue-200", icon: CheckCircle2 },
   { key: "shipping", label: "Em transporte", cls: "bg-indigo-50 text-indigo-700 border-indigo-200", icon: Truck },
   { key: "delivered", label: "Entregue", cls: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle2 },
+  { key: "entregue", label: "Entregue", cls: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle2 },
   { key: "cancelled", label: "Cancelado", cls: "bg-red-50 text-red-700 border-red-200", icon: XCircle },
+  { key: "cancelado", label: "Cancelado", cls: "bg-red-50 text-red-700 border-red-200", icon: XCircle },
 ]
 const statusMeta = (s: string) => STATUSES.find((x) => x.key === s) || { key: s, label: s, cls: "bg-slate-100 text-slate-600 border-slate-200", icon: Clock }
 
