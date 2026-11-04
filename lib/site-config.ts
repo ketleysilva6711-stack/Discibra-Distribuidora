@@ -2,6 +2,9 @@
 export const SITE = {
   legalName: "Discibra Distribuidora",
   shortName: "Discibra",
+  razaoSocial: "DISCIBRA DISTRIBUIDORA DA CONSTRUÇÃO",
+  cnpj: "50.840.428/0001-90",
+  ie: "Isento",
   tagline: "Cimento e materiais de construção direto pra sua obra: preço de atacado, entrega programada e atendimento rápido.",
   whatsappE164: "5516996447972",
   phoneDisplay: "(16) 99644-7972",

@@ -3,6 +3,7 @@
 import { ArrowRight } from "lucide-react"
 import { waLink } from "@/lib/site-config"
 import { trackWhatsAppClick } from "@/lib/track-whatsapp"
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon"
 
 export default function HomeWhatsAppCta() {
   return (
@@ -17,6 +18,7 @@ export default function HomeWhatsAppCta() {
       onClick={() => trackWhatsAppClick("home_cta")}
       className="group/btn relative inline-flex h-14 w-full items-center justify-center gap-3 rounded-[4px] bg-[#15803D] px-6 text-sm font-semibold text-white transition-colors duration-300 hover:bg-[#166534] btn-whatsapp-track sm:h-16 sm:w-auto sm:min-w-[280px] sm:text-base"
     >
+      <WhatsAppIcon className="w-5 h-5" />
       <span className="relative z-10">Falar no WhatsApp</span>
       <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover/btn:translate-x-1 text-white" />
     </a>

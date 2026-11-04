@@ -9,7 +9,7 @@ export default function Topbar() {
       <div className="mx-auto flex max-w-[1440px] items-center justify-between px-4 py-2 lg:px-10">
         {/* Esquerda: Identificação Institucional e Logística */}
         <div className="flex items-center gap-2 whitespace-nowrap">
-          <span className="font-semibold text-white">CNPJ 59.566.414/0001-25</span>
+          <span className="font-semibold text-white">CNPJ {SITE.cnpj}</span>
           <span className="text-slate-600">·</span>
           <span className="text-slate-300">CD Logístico: Ribeirão Preto — SP</span>
           <span className="hidden md:inline text-slate-600">·</span>

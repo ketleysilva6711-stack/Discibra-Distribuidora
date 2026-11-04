@@ -1,11 +1,12 @@
 "use client"
 
-import { Phone, Smartphone, Instagram, Youtube, Facebook } from "lucide-react"
+import { Smartphone, Instagram, Youtube, Facebook } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import DynamicBrandLogo from "@/components/store/dynamic-brand-logo"
 import { SITE } from "@/lib/site-config"
 import { trackWhatsAppClick } from "@/lib/track-whatsapp"
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon"
 
 const PaymentCard = ({ children, label }: { children: React.ReactNode; label: string }) => (
   <div
@@ -86,7 +87,7 @@ export default function StoreFooter() {
               className="inline-flex items-center gap-3 bg-[#25D366]/10 border border-[#25D366]/20 hover:bg-[#25D366]/20 transition-all rounded-[4px] px-4 py-3 group btn-whatsapp-track"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[4px] bg-[#25D366] text-white">
-                <Phone className="h-5 w-5" />
+                <WhatsAppIcon className="h-5 w-5" />
               </span>
               <div>
                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#25D366] leading-none mb-1">Televendas via WhatsApp</p>
@@ -245,6 +246,10 @@ export default function StoreFooter() {
           <p className="text-xs text-white/30 font-medium">
             © {currentYear} {SITE.legalName}. Todos os direitos reservados.
           </p>
+          <div className="flex items-center gap-5 text-[10px] text-white/30 font-medium whitespace-nowrap">
+            <span>{SITE.razaoSocial} · CNPJ: {SITE.cnpj} · IE: {SITE.ie}</span>
+            <span>Rua Igarapava, 73 — Vila Albertina — Ribeirão Preto / SP</span>
+          </div>
           <div className="flex items-center gap-5">
             <Link href="/politica-de-privacidade" className="text-[11px] text-white/40 hover:text-white/60 font-bold uppercase tracking-widest transition-colors">
               Privacidade

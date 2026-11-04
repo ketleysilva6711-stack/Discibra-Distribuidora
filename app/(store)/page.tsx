@@ -13,6 +13,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { SITE } from "@/lib/site-config"
 import HomeWhatsAppCta from "@/components/store/home-whatsapp-cta"
 
 const CAT_CIMENTO = "c0134152-de0a-42f7-bb87-dd9ec8588983"
@@ -319,7 +320,7 @@ export default async function HomePage() {
             <div className="mt-8 pt-8 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
               <div>
                 <p className="text-[10px] font-mono tracking-wider text-white/50 uppercase">CNPJ</p>
-                <p className="mt-1 text-base font-black text-white whitespace-nowrap">59.566.414/0001-25</p>
+                <p className="mt-1 text-base font-black text-white whitespace-nowrap">{SITE.cnpj}</p>
               </div>
               <div>
                 <p className="text-[10px] font-mono tracking-wider text-white/50 uppercase">Centro de Distribuição</p>
