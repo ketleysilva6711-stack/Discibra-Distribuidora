@@ -73,6 +73,7 @@ scratch/
 next-env.d.ts
 # Datasets e backups grandes
 data/
+backups/
 *.csv
 *.json.gz
 *.parquet

@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     customerCompany,
     customerCpfCnpj,
     shippingValue = 0,
-    paymentTerms = "À vista via PIX ou Faturado após análise cadastral",
+    paymentTerms = "PIX com 3% de desconto ou Cartão em até 12x",
     validDays = 5,
     notesClient,
     items = [],

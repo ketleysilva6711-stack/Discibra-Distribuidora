@@ -39,7 +39,7 @@ export default function OrcamentosPage() {
   const [clientPhone, setClientPhone] = useState("")
   const [clientCompany, setClientCompany] = useState("")
   const [shippingValue, setShippingValue] = useState("0")
-  const [paymentTerms, setPaymentTerms] = useState("À vista na autorização ou Faturado para PJ")
+  const [paymentTerms, setPaymentTerms] = useState("PIX (3% desconto) ou Cartão em até 12x")
   const [validDays, setValidDays] = useState("5")
   const [creating, setCreating] = useState(false)
   // Itens da cotação express

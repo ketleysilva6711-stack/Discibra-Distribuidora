@@ -19,7 +19,7 @@ type CartItem = {
   qty: number
 }
 
-// ── Regras B2B de desconto por volume e peso da carga ──
+// ── Regras de desconto por volume e peso da carga ──
 function getItemDiscountRate(name: string, unit: string, qty: number): number {
   const isBulkEligible =
     unit === "saco" ||
@@ -205,7 +205,7 @@ export default function CartPage() {
       totalWeight >= 1000
         ? "*Logística Sugerida:* Caminhão Munck ou Carga Paletizada"
         : null,
-      totalDiscount > 0 ? `*Desconto B2B Volume:* - R$ ${totalDiscount.toFixed(2)}` : null,
+      totalDiscount > 0 ? `*Desconto Volume:* - R$ ${totalDiscount.toFixed(2)}` : null,
     ].filter(Boolean)
     const msg = [
       `🏗️ *ORÇAMENTO DISCIBRA DISTRIBUIDORA*`,
@@ -222,7 +222,7 @@ export default function CartPage() {
       `*Itens Solicitados:*`,
       ...whatsLines,
       ``,
-      b2bDetails.length > 0 ? `*Resumo B2B:*` : null,
+      b2bDetails.length > 0 ? `*Resumo:*` : null,
       ...b2bDetails,
       `*Total Estimado:* R$ ${total.toFixed(2)}`,
       ``,
@@ -360,7 +360,7 @@ export default function CartPage() {
             </div>
             {totalDiscount > 0 && (
               <div className="flex justify-between text-sm font-semibold text-[#15803D]">
-                <span>Desconto B2B Volume</span>
+                <span>Desconto Volume</span>
                 <span>- R$ {totalDiscount.toFixed(2)}</span>
               </div>
             )}
@@ -388,7 +388,7 @@ export default function CartPage() {
               <span className="font-black text-[#15803D] text-2xl font-mono">R$ {total.toFixed(2)}</span>
             </div>
           </div>
-          {/* Bloco de Identificação Obrigatória B2B */}
+          {/* Bloco de Identificação do Cliente */}
           <div className="mb-6 rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] p-4">
             <h3 className="mb-3 text-xs font-black uppercase tracking-wider text-slate-800">
               Dados para Entrega e Contato
@@ -396,14 +396,14 @@ export default function CartPage() {
             <div className="space-y-3">
               <div>
                 <label className="mb-1 block text-[10px] font-black uppercase tracking-widest text-slate-500">
-                  Seu Nome ou Construtora *
+                  Seu Nome *
                 </label>
                 <input
                   type="text"
                   required
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder="Ex: João Silva ou Construtora Alfa"
+                  placeholder="Ex: João Silva"
                   className="h-10 w-full rounded-[4px] border border-[#E5E5E3] bg-white px-3 text-xs font-medium text-slate-900 outline-none transition focus:border-[#002D5B]"
                 />
               </div>

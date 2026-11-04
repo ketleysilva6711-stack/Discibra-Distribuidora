@@ -204,7 +204,7 @@ export default function OrcamentoPublicoClient({
           </a>
         )}
         <p className="text-center text-xs text-slate-400 mt-8">
-          {SITE.legalName} · CNPJ 59.566.414/0001-25 · {SITE.phoneDisplay}
+          {SITE.legalName} · {SITE.phoneDisplay}
         </p>
       </main>
     </div>
