@@ -10,6 +10,8 @@ export type LocalOrder = {
   createdAt: string
   total: number
   itemsSummary: string
+  is_orcamento?: boolean
+  redirect_url?: string | null
 }
 
 const KEY = "ccc_distribuidora_orders"

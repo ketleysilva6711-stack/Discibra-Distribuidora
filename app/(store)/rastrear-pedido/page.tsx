@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ChevronLeft, Package, Search, Warehouse, Truck, CheckCircle2 } from "lucide-react"
+import { ChevronLeft, Package, Search, Warehouse, Truck, CheckCircle2, ExternalLink } from "lucide-react"
 import { findOrderByCode, findOrdersByEmail, type LocalOrder, type OrderStatus } from "@/lib/local-orders"
 import WhatsAppCta from "@/components/store/whatsapp-cta"
 import { SITE } from "@/lib/site-config"
@@ -16,6 +16,8 @@ type RemoteOrder = {
   items_summary?: string | null
   created_at?: string | null
   updated_at?: string | null
+  is_orcamento?: boolean
+  redirect_url?: string | null
 }
 
 type RemoteOrdersResponse = {
@@ -47,6 +49,8 @@ function mapRemoteOrder(o: RemoteOrder): LocalOrder {
     createdAt: o.created_at ?? new Date().toISOString(),
     total: Number(o.total) || 0,
     itemsSummary: o.items_summary ?? "",
+    is_orcamento: o.is_orcamento,
+    redirect_url: o.redirect_url ?? null,
   }
 }
 
@@ -160,7 +164,8 @@ export default function RastrearPedidoPage() {
           </Link>
           <h1 className="font-heading text-2xl md:text-3xl font-bold text-foreground">Rastrear pedido</h1>
           <p className="text-muted-foreground mt-2 text-sm md:text-base">
-            Informe o código do pedido (ex.: CCC-12345) ou o e-mail usado no cadastro, se vinculado ao pedido.
+            Informe o código do pedido (ex.: PED-12345) ou do orçamento (ex.: ORC-XXXXX), ou o
+            e-mail usado no cadastro, se vinculado ao pedido.
           </p>
         </div>
       </div>
@@ -172,13 +177,13 @@ export default function RastrearPedidoPage() {
         >
           <div>
             <label htmlFor="code" className="block text-sm font-medium text-foreground mb-1.5">
-              Código do pedido
+              Código do pedido ou orçamento
             </label>
             <input
               id="code"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder="CCC-00000"
+              placeholder="PED-XXXXX ou ORC-XXXXX"
               className="w-full rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/25"
             />
           </div>
@@ -240,6 +245,16 @@ export default function RastrearPedidoPage() {
             </p>
             <p className="text-sm text-foreground/80 mt-2 whitespace-pre-line">{result.itemsSummary}</p>
             <OrderTimeline order={result} />
+            {result.is_orcamento && result.redirect_url && (
+              <a
+                href={result.redirect_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center justify-center gap-2 rounded-[4px] bg-[#15803D] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#166534]"
+              >
+                <ExternalLink className="w-4 h-4" /> Ver Proposta Comercial Timbrada
+              </a>
+            )}
           </div>
         )}
 

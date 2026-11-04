@@ -208,21 +208,77 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = createAdminClient()
-    let query = supabase
-      .from("orders")
-      .select("id, code, email, status, total, items_summary, created_at, updated_at")
 
+    // ── Consulta por código ──
     if (code) {
-      query = query.eq("code", code)
-      const { data, error } = await query.maybeSingle()
-      if (error) throw error
-      if (!data) return NextResponse.json({ error: "Pedido não encontrado." }, { status: 404 })
-      return NextResponse.json({ order: data })
+      const isOrcamentoCode = code.startsWith("ORC-")
+
+      // Tenta tabela orders (pedidos PED-), exceto quando já é ORC-
+      if (!isOrcamentoCode) {
+        const { data: orderData, error: orderError } = await supabase
+          .from("orders")
+          .select("id, code, email, status, total, items_summary, created_at, updated_at")
+          .eq("code", code)
+          .maybeSingle()
+        if (orderError) throw orderError
+        if (orderData) {
+          return NextResponse.json({ order: orderData })
+        }
+      }
+
+      // Fallback para tabela orcamentos (cotações ORC-)
+      const { data: orcamento, error: oErr } = await supabase
+        .from("orcamentos")
+        .select(
+          "id, codigo, cliente_nome, cliente_email, status, total, token_acesso, criado_em, atualizado_em",
+        )
+        .eq("codigo", code)
+        .maybeSingle()
+      if (oErr) throw oErr
+      if (!orcamento) {
+        return NextResponse.json(
+          { error: "Pedido ou orçamento não encontrado." },
+          { status: 404 },
+        )
+      }
+
+      // Mapeia status do orçamento para status operacional do frontend
+      const statusMap: Record<string, string> = {
+        rascunho: "received",
+        enviado: "received",
+        negociando: "received",
+        aprovado: "shipped",
+        separando: "picking",
+        em_transporte: "shipped",
+        entregue: "delivered",
+        cancelado: "cancelled",
+      }
+      const mappedStatus = statusMap[orcamento.status] || "received"
+
+      const mappedOrder = {
+        id: orcamento.id,
+        code: orcamento.codigo,
+        email: orcamento.cliente_email ?? null,
+        status: mappedStatus,
+        total: Number(orcamento.total || 0),
+        items_summary: `Proposta Comercial ${orcamento.codigo} — ${orcamento.status.toUpperCase()}`,
+        created_at: orcamento.criado_em,
+        updated_at: orcamento.atualizado_em,
+        is_orcamento: true,
+        redirect_url: `/orcamento/${orcamento.codigo}?t=${orcamento.token_acesso}`,
+      }
+
+      return NextResponse.json({ order: mappedOrder })
     }
 
+    // ── Consulta por e-mail (apenas tabela orders) ──
     if (email) {
-      query = query.eq("email", email).order("created_at", { ascending: false }).limit(20)
-      const { data, error } = await query
+      const { data, error } = await supabase
+        .from("orders")
+        .select("id, code, email, status, total, items_summary, created_at, updated_at")
+        .eq("email", email)
+        .order("created_at", { ascending: false })
+        .limit(20)
       if (error) throw error
       return NextResponse.json({ orders: data || [] })
     }
