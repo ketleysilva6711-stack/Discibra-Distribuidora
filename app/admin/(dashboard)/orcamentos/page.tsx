@@ -3,10 +3,10 @@
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { Search, Clock, Truck, ArrowRight, Package } from "lucide-react"
-import { createPublicClient } from "@/lib/supabase/public"
+import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 
-const supabase = createPublicClient()
+const supabase = createClient()
 
 const brl = (n: number) =>
   "R$ " + (Number(n) || 0).toLocaleString("pt-BR", {

@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, CheckCircle2, Clock, FileText, MessageCircle, Printer, Package, Truck, User, CreditCard, MessageCircle as MsgCircle } from "lucide-react"
-import { createPublicClient } from "@/lib/supabase/public"
+import { ArrowLeft, CheckCircle2, Clock, Copy, FileText, MessageCircle, Printer, Package, Truck, User, CreditCard, MessageCircle as MsgCircle, Pencil, Plus, Trash2, Search, Save, X as XIcon } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 
-const supabase = createPublicClient()
+const supabase = createClient()
 
 const brl = (n: number) =>
   "R$ " + (Number(n) || 0).toLocaleString("pt-BR", {
@@ -55,6 +55,13 @@ export default function OrcamentoDetalhePage({
   const [status, setStatus] = useState("")
   const [pixKey, setPixKey] = useState("")
   const [observacao, setObservacao] = useState("")
+  const [modoEdicao, setModoEdicao] = useState(false)
+  const [itensEditados, setItensEditados] = useState<any[]>([])
+  const [freteEditado, setFreteEditado] = useState("")
+  const [descontoPixManual, setDescontoPixManual] = useState("")
+  const [buscaProduto, setBuscaProduto] = useState("")
+  const [resultadosBusca, setResultadosBusca] = useState<any[]>([])
+  const [buscandoProduto, setBuscandoProduto] = useState(false)
 
   const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -117,6 +124,9 @@ export default function OrcamentoDetalhePage({
       setStatus(orcamentoData.status || "")
       setPixKey(orcamentoData.pix_key || "")
       setClienteFicha(orcamentoData.clientes?.[0] || null)
+      setItensEditados((iRes.data || []).map((i: any) => ({ ...i })))
+      setFreteEditado(String(orcamentoData.valor_frete || 0))
+      setDescontoPixManual(String(orcamentoData.desconto_pix || 0))
     } catch (e: any) {
       toast.error(e.message || "Erro ao carregar orçamento")
     } finally {
@@ -124,9 +134,14 @@ export default function OrcamentoDetalhePage({
     }
   }
 
-  const totalItens = itens.reduce((s, i) => s + Number(i.preco_aplicado) * Number(i.quantidade), 0)
-  const pesoTotalKg = itens.reduce((s, i) => s + Number(i.peso_total_kg || 0), 0)
+  const itensParaExibir = modoEdicao ? itensEditados : itens
+  const totalItens = itensParaExibir.reduce((s, i) => s + Number(i.preco_aplicado) * Number(i.quantidade), 0)
+  const pesoTotalKg = itensParaExibir.reduce((s, i) => s + Number(i.peso_total_kg || 0), 0)
   const pesoTons = pesoTotalKg >= 1000 ? `${(pesoTotalKg / 1000).toFixed(1)} t` : `${pesoTotalKg.toLocaleString("pt-BR")} kg`
+
+  const valorFreteDisplay = modoEdicao ? Number(freteEditado || 0) : Number(orcamento.valor_frete || 0)
+  const descontoPixDisplay = modoEdicao ? Number(descontoPixManual || 0) : Number(orcamento.desconto_pix || 0)
+  const totalGeralDisplay = modoEdicao ? totalItens - descontoPixDisplay + valorFreteDisplay : Number(orcamento.total || 0)
 
   async function handleSaveStatus() {
     setSaving(true)
@@ -238,6 +253,125 @@ export default function OrcamentoDetalhePage({
     }
   }
 
+  // ── Buscar produtos para adicionar ao orçamento ──
+  useEffect(() => {
+    if (!buscaProduto.trim()) {
+      setResultadosBusca([])
+      return
+    }
+    const timer = setTimeout(async () => {
+      setBuscandoProduto(true)
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("id, name, sku, price, preco_avulso, unit, stock")
+          .ilike("name", `%${buscaProduto.trim()}%`)
+          .eq("active", true)
+          .limit(10)
+        if (error) throw error
+        setResultadosBusca(data || [])
+      } catch {
+        setResultadosBusca([])
+      } finally {
+        setBuscandoProduto(false)
+      }
+    }, 250)
+    return () => clearTimeout(timer)
+  }, [buscaProduto])
+
+  async function adicionarProdutoAoOrcamento(p: any) {
+    const jaExiste = itensEditados.find((i) => i.produto_id === p.id)
+    if (jaExiste) {
+      setItensEditados(itensEditados.map((i) =>
+        i.produto_id === p.id
+          ? { ...i, quantidade: i.quantidade + 1 }
+          : i
+      ))
+    } else {
+      const preco = Number(p.preco_avulso || p.price || 0)
+      setItensEditados([...itensEditados, {
+        id: crypto.randomUUID(),
+        produto_id: p.id,
+        nome_produto: p.name,
+        sku: p.sku || null,
+        quantidade: 1,
+        preco_aplicado: preco,
+        preco_tabela: preco,
+        tipo_preco: "avulso",
+        ordem: itensEditados.length + 1,
+        unidade: p.unit || "sc",
+        peso_unitario_kg: 1,
+        peso_total_kg: preco > 0 ? 0 : 0,
+      }])
+    }
+    setBuscaProduto("")
+    setResultadosBusca([])
+  }
+
+  // ── Salvar alterações de materiais, frete e desconto ──
+  async function handleSaveItens() {
+    setSaving(true)
+    try {
+      if (!orcamentoId) throw new Error("Orçamento não carregado")
+
+      const subtotalMateriais = itensEditados.reduce(
+        (s, i) => s + Number(i.preco_aplicado) * Number(i.quantidade), 0)
+      const valorFrete = Number(freteEditado || 0)
+      const descontoPix = Number(descontoPixManual || 0)
+      const total = subtotalMateriais - descontoPix + valorFrete
+
+      // Atualiza orçamento
+      const { error: uErr } = await supabase
+        .from("orcamentos")
+        .update({ subtotal: subtotalMateriais, desconto_pix: descontoPix, valor_frete: valorFrete, total })
+        .eq("id", orcamentoId)
+      if (uErr) throw uErr
+
+      // Remove itens antigos e insere novos
+      const { error: dErr } = await supabase
+        .from("orcamento_itens")
+        .delete()
+        .eq("orcamento_id", orcamentoId)
+      if (dErr) throw dErr
+
+      const itensParaInserir = itensEditados.map((i, idx) => ({
+        id: crypto.randomUUID(),
+        orcamento_id: orcamentoId,
+        produto_id: i.produto_id,
+        sku: i.sku || null,
+        nome_produto: i.nome_produto,
+        unidade: i.unidade || "sc",
+        quantidade: Number(i.quantidade) || 1,
+        preco_tabela: Number(i.preco_tabela || i.preco_aplicado || 0),
+        preco_aplicado: Number(i.preco_aplicado || 0),
+        tipo_preco: i.tipo_preco || "avulso",
+        ordem: idx + 1,
+        peso_unitario_kg: Number(i.peso_unitario_kg || 1),
+        peso_total_kg: (Number(i.quantidade || 1) * Number(i.peso_unitario_kg || 1)),
+      }))
+      const { error: iErr } = await supabase
+        .from("orcamento_itens")
+        .insert(itensParaInserir)
+      if (iErr) throw iErr
+
+      // Auditoria
+      await supabase.from("orcamento_auditoria").insert({
+        orcamento_id: orcamentoId,
+        status_anterior: orcamento?.status || null,
+        status_novo: orcamento?.status || null,
+        observacao: "Materiais e valores ajustados manualmente pelo operador",
+      })
+
+      toast.success("Orçamento atualizado com sucesso!")
+      setModoEdicao(false)
+      fetchOrcamento()
+    } catch (e: any) {
+      toast.error(e.message || "Erro ao salvar alterações")
+    } finally {
+      setSaving(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-20 text-center">
@@ -322,6 +456,12 @@ export default function OrcamentoDetalhePage({
           >
             <FileText className="h-3.5 w-3.5" /> Visualizar Proposta
           </a>
+          <Link
+            href={`/admin/orcamentos/novo?cloneFrom=${orcamento.codigo}`}
+            className="flex items-center gap-2 rounded-[4px] border border-[#CBD5E1] bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-[#FAFAF9] transition-colors"
+          >
+            <Copy className="h-3.5 w-3.5" /> Duplicar / Ajustar Orçamento
+          </Link>
         </div>
       </div>
 
@@ -379,46 +519,207 @@ export default function OrcamentoDetalhePage({
           </div>
 
           <div className="rounded-[4px] border border-[#E5E5E3] bg-white overflow-hidden">
-            <div className="border-b border-[#E5E5E3] bg-[#FAFAF9] px-5 py-3">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">Materiais Cotados</h2>
+            <div className="border-b border-[#E5E5E3] bg-[#FAFAF9] px-5 py-3 flex items-center justify-between">
+              <div>
+                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">Materiais Cotados</h2>
+              </div>
+              {modoEdicao ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setModoEdicao(false)}
+                    className="flex items-center gap-2 rounded-[4px] border border-[#E5E5E3] bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-[#FAFAF9] transition-colors"
+                  >
+                    <XIcon className="h-3.5 w-3.5" /> Cancelar
+                  </button>
+                  <button
+                    onClick={handleSaveItens}
+                    disabled={saving}
+                    className="flex items-center gap-2 rounded-[4px] bg-[#15803D] hover:bg-[#166534] px-3 py-1.5 text-xs font-bold text-white disabled:opacity-60 transition-colors"
+                  >
+                    <Save className="h-3.5 w-3.5" /> Salvar Alterações
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    setModoEdicao(true)
+                    setItensEditados(itens.map((i) => ({ ...i })))
+                    setFreteEditado(String(orcamento.valor_frete || 0))
+                    setDescontoPixManual(String(orcamento.desconto_pix || 0))
+                  }}
+                  className="flex items-center gap-2 rounded-[4px] border border-[#15803D] text-[#15803D] px-3 py-1.5 text-xs font-bold hover:bg-[#15803D] hover:text-white transition-colors"
+                >
+                  <Pencil className="h-3.5 w-3.5" /> Editar Itens / Valores
+                </button>
+              )}
             </div>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[#E5E5E3] text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  <th className="px-4 py-2.5">Produto</th>
-                  <th className="px-4 py-2.5 w-16 text-center">SKU</th>
-                  <th className="px-4 py-2.5 w-16 text-center">Qtd</th>
-                  <th className="px-4 py-2.5 w-20 text-right">Preço Unit.</th>
-                  <th className="px-4 py-2.5 w-20 text-center">Tipo</th>
-                  <th className="px-4 py-2.5 w-24 text-right">Subtotal</th>
-                  <th className="px-4 py-2.5 w-16 text-center">Peso</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#E5E5E3]">
-                {itens.map((i) => {
-                  const sub = Number(i.preco_aplicado) * Number(i.quantidade)
-                  const tipoLabel = i.tipo_preco === "palete" ? "Palete" : i.tipo_preco === "carga_fechada" ? "Carga Fechada" : "Avulso"
-                  return (
-                    <tr key={i.id} className="hover:bg-[#FAFAF9]">
-                      <td className="px-4 py-3">
-                        <div className="font-medium text-slate-800">{i.nome_produto}</div>
-                        {i.sku && <div className="text-[10px] text-slate-500 mt-0.5">{i.sku}</div>}
-                      </td>
-                      <td className="px-4 py-3 text-center text-slate-500">{i.sku || "—"}</td>
-                      <td className="px-4 py-3 text-center">{Number(i.quantidade).toLocaleString("pt-BR")}</td>
-                      <td className="px-4 py-3 text-right">{brl(Number(i.preco_aplicado))}</td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[9px] font-bold ${i.tipo_preco === "palete" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : i.tipo_preco === "carga_fechada" ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-[#FAFAF9] text-slate-600 border-[#E5E5E3]"}`}>
-                          {tipoLabel}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-right font-medium">{brl(sub)}</td>
-                      <td className="px-4 py-3 text-center text-slate-600 font-mono">{Number(i.peso_total_kg || 0).toLocaleString("pt-BR")} kg</td>
+            <div className="p-4">
+              {modoEdicao ? (
+                <>
+                  <div className="mb-4 relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <input
+                      type="text"
+                      value={buscaProduto}
+                      onChange={(e) => setBuscaProduto(e.target.value)}
+                      placeholder="Buscar produto para adicionar..."
+                      className="w-full h-10 rounded-[4px] border border-[#E5E5E3] bg-white pl-10 pr-4 text-sm outline-none focus:border-[#15803D]"
+                    />
+                    {buscandoProduto && <p className="text-[10px] text-slate-400 absolute right-3 top-1/2 -translate-y-1/2">Buscando...</p>}
+                  </div>
+                  {resultadosBusca.length > 0 && (
+                    <div className="mb-4 absolute left-0 right-0 z-20 max-h-60 overflow-y-auto rounded-[4px] border border-[#E5E5E3] bg-white shadow-xl divide-y divide-[#E5E5E3]">
+                      {resultadosBusca.map((p) => (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => adicionarProdutoAoOrcamento(p)}
+                          className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-[#FAFAF9] border-b border-[#E5E5E3] last:border-b-0"
+                        >
+                          <div>
+                            <div className="font-medium text-slate-800 text-sm">{p.name}</div>
+                            <div className="text-[10px] text-slate-500">{p.sku || "Sem SKU"} · {p.unit || "un"} · Estoque: {p.stock}</div>
+                          </div>
+                          <Plus className="h-4 w-4 text-[#15803D]" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-[#E5E5E3] text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          <th className="px-4 py-2.5">Produto</th>
+                          <th className="px-4 py-2.5 w-16 text-center">SKU</th>
+                          <th className="px-4 py-2.5 w-16 text-center">Qtd</th>
+                          <th className="px-4 py-2.5 w-20 text-right">Preço Unit.</th>
+                          <th className="px-4 py-2.5 w-24 text-right">Subtotal</th>
+                          <th className="px-4 py-2.5 w-12 text-center">Ação</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#E5E5E3]">
+                        {itensEditados.map((i, idx) => {
+                          const sub = Number(i.preco_aplicado) * Number(i.quantidade)
+                          return (
+                            <tr key={i.id} className="hover:bg-[#FAFAF9]">
+                              <td className="px-4 py-3">
+                                <div className="font-medium text-slate-800">{i.nome_produto}</div>
+                                {i.sku && <div className="text-[10px] text-slate-500 mt-0.5">SKU: {i.sku}</div>}
+                              </td>
+                              <td className="px-4 py-3 text-center text-slate-500">{i.sku || "—"}</td>
+                              <td className="px-4 py-3 text-center">
+                                <div className="flex items-center justify-center gap-1">
+                                  <button
+                                    onClick={() => {
+                                      const nova = Math.max(1, Number(i.quantidade) - 1)
+                                      setItensEditados(itensEditados.map((x) => x.id === i.id ? { ...x, quantidade: nova } : x))
+                                    }}
+                                    className="p-1 text-slate-600 hover:text-[#C2410C]"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </button>
+                                  <span className="w-8 text-center font-mono font-bold text-slate-800">
+                                    {Number(i.quantidade).toLocaleString("pt-BR")}
+                                  </span>
+                                  <button
+                                    onClick={() => {
+                                      setItensEditados(itensEditados.map((x) => x.id === i.id ? { ...x, quantidade: Number(x.quantidade) + 1 } : x))
+                                    }}
+                                    className="p-1 text-slate-600 hover:text-[#15803D]"
+                                  >
+                                    <Plus className="h-3 w-3" />
+                                  </button>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-right">
+                                <input
+                                  type="number"
+                                  value={Number(i.preco_aplicado)}
+                                  onChange={(e) => {
+                                    const v = Number(e.target.value) || 0
+                                    setItensEditados(itensEditados.map((x) => x.id === i.id ? { ...x, preco_aplicado: v } : x))
+                                  }}
+                                  className="w-full h-8 rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] px-2 text-xs font-mono text-right text-slate-900 outline-none focus:border-[#15803D]"
+                                />
+                              </td>
+                              <td className="px-4 py-3 text-right font-medium">{brl(sub)}</td>
+                              <td className="px-4 py-3 text-center">
+                                <button
+                                  onClick={() => setItensEditados(itensEditados.filter((x) => x.id !== i.id))}
+                                  className="p-1 text-slate-400 hover:text-red-600"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </button>
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-[#E5E5E3] grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Frete</label>
+                      <input
+                        type="number"
+                        value={freteEditado}
+                        onChange={(e) => setFreteEditado(e.target.value)}
+                        placeholder="0,00"
+                        className="w-full h-10 rounded-[4px] border border-[#E5E5E3] bg-white px-3 text-sm font-mono text-slate-900 outline-none focus:border-[#15803D]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Desconto PIX</label>
+                      <input
+                        type="number"
+                        value={descontoPixManual}
+                        onChange={(e) => setDescontoPixManual(e.target.value)}
+                        placeholder="0,00"
+                        className="w-full h-10 rounded-[4px] border border-[#E5E5E3] bg-white px-3 text-sm font-mono text-slate-900 outline-none focus:border-[#15803D]"
+                      />
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-[#E5E5E3] text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      <th className="px-4 py-2.5">Produto</th>
+                      <th className="px-4 py-2.5 w-16 text-center">SKU</th>
+                      <th className="px-4 py-2.5 w-16 text-center">Qtd</th>
+                      <th className="px-4 py-2.5 w-20 text-right">Preço Unit.</th>
+                      <th className="px-4 py-2.5 w-20 text-center">Tipo</th>
+                      <th className="px-4 py-2.5 w-24 text-right">Subtotal</th>
+                      <th className="px-4 py-2.5 w-16 text-center">Peso</th>
                     </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody className="divide-y divide-[#E5E5E3]">
+                    {itensParaExibir.map((i) => {
+                      const sub = Number(i.preco_aplicado) * Number(i.quantidade)
+                      const tipoLabel = i.tipo_preco === "palete" ? "Palete" : i.tipo_preco === "carga_fechada" ? "Carga Fechada" : "Avulso"
+                      return (
+                        <tr key={i.id} className="hover:bg-[#FAFAF9]">
+                          <td className="px-4 py-3">
+                            <div className="font-medium text-slate-800">{i.nome_produto}</div>
+                            {i.sku && <div className="text-[10px] text-slate-500 mt-0.5">{i.sku}</div>}
+                          </td>
+                          <td className="px-4 py-3 text-center text-slate-500">{i.sku || "—"}</td>
+                          <td className="px-4 py-3 text-center">{Number(i.quantidade).toLocaleString("pt-BR")}</td>
+                          <td className="px-4 py-3 text-right">{brl(Number(i.preco_aplicado))}</td>
+                          <td className="px-4 py-3 text-center">
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[9px] font-bold ${i.tipo_preco === "palete" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : i.tipo_preco === "carga_fechada" ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-[#FAFAF9] text-slate-600 border-[#E5E5E3]"}`}>
+                              {tipoLabel}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right font-medium">{brl(sub)}</td>
+                          <td className="px-4 py-3 text-center text-slate-600 font-mono">{Number(i.peso_total_kg || 0).toLocaleString("pt-BR")} kg</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
 
           <div className="rounded-[4px] border border-[#E5E5E3] bg-white p-5">
@@ -428,19 +729,19 @@ export default function OrcamentoDetalhePage({
                 <span className="text-slate-500">Subtotal Materiais</span>
                 <span className="font-medium text-slate-900">{brl(totalItens)}</span>
               </div>
-              {Number(orcamento.desconto_pix || 0) > 0 && (
+              {descontoPixDisplay > 0 && (
                 <div className="flex justify-between text-sm text-emerald-600">
-                  <span>Desconto PIX (3%)</span>
-                  <span className="font-semibold">- {brl(Number(orcamento.desconto_pix))}</span>
+                  <span>Desconto PIX</span>
+                  <span className="font-semibold">- {brl(descontoPixDisplay)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500">Frete</span>
-                <span className="font-medium text-slate-900">{Number(orcamento.valor_frete || 0) === 0 ? "Grátis" : brl(Number(orcamento.valor_frete))}</span>
+                <span className="font-medium text-slate-900">{valorFreteDisplay === 0 ? "Grátis" : brl(valorFreteDisplay)}</span>
               </div>
               <div className="border-t border-[#E5E5E3] pt-3 mt-2 flex justify-between font-bold">
                 <span className="text-sm">TOTAL GERAL</span>
-                <span className="text-base font-black text-[#C2410C]">{brl(Number(orcamento.total || 0))}</span>
+                <span className="text-base font-black text-[#C2410C]">{brl(totalGeralDisplay)}</span>
               </div>
             </div>
             <div className="mt-5 pt-4 border-t border-[#E5E5E3] rounded-[4px] border border-amber-100 bg-amber-50 p-3">
