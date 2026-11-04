@@ -6,8 +6,7 @@ import { ArrowLeft, Search, PackageOpen } from "lucide-react"
 import { rawTokens, canonicalCementSearch, matchesSearch, escapeLike } from "@/lib/search-normalize"
 import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon"
 
-export const dynamic = "force-static"
-export const revalidate = 60
+export const dynamic = "force-dynamic"
 
 export async function generateMetadata({
   searchParams,

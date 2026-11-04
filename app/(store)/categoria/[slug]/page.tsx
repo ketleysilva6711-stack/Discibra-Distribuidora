@@ -35,7 +35,7 @@ function slugCandidates(slug: string): string[] {
   return out
 }
 
-export const revalidate = 300 // 5 min de cache edge/ISR
+export const dynamic = "force-dynamic"
 
 export async function generateMetadata({
   params,
