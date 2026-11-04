@@ -14,6 +14,8 @@ const SLUG_ALIASES: Record<string, string[]> = {
   "ferramentas-e-epis": ["ferramentas-epis", "ferramentas"],
   "ferramentas-epis": ["ferramentas-e-epis", "ferramentas"],
   "ferramentas": ["ferramentas-e-epis", "ferramentas-epis"],
+  "cimento": ["cimentos"],
+  "cimentos": ["cimento"],
 }
 
 function slugCandidates(slug: string): string[] {
@@ -138,31 +140,42 @@ export default async function CategoryPage({
     .eq("active", true)
 
   // Ordenação comercial B2B via query param ?sort=
-  switch (sort) {
-    case "price_asc":
-      query = query.order("price", { ascending: true })
-      break
-    case "price_desc":
-      query = query.order("price", { ascending: false })
-      break
-    default:
-      query = query.order("sort_order", { ascending: true }).order("created_at", {
-        ascending: false,
-      })
+  // Observação: a tabela products NÃO possui coluna sort_order (apenas categories).
+  // Ordenamos sempre por featured (destaques primeiro) e created_at (mais recentes).
+  let products: any[] = []
+  let total = 0
+  let sortLabel = "Mais recentes / destaques"
+  try {
+    switch (sort) {
+      case "price_asc":
+        query = query.order("price", { ascending: true })
+        break
+      case "price_desc":
+        query = query.order("price", { ascending: false })
+        break
+      default:
+        query = query.order("featured", { ascending: false }).order("created_at", {
+          ascending: false,
+        })
+    }
+
+    const { data, count, error } = await query.range(from, to)
+    if (error) throw error
+
+    products = data || []
+    total = count ?? 0
+    sortLabel =
+      sort === "price_asc"
+        ? "Menor preço"
+        : sort === "price_desc"
+          ? "Maior preço"
+          : "Mais recentes / destaques"
+  } catch (err) {
+    console.error("[Categoria] Erro ao buscar produtos:", err)
+    products = []
+    total = 0
+    sortLabel = "Mais recentes / destaques"
   }
-
-  const { data: products, count, error } = await query.range(from, to)
-
-  if (error) throw error
-
-  const total = count ?? 0
-
-  const sortLabel =
-    sort === "price_asc"
-      ? "Menor preço"
-      : sort === "price_desc"
-        ? "Maior preço"
-        : "Mais recentes / destaques"
 
   const breadcrumbItems = [
     { name: "Início", url: "/" },

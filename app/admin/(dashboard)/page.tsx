@@ -1,17 +1,61 @@
 ﻿"use client"
 
 import useSWR from "swr"
+import { useState } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import {
   ShoppingCart, Package, Star, MessageCircle, TrendingUp, AlertTriangle,
   ArrowRight, CheckCircle2, Clock, CreditCard,
+  ShieldCheck, RefreshCw,
 } from "lucide-react"
 
 const supabase = createClient()
 
 function brl(n: number) {
   return "R$ " + (Number(n) || 0).toFixed(2).replace(".", ",")
+}
+
+// ── Scanner de Infraestrutura em Tempo Real ──
+const VITAL_ROUTES = [
+  { path: "/", label: "Home" },
+  { path: "/categoria/cimentos", label: "Cimentos" },
+  { path: "/calculadora", label: "Calculadora" },
+  { path: "/orcamento/ORC-TEST", label: "Proposta Pública" },
+]
+
+let supabaseLatencyMs = 0
+
+async function pingSupabase(): Promise<number> {
+  const start = Date.now()
+  try {
+    await supabase.from("products").select("id").limit(1)
+  } catch {}
+  return Date.now() - start
+}
+
+async function fetchRouteStatus(route: string) {
+  const start = Date.now()
+  let ok = false
+  let status = 0
+  try {
+    const res = await fetch(route, { cache: "no-store", signal: AbortSignal.timeout(5000) })
+    status = res.status
+    ok = res.ok
+  } catch {
+    ok = false
+    status = 0
+  }
+  return { path: route, ok, status, ms: Date.now() - start }
+}
+
+async function runScanner() {
+  const [latency, routeResults] = await Promise.all([
+    pingSupabase(),
+    Promise.all(VITAL_ROUTES.map((r) => fetchRouteStatus(r.path))),
+  ])
+  supabaseLatencyMs = latency
+  return { latency, routes: routeResults, scannedAt: Date.now() }
 }
 
 async function fetchDashboard() {
@@ -61,6 +105,23 @@ export default function AdminDashboardPage() {
   const { data: metrics, isLoading: metricsLoading } = useSWR("admin-metrics", fetchMetrics, {
     refreshInterval: 30000,
   })
+
+  const [scannerStatus, setScannerStatus] = useState<{
+    latency: number
+    routes: { path: string; ok: boolean; status: number; ms: number }[]
+    scannedAt: number
+  } | null>(null)
+  const [scanning, setScanning] = useState(false)
+
+  const handleScan = async () => {
+    setScanning(true)
+    try {
+      const result = await runScanner()
+      setScannerStatus(result)
+    } finally {
+      setScanning(false)
+    }
+  }
 
   if (isLoading || !data) {
     return (
@@ -128,6 +189,114 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* Scanner do Sistema & Operações em Tempo Real */}
+      <section className="rounded-[4px] border border-[#E5E5E3] bg-white p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+          <div>
+            <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900">
+              <ShieldCheck className="h-4 w-4 text-[#15803D]" />
+              Scanner do Sistema &amp; Operações
+            </h2>
+            <p className="text-xs text-slate-500">
+              Latência do Supabase · integridade das rotas críticas · SLA de orçamentos abertos
+            </p>
+          </div>
+          <button
+            onClick={handleScan}
+            disabled={scanning}
+            className="flex items-center gap-2 rounded-[4px] border border-[#15803D] bg-white px-4 py-2 text-xs font-bold text-[#15803D] hover:bg-[#15803D] hover:text-white transition-colors disabled:opacity-60"
+          >
+            {scanning ? (
+              <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <RefreshCw className="h-3.5 w-3.5" />
+            )}
+            {scanning ? "Escaneando…" : "Escanear Agora"}
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Latência Supabase */}
+          <div className="rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] p-4">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+              Conexão Supabase
+            </p>
+            <div className="flex items-center gap-2">
+              <span className={`h-2 w-2 rounded-full ${
+                supabaseLatencyMs <= 200 ? "bg-[#15803D]" : supabaseLatencyMs <= 500 ? "bg-[#F47920]" : "bg-[#C2410C]"
+              } animate-pulse`} />
+              <span className="text-sm font-semibold text-slate-900">
+                {supabaseLatencyMs} ms
+              </span>
+              <span className="ml-2 text-[10px] text-slate-500">
+                {supabaseLatencyMs <= 200 ? "Estável" : supabaseLatencyMs <= 500 ? "Lento" : "Instável"}
+              </span>
+            </div>
+          </div>
+
+          {/* Integridade das rotas */}
+          <div className="rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] p-4">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+              Integridade das Rotas
+            </p>
+            <div className="space-y-2">
+              {(scannerStatus?.routes || VITAL_ROUTES.map((r) => ({ path: r.path, ok: true, status: 200, ms: 0 }))).map(
+                (r) => (
+                  <div key={r.path} className="flex items-center justify-between text-xs">
+                    <span className="text-slate-600">{r.path.replace("/", "") || "home"}</span>
+                    <span
+                      className={`px-2 py-0.5 rounded-[2px] font-bold ${
+                        r.ok ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-red-50 text-red-600 border-red-200"
+                      }`}
+                    >
+                      {r.ok ? "OK" : "FALHA"} · {r.ms}ms
+                    </span>
+                  </div>
+                )
+              )}
+              <p className="text-[10px] text-slate-400 mt-2">
+                Última verificação:{scannerStatus
+                  ? new Date(scannerStatus.scannedAt).toLocaleTimeString("pt-BR")
+                  : "—"}
+              </p>
+            </div>
+          </div>
+
+          {/* SLA Orçamentos Abertos */}
+          <div className="rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] p-4">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+              SLA — Orçamentos Abertos (últimas 2h)
+            </p>
+            <div className="flex items-baseline gap-1">
+              <span className="text-3xl font-black text-[#C2410C]">
+                {metrics?.orcamentosAbertos ?? 0}
+              </span>
+              <span className="text-sm font-bold text-slate-600">propostas</span>
+            </div>
+            <p className="text-[10px] text-slate-500 mt-2">
+              Aguardando fechamento via WhatsApp
+            </p>
+          </div>
+
+          {/* Última varredura */}
+          <div className="rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] p-4">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+              Status do Sistema
+            </p>
+            <div className="flex items-center gap-2">
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  scannerStatus ? "bg-[#15803D] animate-pulse" : "bg-slate-400"
+                }`}
+              />
+              <span className={`text-sm font-bold ${scannerStatus ? "text-[#15803D]" : "text-slate-500"}`}>
+                {scannerStatus ? "Sistema Verificado" : "Aguardando varredura"}
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* KPIs */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((k) => (

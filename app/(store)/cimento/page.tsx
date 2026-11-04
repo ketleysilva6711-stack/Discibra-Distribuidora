@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { waLink, SITE } from "@/lib/site-config"
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon"
 
 export const dynamic = "force-static"
 
@@ -42,6 +43,7 @@ type Offer = {
   tag?: string
   use: string
   searchSlug: string
+  productSlug: string
 }
 
 const OFFERS: Offer[] = [
@@ -56,6 +58,7 @@ const OFFERS: Offer[] = [
     tag: "Mais vendido",
     use: "Obras residenciais e reformas",
     searchSlug: "votoran",
+    productSlug: "cimento-votoran-todas-as-obras-cp2-50kg",
   },
   {
     name: "Votoran Obras Estruturais CP III-40",
@@ -68,6 +71,7 @@ const OFFERS: Offer[] = [
     tag: "Para estrutura",
     use: "Lajes, vigas, pilares e fundações",
     searchSlug: "votoran cp iii",
+    productSlug: "cimento-cp-iii-todas-obras-50kg-cinza-votoran-1-unidade-993",
   },
   {
     name: "Votoran Alta Resistência CP V ARI",
@@ -80,6 +84,7 @@ const OFFERS: Offer[] = [
     tag: "Desforma rápida",
     use: "Pré-moldados, industrial e obra acelerada",
     searchSlug: "votoran ari",
+    productSlug: "cimento-votoran-alta-resistencia-cp-v-ari-50kg",
   },
   {
     name: "Cauê Uso Geral CP II-E-32",
@@ -92,6 +97,7 @@ const OFFERS: Offer[] = [
     tag: "Custo-benefício",
     use: "Alvenaria, reboco e contrapiso",
     searchSlug: "caue",
+    productSlug: "cimento-caue-uso-geral-cp2-e-50kg-202517",
   },
   {
     name: "Montes Claros CP II-E-32",
@@ -104,6 +110,7 @@ const OFFERS: Offer[] = [
     tag: "Menor preço",
     use: "Obras e reformas em geral",
     searchSlug: "montes claros",
+    productSlug: "cimento-montes-claros-cp2-50kg",
   },
   {
     name: "Cimento CSN CP II-F-32",
@@ -115,6 +122,7 @@ const OFFERS: Offer[] = [
     economia: "R$ 400,00",
     use: "Alvenaria, reboco e concreto simples",
     searchSlug: "csn",
+    productSlug: "cimento-csn-cp-ii-f-32-50kg",
   },
   {
     name: "Cimento Mauá CP II-E-32",
@@ -126,6 +134,7 @@ const OFFERS: Offer[] = [
     economia: "R$ 400,00",
     use: "Obras residenciais e comerciais",
     searchSlug: "maua",
+    productSlug: "cimento-maua-cp-ii-e-32-50kg",
   },
   {
     name: "Cimento Branco Estrutural",
@@ -138,6 +147,7 @@ const OFFERS: Offer[] = [
     tag: "Especial",
     use: "Revestimentos, mármores e acabamento fino",
     searchSlug: "cimento branco",
+    productSlug: "cimento-branco-estrutural-25kg",
   },
 ]
 
@@ -163,14 +173,6 @@ const FAQS = [
     a: "Todas as cargas acompanham NF-e e laudo de resistência do fabricante, conforme NBR 16697. Enviamos a documentação por e-mail e WhatsApp antes da descarga.",
   },
 ]
-
-function WhatsAppSvg({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-    </svg>
-  )
-}
 
 export default function CimentoLandingPage() {
   const jsonLd = {
@@ -212,13 +214,13 @@ export default function CimentoLandingPage() {
 
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-14 lg:items-center">
             <div>
-              <div className="mb-5 inline-flex items-center gap-2 rounded-[4px] border border-[#25D366]/40 bg-[#25D366]/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#25D366]">
-                <span className="h-2 w-2 rounded-[4px] bg-[#25D366] animate-pulse" />
+              <div className="mb-5 inline-flex items-center gap-2 rounded-[4px] border border-[#15803D]/40 bg-[#15803D]/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#15803D]">
+                <span className="h-2 w-2 rounded-[4px] bg-[#15803D] animate-pulse" />
                 Entrega rápida com descarga inclusa
               </div>
               <h1 className="text-3xl font-black leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.4rem]">
                 Distribuidora de Cimento no Atacado —{" "}
-                <span className="text-[#25D366]">Direto da Fábrica</span>
+                <span className="text-[#15803D]">Direto da Fábrica</span>
               </h1>
               <p className="mt-5 max-w-xl text-base leading-relaxed text-white/70 sm:text-lg">
                 Saco de cimento 50kg, palete com 40 sacos e carga fechada de 560 a 640 sacos.
@@ -241,9 +243,9 @@ export default function CimentoLandingPage() {
                   data-track="btn_whatsapp"
                   data-button-name="btn_whatsapp"
                   data-source="cimento_hero"
-                  className="btn-whatsapp-track inline-flex min-h-[64px] flex-1 items-center justify-center gap-3 rounded-[4px] bg-[#25D366] px-8 text-lg font-black text-white transition-all hover:bg-[#1EBE5B] hover:scale-[1.02] active:scale-95 sm:flex-none sm:px-10"
+                  className="btn-whatsapp-track inline-flex min-h-[64px] flex-1 items-center justify-center gap-3 rounded-[4px] bg-[#15803D] px-8 text-lg font-black text-white transition-all hover:bg-[#166534] hover:scale-[1.02] active:scale-95 sm:flex-none sm:px-10"
                 >
-                  <WhatsAppSvg className="h-7 w-7" />
+                  <WhatsAppIcon className="h-7 w-7" />
                   <span className="hidden sm:inline">Cotar Carga Fechada ou Palete no WhatsApp</span>
                   <span className="sm:hidden">Cotar no WhatsApp</span>
                 </a>
@@ -267,7 +269,7 @@ export default function CimentoLandingPage() {
                       <p className="font-bold text-white">{r.k}</p>
                       <p className="text-xs text-white/55">{r.d}</p>
                     </div>
-                    <p className="text-right text-sm font-black text-[#25D366] whitespace-nowrap">{r.v}</p>
+                    <p className="text-right text-sm font-black text-[#15803D] whitespace-nowrap">{r.v}</p>
                   </div>
                 ))}
               </div>
@@ -328,7 +330,7 @@ export default function CimentoLandingPage() {
                 data-source="cimento_super_oferta"
                 className="btn-whatsapp-track inline-flex min-h-[54px] items-center justify-center gap-2 rounded-[4px] bg-[#15803D] px-8 text-sm font-black text-white transition-colors hover:bg-[#166534]"
               >
-                <WhatsAppSvg className="h-5 w-5 shrink-0" />
+                <WhatsAppIcon className="h-5 w-5 shrink-0" />
                 Garantir Oferta no WhatsApp
               </a>
               <p className="text-center text-xs text-[#6B7280]">
@@ -341,7 +343,7 @@ export default function CimentoLandingPage() {
         <div className="mb-8 max-w-3xl">
           <p className="text-xs font-black uppercase tracking-[0.3em] text-[#F47920]">Tipos e preços</p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900 sm:text-4xl">
-            Tabela comparativa de cimentos e preços de atacado
+            Cimentos no Atacado — Tabela Direto da Fábrica
           </h2>
           <p className="mt-3 text-sm text-slate-500 sm:text-base">
             Valores por saco com faixas de desconto: <strong>carga fechada</strong> (maior desconto) e{" "}
@@ -353,10 +355,10 @@ export default function CimentoLandingPage() {
           {OFFERS.map((o) => (
             <article
               key={o.name}
-              className="flex flex-col rounded-[4px] border border-slate-200 bg-white p-5 border border-slate-200 bg-white p-5 transition-all hover:border-[#25D366]/50"
+              className="flex flex-col h-full justify-between rounded-[4px] border border-slate-200 bg-white p-5 border border-slate-200 bg-white p-5 transition-all hover:border-[#15803D]/50"
             >
               {o.tag && (
-                <span className="mb-3 inline-flex w-fit rounded-[4px] bg-[#0A1628] px-3 py-1 text-[10px] font-black uppercase tracking-widest text-[#25D366]">
+                <span className="mb-3 inline-flex w-fit rounded-[4px] bg-[#0A1628] px-3 py-1 text-[10px] font-black uppercase tracking-widest text-[#15803D]">
                   {o.tag}
                 </span>
               )}
@@ -393,13 +395,13 @@ export default function CimentoLandingPage() {
                 data-track="btn_whatsapp"
                 data-button-name="btn_whatsapp"
                 data-source="cimento_card"
-                className="btn-whatsapp-track mt-4 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-[4px] bg-[#25D366] px-4 text-sm font-black text-white  transition-all hover:bg-[#1EBE5B] active:scale-95"
+                className="btn-whatsapp-track mt-4 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-[4px] bg-[#15803D] px-4 text-sm font-black text-white  transition-all hover:bg-[#166534] active:scale-95"
               >
-                <WhatsAppSvg className="h-5 w-5" />
+                <WhatsAppIcon className="h-5 w-5" />
                 Cotar este cimento no WhatsApp
               </a>
               <Link
-                href={`/busca?q=${encodeURIComponent(o.searchSlug)}`}
+                href={o.productSlug ? `/produto/${o.productSlug}` : `/busca?q=${encodeURIComponent(o.searchSlug)}`}
                 className="mt-2 text-center text-xs font-semibold text-slate-400 hover:text-slate-700"
               >
                 Ver no catálogo →
@@ -422,7 +424,7 @@ export default function CimentoLandingPage() {
             data-source="cimento_b2b"
             className="btn-whatsapp-track mt-4 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-[4px] bg-[#15803D] px-8 font-black text-white transition-colors hover:bg-[#166534]"
           >
-            <WhatsAppSvg className="h-5 w-5" />
+            <WhatsAppIcon className="h-5 w-5" />
             Abrir conta B2B no WhatsApp
           </a>
         </div>
@@ -466,10 +468,10 @@ export default function CimentoLandingPage() {
             <h2 className="text-2xl font-black text-slate-900 sm:text-3xl">Perguntas frequentes do atacado</h2>
             <div className="mt-6 space-y-3">
               {FAQS.map((f) => (
-                <details key={f.q} className="group rounded-[4px] border border-slate-200 bg-white p-5 open:border-[#25D366]/50 open:">
+                <details key={f.q} className="group rounded-[4px] border border-slate-200 bg-white p-5 open:border-[#15803D]/50 open:">
                   <summary className="cursor-pointer list-none font-bold text-slate-900 flex items-center justify-between gap-4">
                     {f.q}
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[4px] bg-slate-100 font-black text-slate-500 group-open:bg-[#25D366] group-open:text-white transition-all">+</span>
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[4px] bg-slate-100 font-black text-slate-500 group-open:bg-[#15803D] group-open:text-white transition-all">+</span>
                   </summary>
                   <p className="mt-3 text-sm leading-relaxed text-slate-600">{f.a}</p>
                 </details>
@@ -489,7 +491,7 @@ export default function CimentoLandingPage() {
                 data-source="cimento_faq_cta"
                 className="btn-whatsapp-track mt-4 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[4px] bg-[#15803D] px-6 text-sm font-bold text-white transition-colors hover:bg-[#166534]"
               >
-                <WhatsAppSvg className="h-4 w-4" />
+                <WhatsAppIcon className="h-4 w-4" />
                 Falar com Especialista
               </a>
             </div>
@@ -514,7 +516,7 @@ export default function CimentoLandingPage() {
             data-source="cimento_footer"
             className="btn-whatsapp-track mx-auto mt-6 inline-flex min-h-[64px] items-center justify-center gap-3 rounded-[4px] bg-[#15803D] px-10 text-lg font-black text-white transition-colors hover:bg-[#166534] hover:scale-[1.02] active:scale-95"
           >
-            <WhatsAppSvg className="h-7 w-7" />
+            <WhatsAppIcon className="h-7 w-7" />
             Cotar agora no WhatsApp
           </a>
         </div>

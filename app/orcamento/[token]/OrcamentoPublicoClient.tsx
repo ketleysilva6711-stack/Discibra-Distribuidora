@@ -422,8 +422,14 @@ export default function OrcamentoPublicoClient({
             body {
               background: #ffffff !important;
               color: #0f172a !important;
+              overflow: visible !important;
+              height: auto !important;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
+            }
+            html {
+              overflow: visible !important;
+              height: auto !important;
             }
             .print\\:hidden {
               display: none !important;
@@ -433,6 +439,7 @@ export default function OrcamentoPublicoClient({
             }
             header, main, div, table, tr, td, th {
               visibility: visible !important;
+              overflow: visible !important;
             }
             .print\\:max-w-none {
               max-width: none !important;

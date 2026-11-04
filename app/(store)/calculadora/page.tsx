@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { waLink } from "@/lib/site-config"
 import { trackWhatsAppClick } from "@/lib/track-whatsapp"
 
+export const dynamic = "force-static"
+
 const TILE_PRESETS = [
   { label: "Cerâmica até 45×45 cm (~4 kg/m²)", perM2: 4, type: "AC-I ou AC-II" },
   { label: "Porcelanato até 60×60 cm (~5 kg/m²)", perM2: 5, type: "AC-II ou AC-III" },
