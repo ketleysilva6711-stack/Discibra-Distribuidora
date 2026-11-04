@@ -1,7 +1,6 @@
 -- ==============================================================================
 -- DISCIBRA — Fase 1: Migração Core de Orçamentos, Frete e Precificação (B2C)
 -- Idempotente: pode ser re-executada sem erro
--- Aplicar no SQL Editor: https://supabase.com/dashboard/project/mvgwgzzaiamxddydrclt/sql
 -- ==============================================================================
 
 -- 1. Função de atualização de timestamp (atualizado_em)
@@ -134,22 +133,24 @@ SELECT * FROM (VALUES
 ) AS v(km_max, km_faixa_anterior, valor_base, valor_km_adicional, valor_minimo_frete_gratis, taxa_munck)
 WHERE NOT EXISTS (SELECT 1 FROM public.configuracoes_frete LIMIT 1);
 
--- 7. CEP base e endereço da matriz em site_settings
-CREATE TABLE IF NOT EXISTS public.site_settings (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  key TEXT NOT NULL UNIQUE,
-  value JSONB NOT NULL,
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
+-- 7. CEP base e endereço do CD em site_settings (estrutura existente)
+ALTER TABLE public.site_settings
+  ADD COLUMN IF NOT EXISTS cep_base TEXT DEFAULT '14060000',
+  ADD COLUMN IF NOT EXISTS logradouro_base TEXT DEFAULT 'Rua Igarapava',
+  ADD COLUMN IF NOT EXISTS numero_base TEXT DEFAULT '73',
+  ADD COLUMN IF NOT EXISTS bairro_base TEXT DEFAULT 'Vila Albertina',
+  ADD COLUMN IF NOT EXISTS cidade_base TEXT DEFAULT 'Ribeirão Preto',
+  ADD COLUMN IF NOT EXISTS uf_base TEXT DEFAULT 'SP';
 
-INSERT INTO public.site_settings (key, value) VALUES
-  ('cep_base', '"14060000"'::jsonb),
-  ('logradouro_base', '"Rua Igarapava"'::jsonb),
-  ('numero_base', '"73"'::jsonb),
-  ('bairro_base', '"Vila Albertina"'::jsonb),
-  ('cidade_base', '"Ribeirão Preto"'::jsonb),
-  ('uf_base', '"SP"'::jsonb)
-ON CONFLICT (key) DO NOTHING;
+INSERT INTO public.site_settings (id, cep_base, logradouro_base, numero_base, bairro_base, cidade_base, uf_base)
+VALUES ('default', '14060000', 'Rua Igarapava', '73', 'Vila Albertina', 'Ribeirão Preto', 'SP')
+ON CONFLICT (id) DO UPDATE SET
+  cep_base = COALESCE(public.site_settings.cep_base, '14060000'),
+  logradouro_base = COALESCE(public.site_settings.logradouro_base, 'Rua Igarapava'),
+  numero_base = COALESCE(public.site_settings.numero_base, '73'),
+  bairro_base = COALESCE(public.site_settings.bairro_base, 'Vila Albertina'),
+  cidade_base = COALESCE(public.site_settings.cidade_base, 'Ribeirão Preto'),
+  uf_base = COALESCE(public.site_settings.uf_base, 'SP');
 
 -- 8. Colunas de preço multi-faixa e peso em products (idempotente)
 ALTER TABLE public.products
@@ -179,8 +180,14 @@ UPDATE public.products
     preco_lista = ROUND(price * 1.10, 2)
 WHERE preco_avulso IS NULL;
 
--- 9. Views de compatibilidade (código legado continua funcionando)
-DROP VIEW IF EXISTS public.quotations;
+-- 9. Transição e Compatibilidade de Quotations
+-- Se quotations e quotation_items existirem como tabelas antigas (vazias), removemos com segurança para virarem views
+DROP TABLE IF EXISTS public.quotation_items CASCADE;
+DROP TABLE IF EXISTS public.quotations CASCADE;
+DROP TABLE IF EXISTS public.quotation_leads CASCADE;
+DROP VIEW IF EXISTS public.quotation_items CASCADE;
+DROP VIEW IF EXISTS public.quotations CASCADE;
+
 CREATE OR REPLACE VIEW public.quotations AS
   SELECT
     id,
@@ -202,7 +209,6 @@ CREATE OR REPLACE VIEW public.quotations AS
     atualizado_em AS updated_at
   FROM public.orcamentos;
 
-DROP VIEW IF EXISTS public.quotation_items;
 CREATE OR REPLACE VIEW public.quotation_items AS
   SELECT
     id,
