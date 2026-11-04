@@ -1,11 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { Phone, MessageCircle, Mail, X, Headphones } from "lucide-react"
+import { Phone, Mail, X, Headphones } from "lucide-react"
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogHeader } from "@/components/ui/dialog"
 import { SITE } from "@/lib/site-config"
 import { trackWhatsAppClick } from "@/lib/track-whatsapp"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon"
 
 export default function ContactPopup({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
@@ -59,12 +60,12 @@ export default function ContactPopup({ children }: { children: React.ReactNode }
             data-button-name="btn_whatsapp"
             data-name="btn_whatsapp"
             data-source="contact_popup_whatsapp"
-            className="btn-whatsapp-track flex items-center gap-4 bg-white border border-black/5 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all group overflow-hidden"
+            className="btn-whatsapp-track flex items-center gap-4 bg-[#15803D] hover:bg-[#166534] text-white rounded-[4px] shadow-[0_4px_15px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all group overflow-hidden min-h-[48px] touch-manipulation"
           >
-            <div className="w-16 h-16 flex items-center justify-center bg-[#00E676] text-white group-hover:scale-105 transition-transform">
-              <MessageCircle className="w-8 h-8 fill-current" />
+            <div className="w-14 h-14 flex items-center justify-center bg-[#15803D] text-white group-hover:scale-105 transition-transform">
+              <WhatsAppIcon className="w-7 h-7 fill-current" />
             </div>
-            <span className="text-[13px] font-bold text-[#002D5B] uppercase tracking-tight">Tirar dúvidas pelo WhatsApp</span>
+            <span className="text-[13px] font-bold uppercase tracking-tight">Tirar dúvidas pelo WhatsApp</span>
           </a>
 
           {/* Email Button */}

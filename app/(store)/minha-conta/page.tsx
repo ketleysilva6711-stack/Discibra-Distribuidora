@@ -10,7 +10,6 @@ import {
   Menu,
   X,
   LogOut,
-  MessageCircle,
   ChevronRight,
   Loader2,
 } from "lucide-react"
@@ -28,6 +27,7 @@ import {
 import WhatsAppCta from "@/components/store/whatsapp-cta"
 import { waLink } from "@/lib/site-config"
 import { trackWhatsAppClick } from "@/lib/track-whatsapp"
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon"
 
 type Section = "resumo" | "dados" | "pedidos" | "enderecos"
 
@@ -248,9 +248,9 @@ export default function MinhaContaPage() {
                     data-name="btn_whatsapp"
                     data-source="minha_conta"
                     onClick={() => trackWhatsAppClick("minha_conta", "/minha-conta", authUserId)}
-                    className="inline-flex items-center gap-2 rounded-xl border border-[#25d366] px-5 py-2.5 text-sm font-semibold text-[#128C7E] hover:bg-[#25d366]/10 min-h-[44px] btn-whatsapp-track"
+                    className="inline-flex items-center gap-2 rounded-[4px] border border-[#15803D] bg-[#15803D] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#166534] min-h-[48px] touch-manipulation btn-whatsapp-track"
                   >
-                    <MessageCircle className="w-4 h-4" />
+                    <WhatsAppIcon className="w-4 h-4" />
                     Orçamento
                   </a>
                 </div>

@@ -1,12 +1,13 @@
 "use client"
 import { useMemo, useState } from "react"
 import Link from "next/link"
-import { ArrowLeft, BrickWall, Box, Layers, Percent, Sparkles, MessageCircle } from "lucide-react"
+import { ArrowLeft, BrickWall, Box, Layers, Percent, Sparkles } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { waLink } from "@/lib/site-config"
 import { trackWhatsAppClick } from "@/lib/track-whatsapp"
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon"
 
 export const dynamic = "force-static"
 
@@ -162,9 +163,9 @@ export default function CalculadoraPage() {
               data-track="btn_whatsapp"
               data-source="calc_mortar_grout"
               onClick={() => trackWhatsAppClick("calc_mortar_grout", "/calculadora")}
-              className="w-full flex h-11 items-center justify-center gap-2 rounded-[4px] bg-[#15803D] text-xs font-bold text-white transition hover:bg-[#166534] btn-whatsapp-track"
+              className="w-full flex h-11 items-center justify-center gap-2 rounded-[4px] bg-[#15803D] text-xs font-bold text-white transition hover:bg-[#166534] btn-whatsapp-track touch-manipulation"
             >
-              <MessageCircle className="w-4 h-4" />
+              <WhatsAppIcon className="w-4 h-4" />
               Cotar {mortarAndGrout.mortarBags} Sacos de Argamassa pelo WhatsApp
             </a>
           </CardContent>
@@ -224,9 +225,9 @@ export default function CalculadoraPage() {
               data-track="btn_whatsapp"
               data-source="calc_cement"
               onClick={() => trackWhatsAppClick("calc_cement", "/calculadora")}
-              className="w-full flex h-11 items-center justify-center gap-2 rounded-[4px] bg-[#15803D] text-xs font-bold text-white transition hover:bg-[#166534] btn-whatsapp-track"
+              className="w-full flex h-11 items-center justify-center gap-2 rounded-[4px] bg-[#15803D] text-xs font-bold text-white transition hover:bg-[#166534] btn-whatsapp-track touch-manipulation"
             >
-              <MessageCircle className="w-4 h-4" />
+              <WhatsAppIcon className="w-4 h-4" />
               Cotar {cementBags} Sacos de Cimento no WhatsApp
             </a>
           </CardContent>
@@ -287,9 +288,9 @@ export default function CalculadoraPage() {
               data-track="btn_whatsapp"
               data-source="calc_bricks"
               onClick={() => trackWhatsAppClick("calc_bricks", "/calculadora")}
-              className="w-full flex h-11 items-center justify-center gap-2 rounded-[4px] bg-[#15803D] text-xs font-bold text-white transition hover:bg-[#166534] btn-whatsapp-track"
+              className="w-full flex h-11 items-center justify-center gap-2 rounded-[4px] bg-[#15803D] text-xs font-bold text-white transition hover:bg-[#166534] btn-whatsapp-track touch-manipulation"
             >
-              <MessageCircle className="w-4 h-4" />
+              <WhatsAppIcon className="w-4 h-4" />
               Cotar {bricks.qty.toLocaleString("pt-BR")} Unidades pelo WhatsApp
             </a>
           </CardContent>
