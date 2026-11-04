@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Grid, ShoppingCart, MessageCircle } from "lucide-react"
+import { Home, Grid, ShoppingCart } from "lucide-react"
 import { SITE, waLink } from "@/lib/site-config"
 import { trackWhatsAppClick } from "@/lib/track-whatsapp"
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon"
 import { cn } from "@/lib/utils"
 
 export default function MobileBottomNav() {
@@ -32,14 +33,14 @@ export default function MobileBottomNav() {
     {
       label: "WhatsApp",
       href: waLink("Olá! Gostaria de fazer uma cotação de materiais."),
-      icon: MessageCircle,
+      icon: WhatsAppIcon,
       isWa: true,
     },
     { label: "Orçamento", href: "/carrinho", icon: ShoppingCart, count: cartCount, active: pathname === "/carrinho" },
   ]
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-xl border-t border-slate-200/80 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] lg:hidden pb-[env(safe-area-inset-bottom,0px)]">
+    <div className="fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-xl border-t border-slate-200 lg:hidden pb-[env(safe-area-inset-bottom,0px)]">
       <nav className="flex items-center justify-around h-16 max-w-md mx-auto px-2">
         {items.map((item) => {
           if (item.isWa) {
@@ -53,12 +54,10 @@ export default function MobileBottomNav() {
                 data-track="btn_whatsapp"
                 data-button-name="btn_whatsapp"
                 data-source="mobile_bottom_nav"
-                className="flex flex-col items-center justify-center flex-1 h-full gap-1 text-[#25D366] active:scale-90 transition-transform btn-whatsapp-track"
+                className="flex flex-col items-center justify-center flex-1 h-full gap-1 text-[#15803D] active:scale-95 transition-transform btn-whatsapp-track"
               >
-                <div className="relative flex items-center justify-center w-11 h-11 rounded-full bg-emerald-500 text-white ring-2 ring-emerald-400/40 animate-pulse shadow-lg">
-                  <item.icon className="w-5 h-5 fill-current" />
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-wider">{item.label}</span>
+                <WhatsAppIcon className="h-5 w-5" />
+                <span className="text-[10px] font-bold uppercase tracking-wider">{item.label}</span>
               </a>
             )
           }
@@ -69,13 +68,12 @@ export default function MobileBottomNav() {
               href={item.href}
               className={cn(
                 "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all active:scale-95",
-                item.active ? "text-[#002D5B]" : "text-slate-500 hover:text-slate-800"
-              )}
-            >
+                item.active ? "text-[#15803D]" : "text-slate-500 hover:text-slate-800"
+              )}>
               <div className="relative">
                 <item.icon className={cn("w-5 h-5", item.active && "stroke-[2.5px]")} />
                 {item.count !== undefined && item.count > 0 && (
-                  <span className="absolute -top-1.5 -right-2.5 flex items-center justify-center h-4 min-w-4 px-1 rounded-full bg-[#002D5B] text-white text-[9px] font-black ring-2 ring-white">
+                  <span className="absolute -top-1.5 -right-2.5 flex items-center justify-center h-4 min-w-4 px-1 rounded-full bg-[#15803D] text-white text-[9px] font-black ring-2 ring-white">
                     {item.count}
                   </span>
                 )}

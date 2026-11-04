@@ -54,7 +54,7 @@ export default function StoreSearch() {
       }}
     >
       <div className="group relative flex items-center">
-        <div className="absolute left-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+        <div className="absolute left-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#15803D] transition-colors">
           <Search className="h-5 w-5" />
         </div>
         <input
@@ -64,15 +64,15 @@ export default function StoreSearch() {
           value={q}
           onChange={(e) => handleChange(e.target.value)}
           placeholder="Buscar cimento, aço, ferramentas..."
-          className="h-14 w-full rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] pl-14 pr-20 sm:pr-24 text-sm font-bold text-slate-900 placeholder:font-medium placeholder:text-slate-400 outline-none transition-all focus:bg-white focus:border-[#15803D]/20 focus:ring-4 focus:ring-[#15803D]/5"
+          className="h-12 w-full rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] pl-14 pr-28 sm:pr-32 text-sm font-bold text-slate-900 placeholder:font-medium placeholder:text-slate-400 outline-none transition-all focus:bg-white focus:border-[#15803D]/20 focus:ring-4 focus:ring-[#15803D]/5"
         />
         <div className="absolute right-1.5 p-1">
           <button
             type="submit"
-            className="h-11 px-3 sm:px-5 rounded-[4px] bg-[#111318] text-white text-xs sm:text-sm font-black uppercase tracking-widest transition-colors hover:bg-black active:scale-95"
+            className="h-10 w-10 rounded-[4px] bg-[#15803D] text-white flex items-center justify-center transition-colors hover:bg-[#166534] active:scale-95"
             aria-label="Buscar"
           >
-            Buscar
+            <Search className="h-5 w-5" />
           </button>
         </div>
       </div>

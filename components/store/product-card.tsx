@@ -180,7 +180,7 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
           <div className="flex items-center gap-1">
             <div className={cn(
               "w-1.5 h-1.5 rounded-[4px]",
-              product.stock > 0 ? "bg-[#15803D] animate-pulse" : "bg-[#6B7280]"
+              product.stock > 0 ? "bg-[#15803D]" : "bg-slate-400"
             )} />
             <span className={cn(
               "text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em]",

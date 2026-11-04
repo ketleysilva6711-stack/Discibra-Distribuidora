@@ -336,7 +336,7 @@ export function ProductPageClient({ product: initialProduct }: { product: Produc
               )}>
                 <div className={cn(
                   "w-2.5 h-2.5 rounded-full shrink-0",
-                  product.stock > 0 ? "bg-emerald-500 animate-pulse" : "bg-red-400"
+                  product.stock > 0 ? "bg-[#15803D]" : "bg-red-500"
                 )} />
                 <div>
                   <p className={cn(
