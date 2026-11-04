@@ -10,6 +10,12 @@ import VolumeUpsellBar from "@/components/checkout/VolumeUpsellBar"
 import CartItemRow from "@/components/checkout/CartItemRow"
 import FreightCalculatorBox from "@/components/checkout/FreightCalculatorBox"
 import { waLink, SITE } from "@/lib/site-config"
+import {
+  trackAddToCart,
+  trackBeginCheckout,
+  trackQuoteCreated,
+  trackWhatsAppClick,
+} from "@/lib/analytics/tracker"
 
 type CartItem = {
   id: string
@@ -101,6 +107,10 @@ export default function CartPage() {
         .then((data) => {
           setFreightResult(data)
           setFreightLoading(false)
+          trackBeginCheckout({
+            total: total,
+            itemsCount: totalItems,
+          })
         })
         .catch(() => setFreightLoading(false))
     } else if (metodoEntrega === "retirada") {
@@ -116,11 +126,21 @@ export default function CartPage() {
   }, [cep, metodoEntrega, cart])
 
   function updateQty(id: string, delta: number) {
+    const item = cart.find((i) => i.id === id)
     const updated = cart.map((i) =>
       i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i
     )
     setCart(updated)
     saveCart(updated)
+
+    if (delta > 0 && item) {
+      trackAddToCart({
+        id: item.id,
+        name: item.name,
+        price: item.preco_aplicado,
+        quantity: delta,
+      })
+    }
   }
 
   function removeItem(id: string) {
@@ -218,6 +238,31 @@ export default function CartPage() {
     if (whatsappUrl) {
       window.open(whatsappUrl, "_blank", "noopener,noreferrer")
     }
+
+    // Disparar eventos de analytics
+    trackQuoteCreated({
+      codigo,
+      total: totalGerado ?? 0,
+      formaPagamento: formaPagamento,
+      items: cart.map((i) => ({
+        id: i.id,
+        name: i.name,
+        price: i.preco_aplicado,
+        quantity: i.qty,
+      })),
+    })
+
+    trackWhatsAppClick({
+      codigo,
+      total: totalGerado ?? 0,
+      origem: "checkout_finalize",
+      items: cart.map((i) => ({
+        id: i.id,
+        name: i.name,
+        price: i.preco_aplicado,
+        quantity: i.qty,
+      })),
+    })
 
     // Redirecionar para a pagina publica do orcamento
     window.location.href = `/orcamento/${codigo}?t=${token}`
