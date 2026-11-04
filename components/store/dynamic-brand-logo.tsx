@@ -24,7 +24,9 @@ export default function DynamicBrandLogo({
         alt="Discibra"
         width={64}
         height={64}
+        decoding="async"
         className={cn("h-9 w-9 shrink-0 object-contain", className)}
+        style={{ imageRendering: "-webkit-optimize-contrast" }}
       />
     )
   }
@@ -33,7 +35,9 @@ export default function DynamicBrandLogo({
     <img
       src={inverted ? "/brand/logo-dark-trim.png" : "/brand/logo-trim.png"}
       alt="Discibra Distribuidora"
+      decoding="async"
       className={cn("h-9 w-auto shrink-0 object-contain", className)}
+      style={{ imageRendering: "-webkit-optimize-contrast" }}
     />
   )
 }
