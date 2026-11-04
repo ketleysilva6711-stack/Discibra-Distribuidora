@@ -217,46 +217,56 @@ export async function createQuoteAction(input: CreateQuoteInput) {
   const total = subtotalMateriais - descontoPix + freteResultado.valorFrete
 
   // ── 9. Inserir orçamento com retry no código único e idempotency_key ──
-  const { data: orcamento } = await inserirComRetryCodigo(async (codigo) => {
-    const { data, error } = await supabase.from("orcamentos").insert({
-      codigo,
-      cliente_id: clienteId,
-      cliente_nome: input.cliente.nome.trim(),
-      cliente_telefone: normalizarTelefone(input.cliente.telefone),
-      cliente_email: input.cliente.email?.trim() || null,
-      endereco_cep: metodoEntrega === "entrega" ? input.entrega?.cep.replace(/\D/g, "") || null : null,
-      endereco_logradouro: metodoEntrega === "entrega" ? input.entrega?.logradouro?.trim() || null : null,
-      endereco_numero: metodoEntrega === "entrega" ? input.entrega?.numero?.trim() || null : null,
-      endereco_complemento: input.entrega?.complemento?.trim() || null,
-      endereco_bairro: metodoEntrega === "entrega" ? input.entrega?.bairro?.trim() || null : null,
-      endereco_cidade: metodoEntrega === "entrega" ? input.entrega?.cidade?.trim() || null : null,
-      endereco_uf: metodoEntrega === "entrega" ? (input.entrega?.uf || "SP").toUpperCase() : null,
-      metodo_entrega: metodoEntrega,
-      distancia_km: distanciaKm,
-      requer_munck: freteResultado.requerMunck,
-      subtotal: subtotalMateriais,
-      desconto_volume: 0,
-      desconto_pix: descontoPix,
-      valor_frete: freteResultado.valorFrete,
-      frete_a_confirmar: freteResultado.freteAConfirmar,
-      total,
-      forma_pagamento: input.pagamento.forma,
-      parcelas_cartao:
-        input.pagamento.forma === "cartao" ? input.pagamento.parcelas : 1,
-      status: "enviado",
-      peso_total_kg: pesoTotalKg,
-      ip_origem: null,
-      idempotency_key: input.idempotencyKey,
-      consentimento_lgpd: input.cliente.consentimentoLgpd,
-      utm_source: input.origem?.utmSource || null,
-      utm_medium: input.origem?.utmMedium || null,
-      utm_campaign: input.origem?.utmCampaign || null,
-      pagina_origem: input.origem?.pagina || null,
-    }).select().single()
+  let orcamento: any = null
+  try {
+    const { data } = await inserirComRetryCodigo(async (codigo) => {
+      const { data: d, error: e } = await supabase.from("orcamentos").insert({
+        codigo,
+        cliente_id: clienteId,
+        cliente_nome: input.cliente.nome.trim(),
+        cliente_telefone: normalizarTelefone(input.cliente.telefone),
+        cliente_email: input.cliente.email?.trim() || null,
+        endereco_cep: metodoEntrega === "entrega" ? input.entrega?.cep.replace(/\D/g, "") || null : null,
+        endereco_logradouro: metodoEntrega === "entrega" ? input.entrega?.logradouro?.trim() || null : null,
+        endereco_numero: metodoEntrega === "entrega" ? input.entrega?.numero?.trim() || null : null,
+        endereco_complemento: input.entrega?.complemento?.trim() || null,
+        endereco_bairro: metodoEntrega === "entrega" ? input.entrega?.bairro?.trim() || null : null,
+        endereco_cidade: metodoEntrega === "entrega" ? input.entrega?.cidade?.trim() || null : null,
+        endereco_uf: metodoEntrega === "entrega" ? (input.entrega?.uf || "SP").toUpperCase() : null,
+        metodo_entrega: metodoEntrega,
+        distancia_km: distanciaKm,
+        requer_munck: freteResultado.requerMunck,
+        subtotal: subtotalMateriais,
+        desconto_volume: 0,
+        desconto_pix: descontoPix,
+        valor_frete: freteResultado.valorFrete,
+        frete_a_confirmar: freteResultado.freteAConfirmar,
+        total,
+        forma_pagamento: input.pagamento.forma,
+        parcelas_cartao:
+          input.pagamento.forma === "cartao" ? input.pagamento.parcelas : 1,
+        status: "enviado",
+        peso_total_kg: pesoTotalKg,
+        ip_origem: null,
+        idempotency_key: input.idempotencyKey,
+        consentimento_lgpd: input.cliente.consentimentoLgpd,
+        utm_source: input.origem?.utmSource || null,
+        utm_medium: input.origem?.utmMedium || null,
+        utm_campaign: input.origem?.utmCampaign || null,
+        pagina_origem: input.origem?.pagina || null,
+      }).select().single()
 
-    if (error) throw error
-    return { data, error: null }
-  }, 5)
+      if (e) throw e
+      return { data: d, error: null }
+    }, 5)
+
+    orcamento = data
+  } catch (e: any) {
+    return {
+      success: false,
+      error: e.message || "Erro ao salvar orçamento",
+    }
+  }
 
   if (!orcamento) {
     return { success: false, error: "Erro ao salvar orçamento" }
