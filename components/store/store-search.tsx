@@ -54,7 +54,7 @@ export default function StoreSearch() {
       }}
     >
       <div className="group relative flex items-center">
-        <div className="absolute left-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#15803D] transition-colors">
+        <div className="absolute left-3.5 sm:left-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#15803D] transition-colors">
           <Search className="h-5 w-5" />
         </div>
         <input
@@ -64,17 +64,15 @@ export default function StoreSearch() {
           value={q}
           onChange={(e) => handleChange(e.target.value)}
           placeholder="Buscar cimento, aço, ferramentas..."
-          className="h-12 w-full rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] pl-14 pr-28 sm:pr-32 text-sm font-bold text-slate-900 placeholder:font-medium placeholder:text-slate-400 outline-none transition-all focus:bg-white focus:border-[#15803D]/20 focus:ring-4 focus:ring-[#15803D]/5"
+          className="h-12 w-full rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] pl-10 sm:pl-12 pr-14 sm:pr-16 text-sm font-semibold text-slate-900 placeholder:text-xs sm:placeholder:text-sm placeholder:font-normal placeholder:text-slate-400 outline-none transition-all focus:bg-white focus:border-[#15803D]/30 focus:ring-4 focus:ring-[#15803D]/5"
         />
-        <div className="absolute right-1.5 p-1">
-          <button
-            type="submit"
-            className="h-10 w-10 rounded-[4px] bg-[#15803D] text-white flex items-center justify-center transition-colors hover:bg-[#166534] active:scale-95"
-            aria-label="Buscar"
-          >
-            <Search className="h-5 w-5" />
-          </button>
-        </div>
+        <button
+          type="submit"
+          className="absolute right-1 sm:right-1.5 h-10 w-10 rounded-[4px] bg-[#15803D] text-white flex items-center justify-center transition-colors hover:bg-[#166534] active:scale-95"
+          aria-label="Buscar"
+        >
+          <Search className="h-5 w-5" />
+        </button>
       </div>
     </form>
   )

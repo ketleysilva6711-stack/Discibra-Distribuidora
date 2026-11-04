@@ -216,10 +216,10 @@ export default async function HomePage() {
       {/* ── SEÇÃO 3: CATEGORIAS PRINCIPAIS (barra horizontal compacta) ── */}
       {data?.categories && data.categories.length > 0 && (
         <section className="py-8 sm:py-12 border-b border-slate-100 bg-white">
-          <div className="mx-auto max-w-7xl px-6">
+          <div className="mx-auto max-w-7xl px-3 sm:px-6">
             <SectionHeader title="Departamentos da obra" subtitle="Categorias" href="/produtos" linkLabel="Ver tudo" />
           </div>
-          <div className="mx-auto max-w-7xl px-6">
+          <div className="mx-auto max-w-7xl px-3 sm:px-6">
             <div className="flex overflow-x-auto gap-3 py-2 [scrollbar-width:none] -mx-6">
               {data.categories.slice(0, 12).map((category: any) => (
                 <Link key={category.id} href={`/categoria/${category.slug}`} className="flex-none flex items-center gap-2.5 px-3 py-2 border border-[#E5E5E3] rounded-[4px] hover:border-[#111318] bg-white transition-colors whitespace-nowrap">
@@ -241,7 +241,7 @@ export default async function HomePage() {
       {/* ── SEÇÃO 4: OFERTAS DA SEMANA (único carrossel de produto) ── */}
       {data?.discounts && data.discounts.length > 0 && (
         <section id="promocoes" className="py-14 sm:py-20 border-b border-slate-100">
-          <div className="mx-auto max-w-7xl px-6">
+          <div className="mx-auto max-w-7xl px-3 sm:px-6">
             <SectionHeader
               title="Ofertas da Semana"
               subtitle="Oportunidades Únicas"
@@ -256,7 +256,7 @@ export default async function HomePage() {
       {/* ── SEÇÃO 5: CIMENTOS E BÁSICOS (vitrine completa, não carrossel) ── */}
       {data?.cimentos && data.cimentos.length > 0 && (
         <section className="py-14 sm:py-20 bg-white border-b border-slate-100">
-          <div className="mx-auto max-w-7xl px-6">
+          <div className="mx-auto max-w-7xl px-3 sm:px-6">
             <div className="flex items-end justify-between mb-4">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-wider text-[#E8590C]">Cimentos e Básicos</p>
@@ -266,8 +266,8 @@ export default async function HomePage() {
               Ver cimentos →
             </Link>
           </div>
-            <div className="mx-auto max-w-7xl px-6">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            <div className="mx-auto max-w-7xl px-3 sm:px-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3.5">
                 {data.cimentos.slice(0, 12).map((p: any) => (
                   <ProductCard key={p.id} product={p as any} />
                 ))}
@@ -280,7 +280,7 @@ export default async function HomePage() {
       {/* ── SEÇÃO 6: TELHAS E IMPERMEABILIZANTES (grid estático, não carrossel) ── */}
       {data?.acabamento && data.acabamento.length > 0 && (
         <section className="py-14 sm:py-20 bg-white border-b border-slate-100">
-          <div className="mx-auto max-w-7xl px-6">
+          <div className="mx-auto max-w-7xl px-3 sm:px-6">
             <div className="flex items-end justify-between mb-4">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-wider text-[#E8590C]">Telhas e Impermeabilizantes</p>
@@ -290,7 +290,7 @@ export default async function HomePage() {
               Ver categoria →
             </Link>
           </div>
-            <div className="mx-auto max-w-7xl px-6">
+            <div className="mx-auto max-w-7xl px-3 sm:px-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {data.acabamento.slice(0, 8).map((p: any) => (
                   <ProductCard key={p.id} product={p as any} />
@@ -303,7 +303,7 @@ export default async function HomePage() {
 
       {/* ── SEÇÃO 7: BLOCO INSTITUCIONAL — PROVA FÍSICA ── */}
       <section className="border-t border-slate-200/60 bg-[#0B1B2B] py-14 sm:py-16 text-white">
-        <div className="mx-auto max-w-7xl px-6">
+        <div className="mx-auto max-w-7xl px-3 sm:px-6">
           <div className="rounded-2xl border border-white/10 bg-[#071320] p-8 sm:p-10">
             <div className="max-w-3xl space-y-3">
               <span className="text-[10px] font-black uppercase tracking-widest text-[#F47920]">

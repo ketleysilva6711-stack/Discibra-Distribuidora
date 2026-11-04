@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon"
 import { toast } from "sonner"
@@ -40,6 +41,9 @@ function formatarTelefone(v: string): string {
 
 export default function NovoOrcamentoPage() {
   const [clienteTelefone, setClienteTelefone] = useState("")
+  const searchParams = useSearchParams()
+  const [clonando, setClonando] = useState(false)
+  const cloneFrom = searchParams.get("cloneFrom")
   const [clienteNome, setClienteNome] = useState("")
   const [clienteRecorrente, setClienteRecorrente] = useState<{ total_orcamentos: number; receita_total: number } | null>(null)
   const [buscandoCliente, setBuscandoCliente] = useState(false)
@@ -95,6 +99,56 @@ export default function NovoOrcamentoPage() {
     }, 400)
     return () => clearTimeout(timer)
   }, [clienteTelefone])
+
+  // ── Clonar orçamento existente via ?cloneFrom=CODIGO ──
+  useEffect(() => {
+    if (cloneFrom && !clonando) {
+      setClonando(true)
+      ;(async () => {
+        try {
+          const { data: orc, error: oErr } = await supabase
+            .from("orcamentos")
+            .select("*, orcamento_itens(*)")
+            .eq("codigo", cloneFrom.toUpperCase())
+            .maybeSingle()
+          if (oErr || !orc) return
+
+          setClienteNome(orc.cliente_nome || "")
+          setClienteTelefone(orc.cliente_telefone || "")
+          setMetodoEntrega(orc.metodo_entrega || "entrega")
+          setEndereco({
+            logradouro: orc.endereco_logradouro || "",
+            numero: orc.endereco_numero || "",
+            complemento: orc.endereco_complemento || "",
+            bairro: orc.endereco_bairro || "",
+            cidade: orc.endereco_cidade || "",
+            uf: orc.endereco_uf || "SP",
+          })
+          setCep(orc.endereco_cep || "")
+          setValorFreteManual(String(orc.valor_frete || 0))
+          setFormaPagamento(orc.forma_pagamento || "pix")
+          setObservacoes(orc.observacoes || "")
+
+          const itensOrc = (orc.orcamento_itens || []).map((it: any) => ({
+            id: crypto.randomUUID(),
+            produto_id: it.produto_id,
+            nome: it.nome_produto,
+            sku: it.sku || null,
+            quantidade: it.quantidade,
+            preco_tabela: it.preco_tabela || 0,
+            preco_aplicado: it.preco_aplicado || 0,
+            tipo_preco: it.tipo_preco || "avulso",
+            subtotal: (it.preco_aplicado || 0) * it.quantidade,
+          }))
+          setItens(itensOrc)
+        } catch {
+          // silencioso
+        } finally {
+          setClonando(false)
+        }
+      })()
+    }
+  }, [cloneFrom, clonando])
 
   // ── Buscar produtos ──
   useEffect(() => {
@@ -367,25 +421,25 @@ export default function NovoOrcamentoPage() {
                 className="w-full h-10 rounded-[4px] border border-[#E5E5E3] bg-white pl-9 pr-3 text-sm outline-none focus:border-[#15803D]"
               />
               {buscandoProduto && <p className="text-[10px] text-slate-400 absolute right-3 top-1/2 -translate-y-1/2">Buscando...</p>}
+              {resultadosProduto.length > 0 && (
+                <div className="absolute left-0 right-0 top-full mt-1 z-50 max-h-72 overflow-y-auto rounded-[4px] border border-[#CBD5E1] bg-white shadow-xl divide-y divide-[#E2E8F0]">
+                  {resultadosProduto.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => adicionarProduto(p)}
+                      className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-[#FAFAF9] border-b border-[#E5E5E3] last:border-b-0"
+                    >
+                      <div>
+                        <div className="font-medium text-slate-800 text-sm">{p.name}</div>
+                        <div className="text-[10px] text-slate-500">{p.sku || "Sem SKU"} · {p.unit || "un"} · Estoque: {p.stock}</div>
+                      </div>
+                      <Plus className="h-4 w-4 text-[#15803D]" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            {resultadosProduto.length > 0 && (
-              <div className="absolute left-0 right-0 top-full mt-1 z-20 max-h-60 overflow-y-auto rounded-[4px] border border-[#E5E5E3] bg-white shadow-lg divide-y divide-[#E5E5E3]">
-                {resultadosProduto.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => adicionarProduto(p)}
-                    className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-[#FAFAF9] border-b border-[#E5E5E3] last:border-b-0"
-                  >
-                    <div>
-                      <div className="font-medium text-slate-800 text-sm">{p.name}</div>
-                      <div className="text-[10px] text-slate-500">{p.sku || "Sem SKU"} · {p.unit || "un"} · Estoque: {p.stock}</div>
-                    </div>
-                    <Plus className="h-4 w-4 text-[#15803D]" />
-                  </button>
-                ))}
-              </div>
-            )}
             <div className="rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] overflow-hidden">
               <table className="w-full text-sm">
                 <thead>

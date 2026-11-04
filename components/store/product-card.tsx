@@ -174,7 +174,7 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
       </Link>
 
       {/* ── Info ── */}
-      <div className="flex flex-1 flex-col p-3 sm:p-5 pt-2 sm:pt-3">
+      <div className="flex flex-1 flex-col p-2.5 sm:p-4 pt-2 sm:pt-2.5">
         {/* Status + Rating */}
         <div className="mb-2 sm:mb-3 flex items-center justify-between">
           <div className="flex items-center gap-1">
@@ -216,7 +216,7 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
                 R$ {Number(product.original_price).toFixed(2).replace(".", ",")}
               </p>
             )}
-            <div className="flex items-baseline gap-1">
+            <div className="flex items-baseline gap-1 whitespace-nowrap">
               <span className="text-xs font-bold text-slate-500">R$</span>
               <p className="font-mono font-bold text-lg tabular-nums text-[#111318] leading-none">
                 {Number(product.price).toFixed(2).replace(".", ",")}
@@ -238,7 +238,7 @@ export default function ProductCard({ product }: { product: ProductCardProduct }
               data-source="product_card"
               aria-label="Pedir pelo WhatsApp"
               onClick={() => trackWhatsAppClick("product_card", `/produto/${product.slug}`)}
-              className="w-full h-11 px-3 bg-[#15803D] hover:bg-[#166534] text-white text-xs font-bold rounded-[4px] flex items-center justify-center gap-2 transition-colors active:scale-[0.98]"
+              className="w-full h-10 sm:h-11 px-1.5 sm:px-3 bg-[#15803D] hover:bg-[#166534] text-white text-[11px] sm:text-xs font-bold rounded-[4px] flex items-center justify-center gap-1.5 sm:gap-2 transition-colors active:scale-[0.98] whitespace-nowrap"
             >
               <WhatsAppIcon className="h-4 w-4" />
               Falar no WhatsApp
