@@ -52,6 +52,10 @@ export default function CartItemRow({
       maximumFractionDigits: 2,
     })
 
+  // Fallback visual: nunca exibir R$ 0,00 se houver qualquer preço disponível
+  const precoExibicao = preco_aplicado > 0 ? preco_aplicado : preco_tabela
+  const subtotalExibicao = subtotal > 0 ? subtotal : precoExibicao * quantidade
+
   return (
     <div className="flex items-center gap-3 rounded-[4px] border border-[#E5E5E3] bg-white p-3 sm:p-4">
       {image_url ? (
@@ -78,7 +82,7 @@ export default function CartItemRow({
         </div>
         <div className="line-clamp-2 text-sm font-semibold text-[#111318]">{name}</div>
         <p className="text-sm font-medium text-slate-500 mt-1">
-          R$ {brl(preco_aplicado)}/{unit}
+          R$ {brl(precoExibicao)}/{unit}
         </p>
       </div>
       <div className="flex shrink-0 items-center overflow-hidden rounded-[4px] border border-[#E5E5E3]">
@@ -101,8 +105,8 @@ export default function CartItemRow({
         </button>
       </div>
       <div className="shrink-0 w-24 text-right">
-        <p className="font-bold text-sm text-[#111318]">R$ {brl(subtotal)}</p>
-        {preco_aplicado < preco_tabela && (
+        <p className="font-bold text-sm text-[#111318]">R$ {brl(subtotalExibicao)}</p>
+        {precoExibicao < preco_tabela && (
           <p className="text-[10px] text-slate-400 line-through">
             R$ {brl(preco_tabela * quantidade)}
           </p>

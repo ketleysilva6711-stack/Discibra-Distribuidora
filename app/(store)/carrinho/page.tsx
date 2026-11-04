@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ShoppingCart, ArrowLeft, MessageCircle, Printer, Trash2 } from "lucide-react"
+import { ShoppingCart, ArrowLeft, Printer, Trash2 } from "lucide-react"
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon"
 import { toast } from "sonner"
 import { createQuoteAction } from "@/app/actions/quote"
 import VolumeUpsellBar from "@/components/checkout/VolumeUpsellBar"
@@ -37,9 +38,44 @@ function brl(n: number) {
   })
 }
 
+function normalizarPrecoItem(item: any): CartItem {
+  const basePrice =
+    Number(item.preco_aplicado) ||
+    Number(item.preco_tabela) ||
+    Number(item.price) ||
+    0
+  let tipoPreco = item.tipo_preco || "avulso"
+  let precoAplicado = basePrice
+
+  if (item.qty >= 560) {
+    tipoPreco = "carga_fechada"
+    precoAplicado = Math.round(basePrice * 0.9506 * 100) / 100
+  } else if (item.qty >= 40) {
+    tipoPreco = "palete"
+    precoAplicado = Math.round(basePrice * 0.97 * 100) / 100
+  } else {
+    tipoPreco = "avulso"
+    precoAplicado = basePrice
+  }
+
+  return {
+    id: item.id,
+    name: item.name,
+    sku: item.sku || null,
+    image_url: item.image_url || null,
+    unit: item.unit || "un",
+    qty: Number(item.qty) || 1,
+    preco_tabela: Number(item.preco_tabela) || basePrice,
+    preco_aplicado: precoAplicado,
+    tipo_preco: tipoPreco,
+    subtotal: precoAplicado * (Number(item.qty) || 1),
+  }
+}
+
 function getCart(): CartItem[] {
   try {
-    return JSON.parse(localStorage.getItem("cart") || "[]")
+    const raw = JSON.parse(localStorage.getItem("cart") || "[]")
+    return Array.isArray(raw) ? raw.map(normalizarPrecoItem) : []
   } catch {
     return []
   }
@@ -81,7 +117,8 @@ export default function CartPage() {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    setCart(getCart())
+    const cartDoStorage = getCart()
+    setCart(cartDoStorage)
     // Gerar chave de idempotência única por sessão de carrinho
     if (!idempotencyKey) {
       setIdempotencyKey(crypto.randomUUID())
@@ -133,10 +170,54 @@ export default function CartPage() {
     }
   }, [cep, metodoEntrega, cart])
 
+  // Autopreenchimento de endereço via CEP
+  useEffect(() => {
+    const cepLimpo = cep.replace(/\D/g, "")
+    if (cepLimpo.length === 8) {
+      fetch(`/api/cep?cep=${cepLimpo}`)
+        .then((r) => r.json())
+        .then((data: any) => {
+          if (!data.erro && (data.logradouro || data.localidade)) {
+            setEndereco((prev) => ({
+              ...prev,
+              logradouro: data.logradouro || prev.logradouro,
+              bairro: data.bairro || prev.bairro,
+              cidade: data.localidade || prev.cidade,
+              uf: data.uf || prev.uf,
+            }))
+            // Focar automaticamente no campo Número após preencher o CEP
+            const numEl = document.getElementById("input-endereco-numero")
+            if (numEl) {
+              ;(numEl as HTMLInputElement).focus()
+            }
+          }
+        })
+        .catch(() => {})
+    }
+  }, [cep])
+
   function updateQty(id: string, delta: number) {
     const item = cart.find((i) => i.id === id)
+    const basePrice = Number(item?.preco_tabela || 0)
+    let precoAplicado = basePrice
+    let tipoPreco = item?.tipo_preco || "avulso"
+    const novaQty = Math.max(1, (item?.qty || 1) + delta)
+
+    if (novaQty >= 560) {
+      tipoPreco = "carga_fechada"
+      precoAplicado = Math.round(basePrice * 0.9506 * 100) / 100
+    } else if (novaQty >= 40) {
+      tipoPreco = "palete"
+      precoAplicado = Math.round(basePrice * 0.97 * 100) / 100
+    } else {
+      tipoPreco = "avulso"
+      precoAplicado = basePrice
+    }
+
     const updated = cart.map((i) =>
-      i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i
+      i.id === id
+        ? { ...i, qty: novaQty, preco_aplicado: precoAplicado, tipo_preco: tipoPreco, subtotal: precoAplicado * novaQty }
+        : i
     )
     setCart(updated)
     saveCart(updated)
@@ -145,7 +226,7 @@ export default function CartPage() {
       trackAddToCart({
         id: item.id,
         name: item.name,
-        price: item.preco_aplicado,
+        price: precoAplicado,
         quantity: delta,
       })
     }
@@ -242,7 +323,7 @@ export default function CartPage() {
           consentimentoLgpd,
         },
         metodo_entrega: metodoEntrega,
-        entrega: metodoEntrega === "entrega" ? { ...endereco, cep } : undefined,
+        entrega: metodoEntrega === "entrega" ? { ...endereco, cep: cep.replace(/\D/g, "") } : undefined,
         pagamento:
           formaPagamento === "pix"
             ? { forma: "pix" }
@@ -619,7 +700,7 @@ export default function CartPage() {
               disabled={submitting}
               className="w-full flex items-center justify-center gap-2 rounded-[4px] bg-[#15803D] hover:bg-[#166534] px-4 py-3 text-sm font-bold text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <MessageCircle className="h-4 w-4" />
+              <WhatsAppIcon className="h-4 w-4" />
               {submitting ? "Gerando Cotação..." : "Solicitar Orcamento via WhatsApp"}
             </button>
             <p className="text-[11px] text-slate-500 text-center mt-3 leading-snug">

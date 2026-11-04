@@ -33,12 +33,18 @@ export function addToCart(product: ProductCardProduct, qty = 1) {
     if (idx >= 0) {
       cart[idx].qty += qty
     } else {
+      const unitPrice = Number(product.price) || Number((product as any).preco_avulso) || 0
       cart.push({
         id: product.id,
         name: product.name,
-        price: product.price,
+        price: unitPrice,
+        preco_tabela: unitPrice,
+        preco_aplicado: unitPrice,
+        tipo_preco: "avulso",
+        subtotal: unitPrice * qty,
         image_url: product.image_url,
-        unit: product.unit,
+        unit: product.unit || "un",
+        sku: product.sku || null,
         qty,
       })
     }
