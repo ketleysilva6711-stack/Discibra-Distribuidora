@@ -30,6 +30,7 @@ export default function OrcamentoPublicoClient({
   orcamento: any
 }) {
   const [printed, setPrinted] = useState(false)
+  const [downloadingPdf, setDownloadingPdf] = useState(false)
   const [pdfLib, setPdfLib] = useState<{ ready: boolean; lib: any } | null>(null)
   const proposalRef = useRef<HTMLDivElement>(null)
 
@@ -94,32 +95,36 @@ export default function OrcamentoPublicoClient({
     }
   }, [printed])
 
-  // ── Download real do PDF timbrado via html2pdf.js ──
-  const downloadPDF = () => {
-    if (!proposalRef.current) {
-      window.print()
-      return
+  // ── Download real do PDF timbrado via html2pdf.js (defensivo, com fallback) ──
+  const downloadPDF = async () => {
+    setDownloadingPdf(true)
+    try {
+      const html2pdfLib = (window as any).html2pdf
+      if (typeof html2pdfLib === "function" && proposalRef.current) {
+        const opt = {
+          margin: [8, 10, 8, 10],
+          filename: `Orcamento-${codigo}.pdf`,
+          image: { type: "jpeg", quality: 0.95 },
+          html2canvas: { scale: 2, letterRendering: true, useCORS: true },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        }
+        await html2pdfLib().set(opt).from(proposalRef.current).save()
+        setDownloadingPdf(false)
+        return
+      }
+    } catch (err) {
+      console.warn("Falha ao gerar via html2pdf, disparando print:", err)
     }
-    const element = proposalRef.current
-    const opt = {
-      margin: [10, 12, 10, 12],
-      filename: `Orcamento-${codigo}.pdf`,
-      image: { type: "jpeg", quality: 0.95 },
-      html2canvas: { scale: 2, letterRendering: true, useCORS: true },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-    }
-    // Força cores de fundo para impressão/PDF
-    ;(window as any).html2pdf()
-      .set(opt)
-      .from(element)
-      .save()
+    // Fallback nativo 100% garantido
+    setDownloadingPdf(false)
+    window.print()
   }
 
-  // ── Dados do PIX ──
-  const pixKey = "50.840.428/0001-90"
+  // ── Dados do PIX (chave dinâmica do orçamento, com fallback padrão) ──
+  const pixKey = orcamento.pix_key?.trim() || "50.840.428/0001-90"
   const pixName = "DISCIBRA DISTRIBUIDORA DA CONSTRUÇÃO"
   const pixCity = "RIBEIRAO PRETO"
-  const pixQR = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=PIX%3A${pixKey}%0AValor%3A${total.toFixed(2)}%0A${codigo}`
+  const pixQR = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=PIX%3A${encodeURIComponent(pixKey)}%0AValor%3A${total.toFixed(2)}%0A${codigo}`
 
   return (
     <div className="min-h-screen bg-[#FAFAF9] text-slate-900">
@@ -172,9 +177,11 @@ export default function OrcamentoPublicoClient({
           <div className="flex items-center gap-2 print:hidden">
             <button
               onClick={downloadPDF}
-              className="inline-flex items-center gap-2 rounded-[4px] border border-[#15803D] bg-white px-3 py-1.5 text-xs font-bold text-[#15803D] hover:bg-[#15803D] hover:text-white transition-colors"
+              disabled={downloadingPdf}
+              className="inline-flex items-center gap-2 rounded-[4px] border border-[#15803D] bg-white px-3 py-1.5 text-xs font-bold text-[#15803D] hover:bg-[#15803D] hover:text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <Download className="h-3.5 w-3.5" /> Baixar PDF / Imprimir
+              <Download className="h-3.5 w-3.5" />
+              {downloadingPdf ? "Gerando PDF…" : "Baixar PDF / Imprimir"}
             </button>
           </div>
         </div>
@@ -371,9 +378,11 @@ export default function OrcamentoPublicoClient({
           )}
           <button
             onClick={downloadPDF}
-            className="w-full h-12 rounded-[4px] border border-[#E5E5E3] bg-white text-[#111318] font-bold flex items-center justify-center gap-2 transition-colors hover:bg-[#FAFAF9]"
+            disabled={downloadingPdf}
+            className="w-full h-12 rounded-[4px] border border-[#E5E5E3] bg-white text-[#111318] font-bold flex items-center justify-center gap-2 transition-colors hover:bg-[#FAFAF9] disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <Printer className="h-5 w-5" /> Baixar PDF / Imprimir Proposta
+            <Printer className="h-5 w-5" />
+            {downloadingPdf ? "Gerando PDF…" : "Baixar PDF / Imprimir Proposta"}
           </button>
           <a
             href={waLink(waMsg)}

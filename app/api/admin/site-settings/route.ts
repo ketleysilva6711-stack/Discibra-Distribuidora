@@ -119,6 +119,26 @@ export async function PATCH(request: NextRequest) {
         ? b.business_maps_url
         : null
 
+  // PIX fields
+  const pix_chave_padrao =
+    b.pix_chave_padrao === null || b.pix_chave_padrao === ""
+      ? null
+      : typeof b.pix_chave_padrao === "string"
+        ? b.pix_chave_padrao
+        : null
+  const pix_titular_padrao =
+    b.pix_titular_padrao === null || b.pix_titular_padrao === ""
+      ? null
+      : typeof b.pix_titular_padrao === "string"
+        ? b.pix_titular_padrao
+        : null
+  const pix_cidade_padrao =
+    b.pix_cidade_padrao === null || b.pix_cidade_padrao === ""
+      ? null
+      : typeof b.pix_cidade_padrao === "string"
+        ? b.pix_cidade_padrao
+        : null
+
   if (!Array.isArray(b.banner_images)) {
     return jsonWithSession({ error: "banner_images deve ser um array." }, { status: 400 })
   }
@@ -160,6 +180,9 @@ export async function PATCH(request: NextRequest) {
     business_phone,
     business_hours,
     business_maps_url,
+    pix_chave_padrao,
+    pix_titular_padrao,
+    pix_cidade_padrao,
     updated_at: new Date().toISOString(),
   }
 

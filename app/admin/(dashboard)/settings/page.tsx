@@ -61,6 +61,10 @@ type FormState = {
   business_phone: string
   business_hours: string
   business_maps_url: string
+  // PIX
+  pix_chave_padrao: string
+  pix_titular_padrao: string
+  pix_cidade_padrao: string
 }
 
 const initialForm = (): FormState => ({
@@ -81,6 +85,9 @@ const initialForm = (): FormState => ({
   business_phone: DEFAULT_BUSINESS_PHONE,
   business_hours: DEFAULT_BUSINESS_HOURS,
   business_maps_url: DEFAULT_BUSINESS_MAPS_URL,
+  pix_chave_padrao: "",
+  pix_titular_padrao: "",
+  pix_cidade_padrao: "",
 })
 
 export default function AdminSiteSettingsPage() {
@@ -124,6 +131,9 @@ export default function AdminSiteSettingsPage() {
         business_phone: data.business_phone?.trim() || DEFAULT_BUSINESS_PHONE,
         business_hours: data.business_hours?.trim() || DEFAULT_BUSINESS_HOURS,
         business_maps_url: data.business_maps_url?.trim() || DEFAULT_BUSINESS_MAPS_URL,
+        pix_chave_padrao: data.pix_chave_padrao?.trim() || "",
+        pix_titular_padrao: data.pix_titular_padrao?.trim() || "DISCIBRA DISTRIBUIDORA DA CONSTRUÇÃO",
+        pix_cidade_padrao: data.pix_cidade_padrao?.trim() || "RIBEIRAO PRETO",
       })
       setLoading(false)
     })()
@@ -157,6 +167,9 @@ export default function AdminSiteSettingsPage() {
           business_phone: form.business_phone || null,
           business_hours: form.business_hours || null,
           business_maps_url: form.business_maps_url || null,
+          pix_chave_padrao: form.pix_chave_padrao || null,
+          pix_titular_padrao: form.pix_titular_padrao || null,
+          pix_cidade_padrao: form.pix_cidade_padrao || null,
         }),
       })
       const json = await res.json()
@@ -402,6 +415,68 @@ export default function AdminSiteSettingsPage() {
             </ul>
           </div>
         </TabsContent>
+
+        {/* Card de configuração da Chave PIX (aba Marca) */}
+        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-bold text-emerald-900 flex items-center gap-2">
+                <Save className="w-5 h-5 text-emerald-600" />
+                Chave PIX Padrão da Empresa
+              </h3>
+              <p className="text-xs text-emerald-700/80">
+                Chave usada nas propostas públicas (ORC) quando o orçamento não tem chave própria.
+              </p>
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div>
+              <label className="text-xs font-semibold uppercase text-emerald-700/80 mb-1.5 block">
+                Chave PIX (CNPJ / e-mail / telefone / aleatória)
+              </label>
+              <input
+                type="text"
+                value={form.pix_chave_padrao}
+                onChange={(e) =>
+                  setForm({ ...form, pix_chave_padrao: e.target.value })
+                }
+                placeholder="Ex: 50.840.428/0001-90"
+                className="w-full px-4 py-2.5 rounded-xl border border-emerald-200 bg-white text-slate-900 font-mono text-sm focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase text-emerald-700/80 mb-1.5 block">
+                Nome do titular
+              </label>
+              <input
+                type="text"
+                value={form.pix_titular_padrao}
+                onChange={(e) =>
+                  setForm({ ...form, pix_titular_padrao: e.target.value })
+                }
+                placeholder="DISCIBRA DISTRIBUIDORA DA CONSTRUÇÃO"
+                className="w-full px-4 py-2.5 rounded-xl border border-emerald-200 bg-white text-slate-900 text-sm focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase text-emerald-700/80 mb-1.5 block">
+                Cidade do titular
+              </label>
+              <input
+                type="text"
+                value={form.pix_cidade_padrao}
+                onChange={(e) =>
+                  setForm({ ...form, pix_cidade_padrao: e.target.value })
+                }
+                placeholder="RIBEIRAO PRETO"
+                className="w-full px-4 py-2.5 rounded-xl border border-emerald-200 bg-white text-slate-900 text-sm focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-emerald-600 text-center">
+            Alterações aqui refletem imediatamente no QR Code e na chave exibida nas propostas públicas.
+          </p>
+        </div>
 
         <TabsContent value="chat" className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="text-lg font-semibold">Configuração do Chat</h2>
