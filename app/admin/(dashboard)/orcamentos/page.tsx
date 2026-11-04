@@ -45,6 +45,24 @@ const TABS: { key: string; label: string }[] = [
   { key: "cancelado", label: "Canceladas" },
 ]
 
+function slaBadge(prazoRespostaEm: string | null, primeiraRespostaEm: string | null): {
+  label: string
+  cls: string
+} {
+  const now = new Date()
+  if (primeiraRespostaEm) {
+    return { label: "Respondido", cls: "bg-emerald-100 text-emerald-700 border-emerald-200" }
+  }
+  if (!prazoRespostaEm) {
+    return { label: "Sem prazo", cls: "bg-slate-100 text-slate-600 border-slate-200" }
+  }
+  const prazo = new Date(prazoRespostaEm)
+  if (prazo < now) {
+    return { label: "SLA Vencido", cls: "bg-red-100 text-red-700 border-red-200 animate-pulse" }
+  }
+  return { label: "Dentro do prazo", cls: "bg-amber-100 text-amber-700 border-amber-200" }
+}
+
 export default function OrcamentosPage() {
   const [orcamentos, setOrcamentos] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -64,7 +82,7 @@ export default function OrcamentosPage() {
     try {
       let query = supabase
         .from("orcamentos")
-        .select("*, orcamento_itens(*)")
+        .select("*, orcamento_itens(*), clientes(nome, telefone, total_orcamentos, receita_total)")
         .order("criado_em", { ascending: false })
 
       if (statusFilter !== "todos") {
@@ -180,11 +198,7 @@ export default function OrcamentosPage() {
             <button
               key={tab.key}
               onClick={() => setStatusFilter(tab.key)}
-              className={`px-4 py-2 rounded-[4px] text-xs font-bold border transition-colors ${
-                isActive
-                  ? "bg-[#15803D] border-[#15803D] text-white"
-                  : "border-[#E5E5E3] bg-[#FAFAF9] text-slate-600 hover:border-[#15803D]"
-              }`}
+              className={`px-4 py-2 rounded-[4px] text-xs font-bold border transition-colors ${isActive ? "bg-[#15803D] border-[#15803D] text-white" : "border-[#E5E5E3] bg-[#FAFAF9] text-slate-600 hover:border-[#15803D]"}`}
             >
               {tab.label} <span className="ml-1 opacity-80">{count}</span>
             </button>
@@ -212,6 +226,7 @@ export default function OrcamentosPage() {
               <th className="px-4 py-3">Código</th>
               <th className="px-4 py-3">Cliente / WhatsApp</th>
               <th className="px-4 py-3">Visualização</th>
+              <th className="px-4 py-3">SLA Resposta</th>
               <th className="px-4 py-3">Entrega</th>
               <th className="px-4 py-3">Peso</th>
               <th className="px-4 py-3 text-right">Valor Total</th>
@@ -222,7 +237,7 @@ export default function OrcamentosPage() {
           <tbody className="divide-y divide-[#E5E5E3]">
             {orcamentos.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-slate-400">
+                <td colSpan={9} className="px-4 py-12 text-center text-slate-400">
                   Nenhum orçamento encontrado.
                 </td>
               </tr>
@@ -235,6 +250,8 @@ export default function OrcamentosPage() {
                 const deliveryLabel = requerMunck ? `${methods} (Munck)` : methods
                 const statusLabel = STATUS_LABELS[o.status] || o.status
                 const badgeClass = STATUS_BADGE[o.status] || "bg-slate-100 text-slate-600"
+                const sla = slaBadge(o.prazo_resposta_em, o.primeira_resposta_em)
+                const cliente = o.clientes?.[0] || {}
 
                 return (
                   <tr key={o.id} className="hover:bg-[#FAFAF9] transition-colors">
@@ -249,14 +266,20 @@ export default function OrcamentosPage() {
                     <td className="px-4 py-3.5">
                       <div className="font-medium text-[#111318]">{o.cliente_nome}</div>
                       <div className="text-xs text-slate-500">{o.cliente_telefone}</div>
+                      {cliente.total_orcamentos && cliente.total_orcamentos > 1 && (
+                        <div className="text-[10px] text-slate-400 mt-0.5">
+                          {cliente.total_orcamentos} orçamentos
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3.5">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-bold ${
-                        visualizado
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                          : "bg-slate-100 text-slate-500 border-slate-200"
-                      }`}>
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-bold ${visualizado ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-slate-100 text-slate-500 border-slate-200"}`}>
                         {visualizado ? "Visualizado" : "Não aberto"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-bold ${sla.cls}`}>
+                        {sla.label}
                       </span>
                     </td>
                     <td className="px-4 py-3.5">
@@ -361,12 +384,7 @@ export default function OrcamentosPage() {
 
 function CreditCardIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 11H7a4 4 0 00-4 8h4a2 2 0 012-2h10a2 2 0 002-2v-6a2 2 0 10-4 0h-4a2 2 0 01-2-2z" />
     </svg>
   )
@@ -374,12 +392,7 @@ function CreditCardIcon({ className }: { className?: string }) {
 
 function XIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
     </svg>
   )
@@ -387,12 +400,7 @@ function XIcon({ className }: { className?: string }) {
 
 function LinkIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.19 8.688a4 4 0 013.202 3.202M8.125 13.2A4 4 0 014.929 6.09l9.533 6.888a2 2 0 011.306 1.306 4 4 0 01-2.646 2.646 2 2 0 01-1.306 1.306l-6.888-9.533a4 4 0 010-5.202z" />
     </svg>
   )

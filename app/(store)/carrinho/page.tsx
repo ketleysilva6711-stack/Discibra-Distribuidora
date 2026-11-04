@@ -9,7 +9,7 @@ import { createQuoteAction } from "@/app/actions/quote"
 import VolumeUpsellBar from "@/components/checkout/VolumeUpsellBar"
 import CartItemRow from "@/components/checkout/CartItemRow"
 import FreightCalculatorBox from "@/components/checkout/FreightCalculatorBox"
-import { waLink, SITE } from "@/lib/site-config"
+import { SITE } from "@/lib/site-config"
 import {
   trackAddToCart,
   trackBeginCheckout,
@@ -52,11 +52,15 @@ function saveCart(cart: CartItem[]) {
 
 export default function CartPage() {
   const [cart, setCart] = useState<CartItem[]>([])
+  const [idempotencyKey, setIdempotencyKey] = useState<string | null>(null)
   const [clienteNome, setClienteNome] = useState("")
   const [clienteTelefone, setClienteTelefone] = useState("")
+  const [clienteEmail, setClienteEmail] = useState("")
   const [cep, setCep] = useState("")
   const [metodoEntrega, setMetodoEntrega] = useState<"entrega" | "retirada">("entrega")
   const [formaPagamento, setFormaPagamento] = useState<"pix" | "cartao">("pix")
+  const [parcelasCartao, setParcelasCartao] = useState(1)
+  const [consentimentoLgpd, setConsentimentoLgpd] = useState(false)
   const [endereco, setEndereco] = useState({
     logradouro: "",
     numero: "",
@@ -74,15 +78,19 @@ export default function CartPage() {
     pesoTotalKg: number
   } | null>(null)
   const [freightLoading, setFreightLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     setCart(getCart())
+    // Gerar chave de idempotência única por sessão de carrinho
+    if (!idempotencyKey) {
+      setIdempotencyKey(crypto.randomUUID())
+    }
   }, [])
 
   // Calcular totais
   const totalItems = cart.reduce((sum, i) => sum + i.qty, 0)
   const subtotalMateriais = cart.reduce((s, i) => s + i.subtotal, 0)
-  const pesoTotalKg = cart.reduce((s, i) => s + (Number(i.preco_aplicado) > 0 ? 0 : 0), 0) // placeholder, o peso vem do backend
 
   // Desconto PIX (3%)
   const descontoPix = formaPagamento === "pix" ? Math.round(subtotalMateriais * 0.03 * 100) / 100 : 0
@@ -152,6 +160,7 @@ export default function CartPage() {
   function clearCart() {
     setCart([])
     saveCart([])
+    setIdempotencyKey(null)
   }
 
   function handleTelefoneChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -185,6 +194,11 @@ export default function CartPage() {
       return
     }
 
+    if (!consentimentoLgpd) {
+      toast.error("O consentimento LGPD e obrigatorio para prosseguir.")
+      return
+    }
+
     if (metodoEntrega === "entrega") {
       if (!cep.replace(/\D/g, "") || cep.replace(/\D/g, "").length !== 8) {
         toast.error("Informe um CEP valido para entrega.")
@@ -208,69 +222,98 @@ export default function CartPage() {
       }
     }
 
-    const { success, codigo, token, total: totalGerado, whatsappUrl, error } =
-      await createQuoteAction({
-        cliente_nome: clienteNome.trim(),
-        cliente_telefone: telefoneLimpo,
-        cliente_email: "",
+    setSubmitting(true)
+
+    try {
+      const {
+        success,
+        codigo,
+        token,
+        total: totalGerado,
+        whatsappUrl,
+        error,
+        idempotente,
+      } = await createQuoteAction({
+        idempotencyKey: idempotencyKey!,
+        cliente: {
+          nome: clienteNome.trim(),
+          telefone: clienteTelefone,
+          email: clienteEmail || "",
+          consentimentoLgpd,
+        },
         metodo_entrega: metodoEntrega,
-        endereco_cep: metodoEntrega === "entrega" ? cep.replace(/\D/g, "") : undefined,
-        endereco_logradouro: metodoEntrega === "entrega" ? endereco.logradouro : undefined,
-        endereco_numero: metodoEntrega === "entrega" ? endereco.numero : undefined,
-        endereco_complemento: endereco.complemento || undefined,
-        endereco_bairro: metodoEntrega === "entrega" ? endereco.bairro : undefined,
-        endereco_cidade: metodoEntrega === "entrega" ? endereco.cidade : undefined,
-        endereco_uf: metodoEntrega === "entrega" ? endereco.uf : undefined,
-        forma_pagamento: formaPagamento,
-        parcelas_cartao: 1,
+        entrega: metodoEntrega === "entrega" ? { ...endereco, cep } : undefined,
+        pagamento:
+          formaPagamento === "pix"
+            ? { forma: "pix" }
+            : { forma: "cartao", parcelas: parcelasCartao },
         itens: cart.map((i) => ({
-          produto_id: i.id,
+          produtoId: i.id,
           quantidade: i.qty,
+        })),
+        origem: {
+          utmSource: undefined,
+          utmMedium: undefined,
+          utmCampaign: undefined,
+          pagina: "/carrinho",
+        },
+      })
+
+      if (!success) {
+        if (error === "CLIENTE_BLOQUEADO") {
+          toast.error("Este cliente esta bloqueado. Entre em contato com a administracao.")
+        } else {
+          toast.error(error || "Erro ao gerar orcamento.")
+        }
+        return
+      }
+
+      // Abrir WhatsApp com o link da cotacao
+      if (whatsappUrl) {
+        window.open(whatsappUrl, "_blank", "noopener,noreferrer")
+      }
+
+      // Disparar eventos de analytics
+      trackQuoteCreated({
+        codigo,
+        total: totalGerado ?? 0,
+        formaPagamento: formaPagamento,
+        items: cart.map((i) => ({
+          id: i.id,
+          name: i.name,
+          price: i.preco_aplicado,
+          quantity: i.qty,
         })),
       })
 
-    if (!success) {
-      toast.error(error || "Erro ao gerar orcamento.")
-      return
+      trackWhatsAppClick({
+        codigo,
+        total: totalGerado ?? 0,
+        origem: "checkout_finalize",
+        items: cart.map((i) => ({
+          id: i.id,
+          name: i.name,
+          price: i.preco_aplicado,
+          quantity: i.qty,
+        })),
+      })
+
+      // Redirecionar para a pagina publica do orcamento
+      window.location.href = `/orcamento/${codigo}?t=${token}`
+
+      // Limpar carrinho
+      clearCart()
+
+      toast.success(
+        idempotente
+          ? `Orcamento ${codigo} ja existia (reutilizado).`
+          : `Orcamento ${codigo} gerado com sucesso!`
+      )
+    } catch (e: any) {
+      toast.error(e.message || "Erro ao gerar orcamento.")
+    } finally {
+      setSubmitting(false)
     }
-
-    // Abrir WhatsApp com o link da cotacao
-    if (whatsappUrl) {
-      window.open(whatsappUrl, "_blank", "noopener,noreferrer")
-    }
-
-    // Disparar eventos de analytics
-    trackQuoteCreated({
-      codigo,
-      total: totalGerado ?? 0,
-      formaPagamento: formaPagamento,
-      items: cart.map((i) => ({
-        id: i.id,
-        name: i.name,
-        price: i.preco_aplicado,
-        quantity: i.qty,
-      })),
-    })
-
-    trackWhatsAppClick({
-      codigo,
-      total: totalGerado ?? 0,
-      origem: "checkout_finalize",
-      items: cart.map((i) => ({
-        id: i.id,
-        name: i.name,
-        price: i.preco_aplicado,
-        quantity: i.qty,
-      })),
-    })
-
-    // Redirecionar para a pagina publica do orcamento
-    window.location.href = `/orcamento/${codigo}?t=${token}`
-
-    // Limpar carrinho
-    clearCart()
-
-    toast.success(`Orcamento ${codigo} gerado com sucesso!`)
   }
 
   if (cart.length === 0) {
@@ -395,6 +438,28 @@ export default function CartPage() {
                   </span>
                 </label>
               </div>
+              {formaPagamento === "cartao" && (
+                <div className="mt-3">
+                  <label className="text-xs font-bold text-slate-500 block mb-1">
+                    Parcelas
+                  </label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 6, 8, 10, 12].map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => setParcelasCartao(p)}
+                        className={`rounded-[4px] border px-2 py-1 text-xs font-bold transition-all ${
+                          parcelasCartao === p
+                            ? "bg-[#15803D] border-[#15803D] text-white"
+                            : "border-[#E5E5E3] text-slate-600 hover:bg-[#FAFAF9]"
+                        }`}
+                      >
+                        {p}x
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Dados do cliente */}
@@ -427,6 +492,29 @@ export default function CartPage() {
                     className="w-full h-10 rounded-[4px] border border-[#E5E5E3] bg-white px-3 text-sm font-mono text-slate-900 outline-none focus:border-[#15803D]"
                   />
                 </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-500 block mb-1">
+                    E-mail (opcional)
+                  </label>
+                  <input
+                    type="email"
+                    value={clienteEmail}
+                    onChange={(e) => setClienteEmail(e.target.value)}
+                    placeholder="joao@email.com"
+                    className="w-full h-10 rounded-[4px] border border-[#E5E5E3] bg-white px-3 text-sm text-slate-900 outline-none focus:border-[#15803D]"
+                  />
+                </div>
+                <div className="flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    checked={consentimentoLgpd}
+                    onChange={(e) => setConsentimentoLgpd(e.target.checked)}
+                    className="rounded-slate-900 text-[#15803D] focus:ring-[#15803D] mt-0.5"
+                  />
+                  <label className="text-xs text-slate-600 leading-tight">
+                    Concordo em receber o contato da Discibra via WhatsApp para atendimento desta cotacao.
+                  </label>
+                </div>
               </div>
             </div>
 
@@ -437,6 +525,18 @@ export default function CartPage() {
                   Endereco de entrega *
                 </p>
                 <div className="space-y-3">
+                  <div>
+                    <label className="text-xs font-bold text-slate-500 block mb-1">
+                      CEP *
+                    </label>
+                    <input
+                      type="text"
+                      value={cep}
+                      onChange={handleCepChange}
+                      placeholder="00000-000"
+                      className="w-full h-10 rounded-[4px] border border-[#E5E5E3] bg-white px-3 text-sm font-mono text-slate-900 outline-none focus:border-[#15803D]"
+                    />
+                  </div>
                   <div>
                     <label className="text-xs font-bold text-slate-500 block mb-1">
                       Logradouro *
@@ -516,9 +616,11 @@ export default function CartPage() {
             <button
               type="button"
               onClick={solicitarOrcamento}
-              className="w-full flex items-center justify-center gap-2 rounded-[4px] bg-[#15803D] hover:bg-[#166534] px-4 py-3 text-sm font-bold text-white transition-colors"
+              disabled={submitting}
+              className="w-full flex items-center justify-center gap-2 rounded-[4px] bg-[#15803D] hover:bg-[#166534] px-4 py-3 text-sm font-bold text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <MessageCircle className="h-4 w-4" /> Solicitar Orcamento via WhatsApp
+              <MessageCircle className="h-4 w-4" />
+              {submitting ? "Gerando Cotação..." : "Solicitar Orcamento via WhatsApp"}
             </button>
             <p className="text-[11px] text-slate-500 text-center mt-3 leading-snug">
               O codigo do orcamento sera gerado e voce sera redirecionado para o WhatsApp com o link da cotacao.

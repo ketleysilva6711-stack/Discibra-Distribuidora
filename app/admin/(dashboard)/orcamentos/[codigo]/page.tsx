@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, CheckCircle2, Clock, FileText, MessageCircle, Printer, Package, Truck } from "lucide-react"
+import { ArrowLeft, CheckCircle2, Clock, FileText, MessageCircle, Printer, Package, Truck, User, CreditCard, MessageCircle as MsgCircle } from "lucide-react"
 import { createPublicClient } from "@/lib/supabase/public"
 import { toast } from "sonner"
 
@@ -46,17 +46,17 @@ export default function OrcamentoDetalhePage({
   const [codigo, setCodigo] = useState<string>("")
 
   const [orcamento, setOrcamento] = useState<any>(null)
-  const [orcamentoId, setOrcamentoId] = useState<string>("")
+  const [orcamentoId, setOrcamentoId] = useState<string>("");
   const [itens, setItens] = useState<any[]>([])
   const [auditoria, setAuditoria] = useState<any[]>([])
+  const [clienteFicha, setClienteFicha] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [status, setStatus] = useState("")
   const [pixKey, setPixKey] = useState("")
   const [observacao, setObservacao] = useState("")
 
-  const UUID_REGEX =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
   useEffect(() => {
     params.then((p) => setCodigo(p.codigo))
@@ -77,7 +77,7 @@ export default function OrcamentoDetalhePage({
       const isUuid = UUID_REGEX.test(codigo)
       const oRes = await supabase
         .from("orcamentos")
-        .select("*")
+        .select("*, clientes(*)")
         .eq(isUuid ? "id" : "codigo", codigo.toUpperCase())
         .maybeSingle()
 
@@ -86,6 +86,7 @@ export default function OrcamentoDetalhePage({
         setOrcamento(null)
         setItens([])
         setAuditoria([])
+        setClienteFicha(null)
         setStatus("")
         setPixKey("")
         setLoading(false)
@@ -115,6 +116,7 @@ export default function OrcamentoDetalhePage({
       setAuditoria(aRes.data || [])
       setStatus(orcamentoData.status || "")
       setPixKey(orcamentoData.pix_key || "")
+      setClienteFicha(orcamentoData.clientes?.[0] || null)
     } catch (e: any) {
       toast.error(e.message || "Erro ao carregar orçamento")
     } finally {
@@ -174,6 +176,68 @@ export default function OrcamentoDetalhePage({
     }
   }
 
+  async function handleAssumir() {
+    setSaving(true)
+    try {
+      if (!orcamentoId) throw new Error("Orçamento não carregado")
+
+      const { error } = await supabase
+        .from("orcamentos")
+        .update({
+          status: "negociando",
+          atendente_id: (await supabase.auth.getUser()).data.user?.id || null,
+          assumido_em: new Date().toISOString(),
+        })
+        .eq("id", orcamentoId)
+      if (error) throw error
+
+      toast.success("Orçamento assumido")
+      fetchOrcamento()
+    } catch (e: any) {
+      toast.error(e.message || "Erro ao assumir orçamento")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handlePrimeiraResposta() {
+    setSaving(true)
+    try {
+      if (!orcamentoId) throw new Error("Orçamento não carregado")
+
+      const agora = new Date().toISOString()
+      const criadoEm = orcamento?.criado_em
+      const tempoMin = criadoEm
+        ? Math.round((new Date(agora).getTime() - new Date(criadoEm).getTime()) / 60000)
+        : 0
+
+      const { error } = await supabase
+        .from("orcamentos")
+        .update({
+          primeira_resposta_em: agora,
+          tempo_resposta_min: tempoMin,
+          status: "negociando",
+        })
+        .eq("id", orcamentoId)
+      if (error) throw error
+
+      const { error: aErr } = await supabase.from("orcamento_auditoria").insert({
+        orcamento_id: orcamentoId,
+        status_anterior: orcamento?.status || null,
+        status_novo: "negociando",
+        observacao: `Primeira resposta em ${tempoMin} min`,
+      })
+      if (aErr) throw aErr
+
+      toast.success(`Primeira resposta registrada (${tempoMin} min)`)
+      fetchOrcamento()
+    } catch (e: any) {
+      toast.error(e.message || "Erro ao registrar resposta")
+    } finally {
+      setSaving(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-20 text-center">
@@ -189,9 +253,7 @@ export default function OrcamentoDetalhePage({
         <div className="rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] p-10 inline-block">
           <Clock className="h-10 w-10 text-slate-400 mb-4" />
           <h2 className="text-xl font-bold text-slate-900 mb-2">Orçamento não encontrado</h2>
-          <p className="text-slate-500 mb-6">
-            O código especificado não existe ou foi removido.
-          </p>
+          <p className="text-slate-500 mb-6">O código especificado não existe ou foi removido.</p>
           <Link
             href="/admin/orcamentos"
             className="inline-flex items-center justify-center gap-2 rounded-[4px] bg-[#15803D] px-4 py-2 text-sm font-bold text-white hover:bg-[#166534] transition-colors"
@@ -204,10 +266,14 @@ export default function OrcamentoDetalhePage({
   }
 
   const statusBadge = STATUS_OPTIONS.find((s) => s.value === orcamento.status) || STATUS_OPTIONS[0]
+  const jaAssumido = !!orcamento.atendente_id
+  const jaRespondeu = !!orcamento.primeira_resposta_em
+  const tempoResposta = orcamento.tempo_resposta_min
+    ? ` em ${orcamento.tempo_resposta_min} min`
+    : ""
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#E5E5E3] pb-4 bg-white p-6 rounded-[4px]">
         <div className="flex items-center gap-3">
           <Link href="/admin/orcamentos" className="text-sm text-slate-500 hover:text-slate-700 flex items-center gap-1">
@@ -222,6 +288,32 @@ export default function OrcamentoDetalhePage({
           </span>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
+          {jaAssumido ? (
+            <button disabled className="flex items-center gap-2 rounded-[4px] bg-[#15803D] px-4 py-2 text-xs font-bold text-white">
+              <User className="h-3.5 w-3.5" /> Assumido
+            </button>
+          ) : (
+            <button
+              onClick={handleAssumir}
+              disabled={saving}
+              className="flex items-center gap-2 rounded-[4px] bg-[#15803D] hover:bg-[#166534] px-4 py-2 text-xs font-bold text-white transition-colors disabled:opacity-60"
+            >
+              <User className="h-3.5 w-3.5" /> Assumir Orçamento
+            </button>
+          )}
+          {jaRespondeu ? (
+            <button disabled className="flex items-center gap-2 rounded-[4px] bg-emerald-100 text-emerald-700 px-4 py-2 text-xs font-bold">
+              <MsgCircle className="h-3.5 w-3.5" /> Respondido{tempoResposta}
+            </button>
+          ) : (
+            <button
+              onClick={handlePrimeiraResposta}
+              disabled={!jaAssumido || saving}
+              className="flex items-center gap-2 rounded-[4px] bg-amber-100 text-amber-700 hover:bg-amber-200 px-4 py-2 text-xs font-bold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <MsgCircle className="h-3.5 w-3.5" /> Primeira Resposta WhatsApp
+            </button>
+          )}
           <a
             href={`/orcamento/${orcamento.codigo}?t=${orcamento.token_acesso}`}
             target="_blank"
@@ -230,22 +322,11 @@ export default function OrcamentoDetalhePage({
           >
             <FileText className="h-3.5 w-3.5" /> Visualizar Proposta
           </a>
-          <a
-            href={`https://wa.me/${orcamento.cliente_telefone?.replace(/\D/g, "") || ""}?text=Ol%C3%A1!+Segue+seu+or%C3%A7amento+${orcamento.codigo}+da+Discibra.` + (orcamento.total ? `+Total:+R$+${Number(orcamento.total).toFixed(2)}` : "")}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-[4px] bg-[#15803D] px-4 py-2 text-xs font-semibold text-white hover:bg-[#166534] transition-colors"
-          >
-            <MessageCircle className="h-3.5 w-3.5" /> WhatsApp do Cliente
-          </a>
         </div>
       </div>
 
-      {/* Grid 2 colunas */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Esquerda: Cliente + Itens + Financeiro */}
         <div className="lg:col-span-8 space-y-6">
-          {/* Dados do Cliente */}
           <div className="rounded-[4px] border border-[#E5E5E3] bg-white p-5">
             <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">Dados do Cliente e Entrega</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -297,7 +378,6 @@ export default function OrcamentoDetalhePage({
             </div>
           </div>
 
-          {/* Tabela de Itens */}
           <div className="rounded-[4px] border border-[#E5E5E3] bg-white overflow-hidden">
             <div className="border-b border-[#E5E5E3] bg-[#FAFAF9] px-5 py-3">
               <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">Materiais Cotados</h2>
@@ -328,20 +408,12 @@ export default function OrcamentoDetalhePage({
                       <td className="px-4 py-3 text-center">{Number(i.quantidade).toLocaleString("pt-BR")}</td>
                       <td className="px-4 py-3 text-right">{brl(Number(i.preco_aplicado))}</td>
                       <td className="px-4 py-3 text-center">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[9px] font-bold ${
-                          i.tipo_preco === "palete"
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                            : i.tipo_preco === "carga_fechada"
-                              ? "bg-blue-50 text-blue-700 border-blue-200"
-                              : "bg-[#FAFAF9] text-slate-600 border-[#E5E5E3]"
-                        }`}>
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[9px] font-bold ${i.tipo_preco === "palete" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : i.tipo_preco === "carga_fechada" ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-[#FAFAF9] text-slate-600 border-[#E5E5E3]"}`}>
                           {tipoLabel}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right font-medium">{brl(sub)}</td>
-                      <td className="px-4 py-3 text-center text-slate-600 font-mono">
-                        {Number(i.peso_total_kg || 0).toLocaleString("pt-BR")} kg
-                      </td>
+                      <td className="px-4 py-3 text-center text-slate-600 font-mono">{Number(i.peso_total_kg || 0).toLocaleString("pt-BR")} kg</td>
                     </tr>
                   )
                 })}
@@ -349,7 +421,6 @@ export default function OrcamentoDetalhePage({
             </table>
           </div>
 
-          {/* Resumo Financeiro */}
           <div className="rounded-[4px] border border-[#E5E5E3] bg-white p-5">
             <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">Resumo Financeiro</h2>
             <div className="space-y-2">
@@ -365,77 +436,38 @@ export default function OrcamentoDetalhePage({
               )}
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500">Frete</span>
-                <span className="font-medium text-slate-900">
-                  {Number(orcamento.valor_frete || 0) === 0 ? "Grátis" : brl(Number(orcamento.valor_frete))}
-                </span>
+                <span className="font-medium text-slate-900">{Number(orcamento.valor_frete || 0) === 0 ? "Grátis" : brl(Number(orcamento.valor_frete))}</span>
               </div>
               <div className="border-t border-[#E5E5E3] pt-3 mt-2 flex justify-between font-bold">
                 <span className="text-sm">TOTAL GERAL</span>
                 <span className="text-base font-black text-[#C2410C]">{brl(Number(orcamento.total || 0))}</span>
               </div>
             </div>
-
-            {/* PIX */}
             <div className="mt-5 pt-4 border-t border-[#E5E5E3] rounded-[4px] border border-amber-100 bg-amber-50 p-3">
               <h3 className="text-xs font-bold uppercase tracking-wider text-amber-800 mb-2">Chave PIX da Transação</h3>
               <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={pixKey}
-                  onChange={(e) => setPixKey(e.target.value)}
-                  placeholder="ex: financeiro@discibra.com"
-                  className="flex-1 rounded-[4px] border border-amber-200 px-3 py-2 text-sm font-mono text-slate-900 outline-none focus:border-[#15803D]"
-                />
-                <button
-                  onClick={handleSavePix}
-                  disabled={saving}
-                  className="rounded-[4px] bg-[#15803D] px-3 py-2 text-xs font-bold text-white hover:bg-[#166534] disabled:opacity-60 transition-colors"
-                >
-                  {saving ? "Salvando..." : "Salvar"}
-                </button>
+                <input type="text" value={pixKey} onChange={(e) => setPixKey(e.target.value)} placeholder="ex: financeiro@discibra.com" className="flex-1 rounded-[4px] border border-amber-200 px-3 py-2 text-sm font-mono text-slate-900 outline-none focus:border-[#15803D]" />
+                <button onClick={handleSavePix} disabled={saving} className="rounded-[4px] bg-[#15803D] px-3 py-2 text-xs font-bold text-white hover:bg-[#166534] disabled:opacity-60 transition-colors">{saving ? "Salvando..." : "Salvar"}</button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Direita: Mudança de Status + Auditoria */}
         <div className="lg:col-span-4 space-y-6">
-          {/* Mudança de Status */}
           <div className="rounded-[4px] border border-[#E5E5E3] bg-white p-5">
             <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">Alterar Status</h2>
             <div className="space-y-3">
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="w-full rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] px-3 py-2.5 text-sm outline-none focus:border-[#15803D]"
-              >
-                {STATUS_OPTIONS.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
+              <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] px-3 py-2.5 text-sm outline-none focus:border-[#15803D]">
+                {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Observação</label>
-                <textarea
-                  value={observacao}
-                  onChange={(e) => setObservacao(e.target.value)}
-                  rows={2}
-                  className="w-full rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] px-3 py-2 text-sm outline-none focus:border-[#15803D]"
-                  placeholder="Ex: Pagamento confirmado via PIX"
-                />
+                <textarea value={observacao} onChange={(e) => setObservacao(e.target.value)} rows={2} className="w-full rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] px-3 py-2 text-sm outline-none focus:border-[#15803D]" placeholder="Ex: Pagamento confirmado via PIX" />
               </div>
-              <button
-                onClick={handleSaveStatus}
-                disabled={saving || status === orcamento.status}
-                className="w-full rounded-[4px] bg-[#15803D] hover:bg-[#166534] px-4 py-2 text-xs font-bold text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {saving ? "Salvando..." : "Salvar Status"}
-              </button>
+              <button onClick={handleSaveStatus} disabled={saving || status === orcamento.status} className="w-full rounded-[4px] bg-[#15803D] hover:bg-[#166534] px-4 py-2 text-xs font-bold text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed">{saving ? "Salvando..." : "Salvar Status"}</button>
             </div>
           </div>
 
-          {/* Timeline de Auditoria */}
           <div className="rounded-[4px] border border-[#E5E5E3] bg-white p-5">
             <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">Linha do Tempo de Auditoria</h2>
             <div className="space-y-3">
@@ -446,29 +478,56 @@ export default function OrcamentoDetalhePage({
                   <div key={i} className="relative pl-4 pb-3">
                     <div className="absolute left-0 top-1 w-1 h-1 rounded-full bg-slate-300" />
                     <div className="flex items-center gap-2 mb-1">
-                      <span className={`px-2 py-0.5 rounded-[2px] text-[9px] font-bold ${
-                        a.status_novo === "entregue" ? "bg-green-100 text-green-700" :
-                        a.status_novo === "cancelado" ? "bg-red-100 text-red-700" :
-                        a.status_novo === "aprovado" ? "bg-emerald-100 text-emerald-700" :
-                        "bg-slate-100 text-slate-600"
-                      }`}>
+                      <span className={`px-2 py-0.5 rounded-[2px] text-[9px] font-bold ${a.status_novo === "entregue" ? "bg-green-100 text-green-700" : a.status_novo === "cancelado" ? "bg-red-100 text-red-700" : a.status_novo === "aprovado" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
                         {STATUS_LABELS[a.status_novo] || a.status_novo}
                       </span>
                       <span className="text-[10px] text-slate-400">{new Date(a.criado_em).toLocaleString("pt-BR")}</span>
                     </div>
-                    {a.status_anterior !== null && (
-                      <p className="text-xs text-slate-500 ml-6">
-                        De: <span className="font-medium">{STATUS_LABELS[a.status_anterior] || a.status_anterior}</span>
-                      </p>
-                    )}
-                    {a.observacao && (
-                      <p className="text-xs text-slate-700 ml-6 italic">"{a.observacao}"</p>
-                    )}
+                    {a.status_anterior !== null && <p className="text-xs text-slate-500 ml-6">De: <span className="font-medium">{STATUS_LABELS[a.status_anterior] || a.status_anterior}</span></p>}
+                    {a.observacao && <p className="text-xs text-slate-700 ml-6 italic">"{a.observacao}"</p>}
                   </div>
                 ))
               )}
             </div>
           </div>
+
+          {clienteFicha && (
+            <div className="rounded-[4px] border border-[#E5E5E3] bg-white p-5">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">Ficha do Cliente</h2>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">Total de Orçamentos</span>
+                  <span className="font-medium text-slate-900">{clienteFicha.total_orcamentos}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">Aprovados</span>
+                  <span className="font-medium text-emerald-600">{clienteFicha.total_aprovados}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">Receita Total</span>
+                  <span className="font-medium text-[#111318]">{brl(clienteFicha.receita_total || 0)}</span>
+                </div>
+                {clienteFicha.primeira_compra_em && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500">Primeira Compra</span>
+                    <span className="font-medium text-slate-600">{new Date(clienteFicha.primeira_compra_em).toLocaleDateString("pt-BR")}</span>
+                  </div>
+                )}
+                {clienteFicha.ultima_compra_em && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500">Última Compra</span>
+                    <span className="font-medium text-slate-600">{new Date(clienteFicha.ultima_compra_em).toLocaleDateString("pt-BR")}</span>
+                  </div>
+                )}
+                {clienteFicha.bloqueado && (
+                  <div className="flex justify-between text-sm text-red-600">
+                    <span className="font-bold text-xs">BLOQUEADO</span>
+                    <span className="font-medium">{clienteFicha.motivo_bloqueio || "Sem motivo informado"}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
