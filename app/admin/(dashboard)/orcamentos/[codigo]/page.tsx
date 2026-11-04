@@ -46,6 +46,7 @@ export default function OrcamentoDetalhePage({
   const [codigo, setCodigo] = useState<string>("")
 
   const [orcamento, setOrcamento] = useState<any>(null)
+  const [orcamentoId, setOrcamentoId] = useState<string>("")
   const [itens, setItens] = useState<any[]>([])
   const [auditoria, setAuditoria] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -54,30 +55,66 @@ export default function OrcamentoDetalhePage({
   const [pixKey, setPixKey] = useState("")
   const [observacao, setObservacao] = useState("")
 
+  const UUID_REGEX =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
   useEffect(() => {
     params.then((p) => setCodigo(p.codigo))
   }, [])
 
   useEffect(() => {
     if (!codigo) return
+    if (codigo.toLowerCase() === "novo") {
+      router.replace("/admin/orcamentos")
+      return
+    }
     fetchOrcamento()
   }, [codigo])
 
   async function fetchOrcamento() {
     setLoading(true)
     try {
-      const [oRes, iRes, aRes] = await Promise.all([
-        supabase.from("orcamentos").select("*").eq("codigo", codigo).maybeSingle(),
-        supabase.from("orcamento_itens").select("*").eq("orcamento_id", codigo).order("ordem", { ascending: true }),
-        supabase.from("orcamento_auditoria").select("*").eq("orcamento_id", codigo).order("criado_em", { ascending: true }),
-      ])
+      const isUuid = UUID_REGEX.test(codigo)
+      const oRes = await supabase
+        .from("orcamentos")
+        .select("*")
+        .eq(isUuid ? "id" : "codigo", codigo.toUpperCase())
+        .maybeSingle()
 
       if (oRes.error) throw oRes.error
-      setOrcamento(oRes.data)
+      if (!oRes.data) {
+        setOrcamento(null)
+        setItens([])
+        setAuditoria([])
+        setStatus("")
+        setPixKey("")
+        setLoading(false)
+        return
+      }
+
+      const orcamentoData = oRes.data
+      const [iRes, aRes] = await Promise.all([
+        supabase
+          .from("orcamento_itens")
+          .select("*")
+          .eq("orcamento_id", orcamentoData.id)
+          .order("ordem", { ascending: true }),
+        supabase
+          .from("orcamento_auditoria")
+          .select("*")
+          .eq("orcamento_id", orcamentoData.id)
+          .order("criado_em", { ascending: true }),
+      ])
+
+      if (iRes.error) throw iRes.error
+      if (aRes.error) throw aRes.error
+
+      setOrcamento(orcamentoData)
+      setOrcamentoId(orcamentoData.id)
       setItens(iRes.data || [])
       setAuditoria(aRes.data || [])
-      setStatus(oRes.data?.status || "")
-      setPixKey(oRes.data?.pix_key || "")
+      setStatus(orcamentoData.status || "")
+      setPixKey(orcamentoData.pix_key || "")
     } catch (e: any) {
       toast.error(e.message || "Erro ao carregar orçamento")
     } finally {
@@ -92,14 +129,16 @@ export default function OrcamentoDetalhePage({
   async function handleSaveStatus() {
     setSaving(true)
     try {
+      if (!orcamentoId) throw new Error("Orçamento não carregado")
+
       const { error: uErr } = await supabase
         .from("orcamentos")
         .update({ status })
-        .eq("codigo", codigo)
+        .eq("id", orcamentoId)
       if (uErr) throw uErr
 
       const { error: aErr } = await supabase.from("orcamento_auditoria").insert({
-        orcamento_id: codigo,
+        orcamento_id: orcamentoId,
         status_anterior: orcamento?.status || null,
         status_novo: status,
         observacao: observacao.trim() || null,
@@ -119,10 +158,12 @@ export default function OrcamentoDetalhePage({
   async function handleSavePix() {
     setSaving(true)
     try {
+      if (!orcamentoId) throw new Error("Orçamento não carregado")
+
       const { error } = await supabase
         .from("orcamentos")
         .update({ pix_key: pixKey.trim() || null })
-        .eq("codigo", codigo)
+        .eq("id", orcamentoId)
       if (error) throw error
       toast.success("Chave PIX atualizada")
       fetchOrcamento()
@@ -133,11 +174,31 @@ export default function OrcamentoDetalhePage({
     }
   }
 
-  if (loading || !orcamento) {
+  if (loading) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-20 text-center">
         <Clock className="h-8 w-8 animate-spin text-slate-400 mb-2" />
         <p className="text-slate-500">Carregando orçamento...</p>
+      </div>
+    )
+  }
+
+  if (!orcamento) {
+    return (
+      <div className="mx-auto max-w-4xl px-4 py-20 text-center">
+        <div className="rounded-[4px] border border-[#E5E5E3] bg-[#FAFAF9] p-10 inline-block">
+          <Clock className="h-10 w-10 text-slate-400 mb-4" />
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Orçamento não encontrado</h2>
+          <p className="text-slate-500 mb-6">
+            O código especificado não existe ou foi removido.
+          </p>
+          <Link
+            href="/admin/orcamentos"
+            className="inline-flex items-center justify-center gap-2 rounded-[4px] bg-[#15803D] px-4 py-2 text-sm font-bold text-white hover:bg-[#166534] transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" /> Voltar para Orçamentos
+          </Link>
+        </div>
       </div>
     )
   }
