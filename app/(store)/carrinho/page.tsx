@@ -123,6 +123,32 @@ export default function CartPage() {
     if (!idempotencyKey) {
       setIdempotencyKey(crypto.randomUUID())
     }
+    // Auto-recuperar preços zerados de itens legados no localStorage
+    const itensComPrecoZero = cartDoStorage.filter((i) => Number(i.preco_aplicado) <= 0)
+    if (itensComPrecoZero.length > 0) {
+      const nomes = itensComPrecoZero.map((i) => i.name).join(",")
+      fetch(`/api/search-products?q=${encodeURIComponent(nomes)}`)
+        .then((r) => r.json())
+        .then((data: any) => {
+          const produtos = data.produtos || data || []
+          setCart((prev) =>
+            prev.map((i) => {
+              const p = produtos.find((prod: any) => prod.sku === i.sku || prod.name === i.name)
+              if (p) {
+                const preco = Number(p.preco_avulso || p.price || 0)
+                return {
+                  ...i,
+                  preco_tabela: preco,
+                  preco_aplicado: preco,
+                  subtotal: preco * i.qty,
+                }
+              }
+              return i
+            })
+          )
+        })
+        .catch(() => {})
+    }
   }, [])
 
   // Calcular totais

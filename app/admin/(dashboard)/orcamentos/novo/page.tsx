@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
-import { createPublicClient } from "@/lib/supabase/public"
+import { createClient } from "@/lib/supabase/client"
 import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon"
 import { toast } from "sonner"
 import { Search, Phone, ArrowLeft, Plus, Trash2, Truck, MapPin, CreditCard, FileText, User, Clock, Minus } from "lucide-react"
 
-const supabase = createPublicClient()
+const supabase = createClient()
 
 const brl = (n: number) =>
   "R$ " + (Number(n) || 0).toLocaleString("pt-BR", {
