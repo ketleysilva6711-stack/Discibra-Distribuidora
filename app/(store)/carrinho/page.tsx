@@ -6,7 +6,6 @@ import Link from "next/link"
 import { ShoppingCart, ArrowLeft, Printer, Trash2 } from "lucide-react"
 import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon"
 import { toast } from "sonner"
-import { createQuoteAction } from "@/app/actions/quote"
 import VolumeUpsellBar from "@/components/checkout/VolumeUpsellBar"
 import CartItemRow from "@/components/checkout/CartItemRow"
 import FreightCalculatorBox from "@/components/checkout/FreightCalculatorBox"
@@ -332,58 +331,49 @@ export default function CartPage() {
     setSubmitting(true)
 
     try {
-      const {
-        success,
-        codigo,
-        token,
-        total: totalGerado,
-        whatsappUrl,
-        error,
-        idempotente,
-      } = await createQuoteAction({
-        idempotencyKey: idempotencyKey!,
-        cliente: {
-          nome: clienteNome.trim(),
-          telefone: clienteTelefone,
-          email: clienteEmail || "",
-          consentimentoLgpd,
-        },
-        metodo_entrega: metodoEntrega,
-        entrega: metodoEntrega === "entrega" ? { ...endereco, cep: cep.replace(/\D/g, "") } : undefined,
-        pagamento:
-          formaPagamento === "pix"
-            ? { forma: "pix" }
-            : { forma: "cartao", parcelas: parcelasCartao },
-        itens: cart.map((i) => ({
-          produtoId: i.id,
-          quantidade: i.qty,
-        })),
-        origem: {
-          utmSource: undefined,
-          utmMedium: undefined,
-          utmCampaign: undefined,
-          pagina: "/carrinho",
-        },
+      const res = await fetch("/api/orcamentos/criar-publico", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cliente_nome: clienteNome.trim(),
+          cliente_telefone: clienteTelefone,
+          cliente_email: clienteEmail || null,
+          endereco_cep: metodoEntrega === "entrega" ? cep.replace(/\D/g, "") : null,
+          endereco_logradouro: metodoEntrega === "entrega" ? endereco.logradouro.trim() || null : null,
+          endereco_numero: metodoEntrega === "entrega" ? endereco.numero.trim() || null : null,
+          endereco_complemento: endereco.complemento.trim() || null,
+          endereco_bairro: metodoEntrega === "entrega" ? endereco.bairro.trim() || null : null,
+          endereco_cidade: metodoEntrega === "entrega" ? endereco.cidade.trim() || null : null,
+          endereco_uf: metodoEntrega === "entrega" ? (endereco.uf || "SP").toUpperCase() : null,
+          metodo_entrega: metodoEntrega,
+          forma_pagamento: formaPagamento,
+          valor_frete: valorFrete,
+          itens: cart.map((i) => ({
+            produto_id: i.id,
+            nome_produto: i.name,
+            sku: i.sku || null,
+            quantidade: i.qty,
+            preco_aplicado: i.preco_aplicado,
+            preco_tabela: i.preco_tabela,
+            tipo_preco: i.tipo_preco,
+            unidade: i.unit || "un",
+          })),
+        }),
       })
 
-      if (!success) {
-        if (error === "CLIENTE_BLOQUEADO") {
-          toast.error("Este cliente esta bloqueado. Entre em contato com a administracao.")
-        } else {
-          toast.error(error || "Erro ao gerar orcamento.")
-        }
+      const data = await res.json()
+
+      if (!res.ok || !data.success) {
+        toast.error(data.error || "Erro ao gerar orcamento.")
         return
       }
 
-      // Abrir WhatsApp com o link da cotacao
-      if (whatsappUrl) {
-        window.open(whatsappUrl, "_blank", "noopener,noreferrer")
-      }
+      const { codigo, token_acesso, redirectUrl } = data
 
       // Disparar eventos de analytics
       trackQuoteCreated({
         codigo,
-        total: totalGerado ?? 0,
+        total: data.total ?? 0,
         formaPagamento: formaPagamento,
         items: cart.map((i) => ({
           id: i.id,
@@ -395,7 +385,7 @@ export default function CartPage() {
 
       trackWhatsAppClick({
         codigo,
-        total: totalGerado ?? 0,
+        total: data.total ?? 0,
         origem: "checkout_finalize",
         items: cart.map((i) => ({
           id: i.id,
@@ -406,16 +396,12 @@ export default function CartPage() {
       })
 
       // Redirecionar para a pagina publica do orcamento
-      window.location.href = `/orcamento/${codigo}?t=${token}`
+      window.location.href = redirectUrl
 
       // Limpar carrinho
       clearCart()
 
-      toast.success(
-        idempotente
-          ? `Orcamento ${codigo} ja existia (reutilizado).`
-          : `Orcamento ${codigo} gerado com sucesso!`
-      )
+      toast.success(`Orcamento ${codigo} gerado com sucesso!`)
     } catch (e: any) {
       toast.error(e.message || "Erro ao gerar orcamento.")
     } finally {
