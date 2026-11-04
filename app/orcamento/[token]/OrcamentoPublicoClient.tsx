@@ -1,8 +1,9 @@
 "use client"
-import { useState } from "react"
+
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { CheckCircle2, MessageCircle, Printer, Clock, Package } from "lucide-react"
+import { CheckCircle2, MessageCircle, Printer, Package, Clock } from "lucide-react"
 import { SITE, waLink } from "@/lib/site-config"
 import { toast } from "sonner"
 
@@ -20,103 +21,90 @@ export default function OrcamentoPublicoClient({
 }: {
   quotation: any
 }) {
-  const [approving, setApproving] = useState(false)
-  const [approved, setApproved] = useState(quotation.status === "approved")
+  const [viewed, setViewed] = useState(false)
+  const [approved, setApproved] = useState(quotation.status === "aprovado")
   const lead = quotation.quotation_leads || {}
-  const items = (quotation.quotation_items || []).sort((a: any, b: any) => a.sort_order - b.sort_order)
-  const subtotalBruto = items.reduce((s: number, i: any) => s + Number(i.unit_price) * Number(i.qty), 0)
-  const descontoItens = items.reduce(
-    (s: number, i: any) => s + Number(i.unit_price) * Number(i.qty) * (Number(i.discount_pct) / 100),
-    0,
-  )
-  const subtotalLiq = subtotalBruto - descontoItens
-  const descontoGlobal = subtotalLiq * (Number(quotation.discount_pct) / 100)
-  const frete = Number(quotation.shipping_value) || 0
-  const total = subtotalLiq - descontoGlobal + frete
+  const items = (quotation.quotation_items || []).sort((a: any, b: any) => a.ordem - b.ordem)
+  const subtotal = items.reduce((s: number, i: any) => s + Number(i.preco_aplicado) * Number(i.quantidade), 0)
+  const descontoPix = Number(quotation.desconto_pix) || 0
+  const valorFrete = Number(quotation.valor_frete) || 0
+  const total = Number(quotation.total) || 0
 
-  async function handleApprove() {
-    setApproving(true)
-    const res = await fetch(`/api/orcamentos/${quotation.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "approved" }),
-    })
-    setApproving(false)
-    if (res.ok) {
-      setApproved(true)
-      toast.success("Orçamento aprovado! Entraremos em contato em breve.")
-    } else {
-      toast.error("Não foi possível aprovar. Contate-nos pelo WhatsApp.")
-    }
-  }
+  // Registrar visualizacao via endpoint com Service Role
+  useEffect(() => {
+    if (viewed) return
+    const token = new URLSearchParams(window.location.search).get("t")
+    if (!token) return
+    fetch(`/api/quotes/${token}/view`)
+      .then(() => setViewed(true))
+      .catch(() => {})
+  }, [viewed])
 
-  const waMsg = `Olá, Discibra! Estou confirmando a aprovação do orçamento *${quotation.code}* no valor de *${brl(total)}*. Podemos avançar?`
+  const formaPagamentoTexto = quotation.forma_pagamento === "pix" ? "PIX (3% de desconto)" : "Cartao de credito"
+  const waMsg = `Olá, Discibra! Solicito atendimento para o orçamento *${quotation.codigo}*. Cliente: *${lead.name || "Cliente"}* Total: R$ ${brl(total)} (${formaPagamentoTexto}). Acesse os detalhes: ${SITE.siteUrl}/orcamento/${quotation.codigo}?t=${quotation.token_acesso}`
+
+  const brlFrete = valorFrete === 0 ? "Gratis" : brl(valorFrete)
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[#FAFAF9]">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 px-4 py-4">
+      <header className="bg-white border-b border-[#E5E5E3] px-4 py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <Link href="/">
             <Image src="/brand/logo-trim.png" alt="Discibra" width={140} height={40} className="h-9 w-auto object-contain" />
           </Link>
-          <button onClick={() => window.print()} className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 transition">
+          <button onClick={() => window.print()} className="flex items-center gap-2 rounded-[4px] px-3 py-1.5 text-sm text-slate-500 border border-[#E5E5E3] hover:text-slate-800 transition">
             <Printer className="h-4 w-4" /> Imprimir
           </button>
         </div>
       </header>
+
       <main className="max-w-3xl mx-auto px-4 py-8">
         {/* Status Banner */}
         {approved && (
-          <div className="mb-6 flex items-center gap-3 rounded-xl bg-emerald-50 border border-emerald-200 px-5 py-4">
-            <CheckCircle2 className="h-6 w-6 text-emerald-600 shrink-0" />
+          <div className="mb-6 flex items-center gap-3 rounded-[4px] bg-emerald-50 border border-emerald-200 px-4 py-3">
+            <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
             <div>
-              <p className="font-bold text-emerald-800">Orçamento aprovado!</p>
+              <p className="font-bold text-emerald-800">Orcamento aprovado!</p>
               <p className="text-sm text-emerald-700">
-                Nossa equipe entrará em contato para confirmar os detalhes de entrega e pagamento.
+                Nossa equipe entrara em contato para confirmar os detalhes de entrega e pagamento.
               </p>
             </div>
           </div>
         )}
-        {/* Título */}
+
+        {/* Titulo */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-1">
             <Package className="h-5 w-5 text-[#C2410C]" />
             <h1 className="text-xl font-bold text-slate-900">Proposta Comercial</h1>
           </div>
-          <p className="text-2xl font-black text-[#C2410C]">{quotation.code}</p>
-          <p className="text-sm text-slate-500 mt-1">Emitida em {fmtDate(quotation.created_at)}</p>
-          {quotation.valid_until && (
-            <div className="mt-2 inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 text-xs font-bold px-3 py-1.5 rounded-full border border-amber-200">
-              <Clock className="h-3 w-3" /> Válida até {fmtDate(quotation.valid_until)}
-            </div>
-          )}
+          <p className="text-2xl font-black text-[#C2410C]">{quotation.codigo}</p>
+          <p className="text-sm text-slate-500 mt-1">Emitida em {fmtDate(quotation.criado_em)}</p>
         </div>
+
         {/* Dados cliente */}
         {lead.name && (
-          <div className="bg-white rounded-xl border border-slate-200 p-5 mb-5">
+          <div className="bg-white rounded-[4px] border border-[#E5E5E3] p-4 mb-5">
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Cliente</p>
-            <p className="font-bold text-slate-900">{lead.company || lead.name}</p>
-            {lead.cpf_cnpj && <p className="text-sm text-slate-600">CPF/CNPJ: {lead.cpf_cnpj}</p>}
+            <p className="font-bold text-slate-900">{lead.name}</p>
             {lead.phone && <p className="text-sm text-slate-600">WhatsApp: {lead.phone}</p>}
             {lead.email && <p className="text-sm text-slate-600">E-mail: {lead.email}</p>}
           </div>
         )}
+
         {/* Itens */}
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-5">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest px-5 pt-4 pb-2">
-            Materiais
-          </p>
-          <div className="divide-y divide-slate-100">
+        <div className="bg-white rounded-[4px] border border-[#E5E5E3] overflow-hidden mb-5">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest px-4 pt-3 pb-2">Materiais</p>
+          <div className="divide-y divide-[#E5E5E3]">
             {items.map((item: any, i: number) => {
-              const sub = Number(item.unit_price) * Number(item.qty) * (1 - Number(item.discount_pct) / 100)
+              const sub = Number(item.preco_aplicado) * Number(item.quantidade)
               return (
-                <div key={item.id} className="px-5 py-3 flex items-center justify-between gap-4">
+                <div key={item.id} className="px-4 py-3 flex items-center justify-between gap-4">
                   <div className="flex-1">
-                    <p className="font-semibold text-slate-900">{item.product_name}</p>
+                    <p className="font-semibold text-slate-900">{item.nome_produto}</p>
                     <p className="text-xs text-slate-500">
-                      {Number(item.qty).toLocaleString("pt-BR")} {item.unit} × {brl(item.unit_price)}
-                      {Number(item.discount_pct) > 0 ? ` (−${item.discount_pct}%)` : ""}
+                      {Number(item.quantidade).toLocaleString("pt-BR")} {item.unidade} × {brl(item.preco_aplicado)}
                     </p>
                   </div>
                   <p className="font-bold text-slate-900 shrink-0">{brl(sub)}</p>
@@ -125,87 +113,56 @@ export default function OrcamentoPublicoClient({
             })}
           </div>
         </div>
+
         {/* Totais */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
+        <div className="bg-white rounded-[4px] border border-[#E5E5E3] p-4 mb-6">
           <div className="space-y-2 text-sm">
-            {descontoItens > 0 && (
+            {descontoPix > 0 && (
               <div className="flex justify-between text-slate-600">
-                <span>Desconto nos itens:</span>
-                <span className="text-emerald-600 font-semibold">− {brl(descontoItens)}</span>
-              </div>
-            )}
-            {Number(quotation.discount_pct) > 0 && (
-              <div className="flex justify-between text-slate-600">
-                <span>Desconto geral ({quotation.discount_pct}%):</span>
-                <span className="text-emerald-600 font-semibold">− {brl(descontoGlobal)}</span>
+                <span>Desconto PIX (3%):</span>
+                <span className="text-emerald-600 font-semibold">- {brl(descontoPix)}</span>
               </div>
             )}
             <div className="flex justify-between text-slate-600">
               <span>Frete:</span>
-              <span>{frete > 0 ? brl(frete) : "A calcular"}</span>
+              <span>{brlFrete}</span>
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-slate-200 flex justify-between items-center">
+          <div className="mt-4 pt-4 border-t border-[#E5E5E3] flex justify-between items-center">
             <span className="text-base font-bold text-slate-900">Total</span>
             <span className="text-2xl font-black text-[#C2410C]">{brl(total)}</span>
           </div>
         </div>
-        {/* Pagamento */}
-        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 mb-6">
-          <p className="text-xs font-bold text-emerald-800 uppercase tracking-widest mb-3">
-            Formas de pagamento
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {["💵 PIX", "💳 12x no cartão", "🔗 Link de pagamento"].map((p) => (
-              <span key={p} className="bg-white text-emerald-800 text-xs font-semibold px-3 py-1.5 rounded-full border border-emerald-300">
-                {p}
-              </span>
-            ))}
-          </div>
-          {quotation.payment_terms && quotation.payment_terms !== "A definir pelo atendente" && (
-            <p className="mt-3 text-sm text-emerald-800 italic">{quotation.payment_terms}</p>
-          )}
-        </div>
-        {/* Observações */}
-        {quotation.notes_client && (
-          <div className="bg-slate-100 rounded-xl p-5 mb-6">
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Observações</p>
-            <p className="text-sm text-slate-700">{quotation.notes_client}</p>
-          </div>
-        )}
+
         {/* CTAs */}
-        {!approved && (
-          <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3">
+          {!approved && (
             <button
-              onClick={handleApprove}
-              disabled={approving}
-              className="w-full py-4 bg-[#C2410C] text-white font-bold rounded-xl text-base hover:bg-[#9a3409] transition disabled:opacity-60"
+              className="w-full py-4 bg-[#15803D] text-white font-bold rounded-[4px] text-base transition hover:bg-[#166534] flex items-center justify-center gap-2"
+              disabled={false}
             >
-              {approving ? "Aprovando..." : "✅ Aprovar este orçamento"}
+              {approved ? "Aprovado" : "Solicitar ajuste pelo WhatsApp"}
             </button>
-            <a
-              href={waLink(waMsg)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-4 bg-[#25D366] text-white font-bold rounded-xl text-base text-center hover:bg-[#1fba58] transition flex items-center justify-center gap-2"
+          )}
+          {approved && (
+            <button
+              className="w-full py-4 bg-[#15803D] text-white font-bold rounded-[4px] text-base transition hover:bg-[#166534] flex items-center justify-center gap-2"
             >
-              <MessageCircle className="h-5 w-5" /> Solicitar ajuste pelo WhatsApp
-            </a>
-          </div>
-        )}
-        {approved && (
+              Falar com atendente pelo WhatsApp
+            </button>
+          )}
           <a
             href={waLink(waMsg)}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-4 bg-[#25D366] text-white font-bold rounded-xl text-base text-center flex items-center justify-center gap-2 hover:bg-[#1fba58] transition"
+            className="w-full py-4 bg-[#25D366] text-white font-bold rounded-[4px] text-base text-center hover:bg-[#1fba58] transition flex items-center justify-center gap-2"
           >
-            <MessageCircle className="h-5 w-5" /> Falar com atendente pelo WhatsApp
+            <MessageCircle className="h-4 w-4" /> Conversar com Atendente no WhatsApp
           </a>
-        )}
-        <p className="text-center text-xs text-slate-400 mt-8">
-          {SITE.legalName} · {SITE.phoneDisplay}
-        </p>
+          <p className="text-center text-xs text-slate-400 mt-8">
+            {SITE.legalName} · {SITE.phoneDisplay}
+          </p>
+        </div>
       </main>
     </div>
   )
